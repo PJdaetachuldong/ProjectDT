@@ -40,8 +40,21 @@ private:
 	class UMovemontComponent* Movement;
 	UPROPERTY(VisibleAnywhere)
 	class UStateComponent* State;
-	UPROPERTY(EditAnywhere)
-	class UInputAction* IA_
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class UInputAction* IA_MoveForward;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInputAction* IA_MoveRight;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInputAction* IA_VerticalLook;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInputAction* IA_HorizontalLook;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInputAction* IA_Dash;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInputAction* IA_Avoid;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInputMappingContext* IMC;
 
 
 	UPROPERTY(EditAnywhere)

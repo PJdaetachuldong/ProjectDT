@@ -20,7 +20,7 @@ UMovemontComponent::UMovemontComponent()
 void UMovemontComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+	OwnerCharacter = Cast<ACharacter>(GetOwner());
 	// ...
 
 }
@@ -66,10 +66,10 @@ void UMovemontComponent::DisableControlRotation()
 	OwnerCharacter->GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
-void UMovemontComponent::OnMoveForward(float InAxis)
+void UMovemontComponent::OnMoveForward(const FInputActionValue& Value)
 {
 	if (!bCanMove)return;
-
+	FVector2D Scale = Value.Get<FVector2D>();
 
 	FRotator rotator = FRotator(0, OwnerCharacter->GetControlRotation().Yaw, 0);
 	FVector direction = FQuat(rotator).GetForwardVector();
@@ -77,7 +77,7 @@ void UMovemontComponent::OnMoveForward(float InAxis)
 	if (bTopViewCamera)
 		direction = FVector::XAxisVector;
 
-	OwnerCharacter->AddMovementInput(direction, InAxis);
+	OwnerCharacter->AddMovementInput(direction, Scale.Size());
 }
 
 void UMovemontComponent::OnMoveRight(float InAxis)

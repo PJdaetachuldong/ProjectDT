@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputActionValue.h"
 #include "MovemontComponent.generated.h"
 
 UENUM()
@@ -64,7 +65,7 @@ public:
 	void DisableControlRotation();
 
 public:
-	void OnMoveForward(float InAxis);
+	void OnMoveForward(const FInputActionValue& Value);
 	void OnMoveRight(float InAxis);
 	void OnHorizontalLook(float InAxis);
 	void OnVerticalLook(float InAxis);
