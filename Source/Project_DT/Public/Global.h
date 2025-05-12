@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "DrawDebugHelpers.h"
 
@@ -8,3 +8,4 @@
 
 #include "Utilities/CHelper.h"
 #include "Utilities/CLog.h"
+#include "Utilities/CAssetPath.h"
