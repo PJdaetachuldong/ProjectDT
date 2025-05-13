@@ -6,9 +6,6 @@
 #include "Familiar/CFamiliarBase.h"
 #include "CFamiliarWolf.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class PROJECT_DT_API ACFamiliarWolf : public ACFamiliarBase
 {
@@ -23,9 +20,11 @@ protected:
 
 public:
 	virtual void Tick ( float DeltaTime ) override;
-
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
+	class UCWolfFSM* WolfFSM;
 public://오버라이드 할 것 같은 항목
-	virtual void OnWeaponChanged ( );	// 무기에 따른 소환수 변화
-	virtual void AssistAttack ( );	// 보조 공격
-	virtual void SetTarget ( );		// 타겟 지정
+	// virtual void OnWeaponChanged ( );	// 무기에 따른 소환수 변화
+	// virtual void AssistAttack ( );	// 보조 공격
+	// virtual void SetTarget ( );		// 타겟 지정
 };
