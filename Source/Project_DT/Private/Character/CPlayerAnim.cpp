@@ -19,6 +19,7 @@ void UCPlayerAnim::NativeUpdateAnimation ( float DeltaSeconds )
 	Super::NativeUpdateAnimation ( DeltaSeconds );
 
 	CheckNull ( OwnerCharacter );
+	isMontagePlaying = Montage_IsPlaying ( nullptr );
 	Speed = OwnerCharacter->GetVelocity ( ).Size2D ( );
 	auto Owner = Cast<ACPlayer> ( TryGetPawnOwner ( ) );
 	Movement = Owner->GetCharacterMovement();

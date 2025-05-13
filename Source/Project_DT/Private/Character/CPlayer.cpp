@@ -17,6 +17,7 @@
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputAction.h"
 #include "Component/CTrajectoryComponent.h"
 #include "Character/CPlayerAnim.h"
+#include "Weapons/CWeaponComponent.h"
 // Sets default values
 ACPlayer::ACPlayer()
 {
@@ -43,8 +44,7 @@ ACPlayer::ACPlayer()
 
 	GetCharacterMovement ( )->RotationRate = FRotator ( ( 0 , 720 , 0 ) );
 
-
-	//CHelpers::CreateActorComponent<UCWeaponComponent> ( this , &Weapon , "Weapon" );
+	CHelpers::CreateActorComponent<UCWeaponComponent> ( this , &Weapon , "Weapon" );
 	CHelpers::CreateActorComponent<UCMointageComponent> ( this , &Montages , "Montages" );
 	CHelpers::CreateActorComponent<UCMovementComponent> ( this , &Movement , "Movement" );
 	CHelpers::CreateActorComponent<UCStateComponent> ( this , &State , "State" );
@@ -111,11 +111,7 @@ void ACPlayer::OnAvoid ( )
 {
 	if ( !State->IsIdleMode ( ) ) return;
 	if ( !Movement->CanMove ( ) ) return;
-	//if ( InputComponent->GetAxisValue ( "MoveForward" ) >= 0.0f ) {
-
-
-	//}
-		State->SetBackStepMode ( );
+		State->SetBackStepMode ();
 }
 
 void ACPlayer::BackStep ()
@@ -123,11 +119,9 @@ void ACPlayer::BackStep ()
 	Movement->EnableControlRotation ();
 
 	Montages->PlayBackStepMode ();
-	//auto A = Cast<UCPlayerAnim> ( GetMesh ( )->GetAnimInstance ( ) );
-	//A->isDodge = true;
-	//FTimerHandle handle;
-	//GetWorld ( )->GetTimerManager ( ).SetTimer(handle, [A]( ) {
-	//	A->isDodge = false;
-	//	},0.2,false);
 }
+void ACPlayer::End_BackStep() {
+	//Movement->DisableControlRotation ( );
 
+	State->SetIdleMode ( );
+}

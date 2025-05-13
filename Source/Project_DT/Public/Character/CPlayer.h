@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Component/CStateComponent.h"
+#include "ICharacter.h"
 #include "CPlayer.generated.h"
 
 UCLASS()
-class PROJECT_DT_API ACPlayer : public ACharacter
+class PROJECT_DT_API ACPlayer : public ACharacter , public IICharacter
 {
 	GENERATED_BODY()
 
@@ -18,8 +19,8 @@ private:
 	UPROPERTY ( VisibleAnywhere )
 	class UCameraComponent* Camera;
 private:
-	//UPROPERTY(VisibleAnywhere)
-	//class UCWeaponComponent* Weapon;
+	UPROPERTY(VisibleAnywhere)
+	class UCWeaponComponent* Weapon;
 
 	UPROPERTY(VisibleAnywhere)
 	class UCMointageComponent* Montages;
@@ -70,5 +71,8 @@ private:
 	void OnAvoid();
 private:
 	void BackStep();
+
+public:
+	void End_BackStep() override;
 
 };

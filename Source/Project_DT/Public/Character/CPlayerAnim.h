@@ -25,7 +25,8 @@ protected:
 	class UCTrajectoryComponent* Trajectory;
 public:
 	UPROPERTY(BlueprintReadOnly,Category="Anim" )
-	bool isDodge=false;
+	bool isMontagePlaying=false;
+
 
 
 public:
