@@ -3,6 +3,7 @@
 
 #include "Component/CMointageComponent.h"
 #include "GameFramework/Character.h"
+#include "Utilities/CHelper.h"
 
 // Sets default values for this component's properties
 UCMointageComponent::UCMointageComponent()
@@ -82,7 +83,7 @@ void UCMointageComponent::PlayDeadMode ( )
 
 void UCMointageComponent::PlayAnimMontage ( EStateType InType )
 {
-	if ( !OwnerCharacter ) return;
+	CheckNull ( OwnerCharacter );
 
 	FMontagesData* data = Datas[(int32)InType];
 

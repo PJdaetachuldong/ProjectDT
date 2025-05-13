@@ -16,6 +16,7 @@
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputMappingContext.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputAction.h"
 #include "Component/CTrajectoryComponent.h"
+#include "Character/CPlayerAnim.h"
 // Sets default values
 ACPlayer::ACPlayer()
 {
@@ -93,6 +94,7 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction ( IA_HorizontalLook , ETriggerEvent::Triggered , Movement , &UCMovementComponent::OnHorizontalLook );
 		playerInput->BindAction ( IA_Dash , ETriggerEvent::Started , Movement , &UCMovementComponent::OnSprint);
 		playerInput->BindAction ( IA_Dash , ETriggerEvent::Completed , Movement , &UCMovementComponent::OnRun);
+		playerInput->BindAction ( IA_Avoid , ETriggerEvent::Completed , this , &ACPlayer::OnAvoid );
 	}
 
 }
@@ -109,11 +111,11 @@ void ACPlayer::OnAvoid ( )
 {
 	if ( !State->IsIdleMode ( ) ) return;
 	if ( !Movement->CanMove ( ) ) return;
-	if ( InputComponent->GetAxisValue ( "MoveForward" ) >= 0.0f ) {
+	//if ( InputComponent->GetAxisValue ( "MoveForward" ) >= 0.0f ) {
 
 
+	//}
 		State->SetBackStepMode ( );
-	}
 }
 
 void ACPlayer::BackStep ()
@@ -121,5 +123,11 @@ void ACPlayer::BackStep ()
 	Movement->EnableControlRotation ();
 
 	Montages->PlayBackStepMode ();
+	//auto A = Cast<UCPlayerAnim> ( GetMesh ( )->GetAnimInstance ( ) );
+	//A->isDodge = true;
+	//FTimerHandle handle;
+	//GetWorld ( )->GetTimerManager ( ).SetTimer(handle, [A]( ) {
+	//	A->isDodge = false;
+	//	},0.2,false);
 }
 

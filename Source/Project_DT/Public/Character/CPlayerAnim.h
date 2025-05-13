@@ -23,6 +23,10 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly,Category="Anim" )
 	class UCTrajectoryComponent* Trajectory;
+public:
+	UPROPERTY(BlueprintReadOnly,Category="Anim" )
+	bool isDodge=false;
+
 
 public:
 	void NativeBeginPlay ( ) override;
