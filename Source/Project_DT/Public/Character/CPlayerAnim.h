@@ -4,11 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Weapons/CWeaponComponent.h"
 #include "CPlayerAnim.generated.h"
 
-/**
- *
- */
 UCLASS()
 class PROJECT_DT_API UCPlayerAnim : public UAnimInstance
 {
@@ -26,7 +24,9 @@ protected:
 public:
 	UPROPERTY(BlueprintReadOnly,Category="Anim" )
 	bool isMontagePlaying=false;
-
+protected:
+	UPROPERTY ( BlueprintReadOnly , EditAnywhere , Category = "Animation" )
+	EWeaponType WeaponType = EWeaponType::Max;
 
 
 public:
@@ -34,7 +34,10 @@ public:
 	void NativeUpdateAnimation ( float DeltaSeconds ) override;
 
 private:
-	class ACharacter* OwnerCharacter;
+	void OnWeaponTypeChanged ( EWeaponType InPrevType , EWeaponType InNewType );
 
+private:
+	class ACharacter* OwnerCharacter;
+	class UCWeaponComponent* Weapon;
 
 };

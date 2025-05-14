@@ -2,21 +2,20 @@
 
 
 #include "Weapons/CWeaponStuctures.h"
-#include "Weapons/CEquipment.h"
-#include "GameFramework/Character.h"
+#include "Global.h"
 #include "Component/CMovementComponent.h"
-#include "Component/CStateComponent.h"
-#include "Utilities/CHelper.h"
 
-//void UCEquipment::BeginPlay ( ACharacter* InOwner , const FEquipmentData& InData ) {
-//	OwnerCharacter = InOwner;
-//	Data = InData;
-//
-//	Movement = CHelpers::GetComponent<UCMovementComponent> ( InOwner );
-//	State = CHelpers::GetComponent<UCStateComponent> ( InOwner );
-//}
-//void UCEquipment::Equip_Implementation ( ) {
-//	State->SetEquipMode ( );
-//
-//
-//}
+void FDoActionData::DoAction ( class ACharacter* InOwner )
+{
+	UCMovementComponent* movement = CHelpers::GetComponent<UCMovementComponent> ( InOwner );
+
+	if ( !!movement ) {
+		if ( bFixedCamera )
+			movement->EnableFixedCamera ( );
+
+		if ( bCanMove == false )
+			movement->Stop ( );
+	}
+	if ( !!Montage )
+		InOwner->PlayAnimMontage ( Montage , PlayRate );
+}

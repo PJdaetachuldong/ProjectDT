@@ -6,6 +6,8 @@
 #include "Weapons/CWeaponAsset.h"
 #include "Utilities/CHelper.h"
 #include "Component/CStateComponent.h"
+#include "Weapons/CEquipment.h"
+#include "Weapons/CDoAction.h"
 
 // Sets default values for this component's properties
 UCWeaponComponent::UCWeaponComponent()
@@ -37,33 +39,53 @@ class ACAttachment* UCWeaponComponent::GetAttachment ( )
 	return DataAssets[(int32)Type]->GetAttachment();
 }
 
-//class UCEquipment* UCWeaponComponent::GetEquipment ( )
-//{
-//	CheckTrueResult ( IsUnarmedMode ( ) , nullptr );
-//	CheckFalseResult ( !!DataAssets[(int32)Type] , nullptr );
-//
-//	return DataAssets[(int32)Type]->GetEquipment ();
-//}
+class UCEquipment* UCWeaponComponent::GetEquipment ( )
+{
+	CheckTrueResult ( IsUnarmedMode ( ) , nullptr );
+	CheckFalseResult ( !!DataAssets[(int32)Type] , nullptr );
+
+	return DataAssets[(int32)Type]->GetEquipment ( );
+}
+
+class UCDoAction* UCWeaponComponent::GetDoAction ( )
+{
+	CheckTrueResult ( IsUnarmedMode ( ) , nullptr );
+	CheckFalseResult ( !!DataAssets[(int32)Type] , nullptr );
+
+	return DataAssets[(int32)Type]->GetDoAction ();
+}
 
 void UCWeaponComponent::SetUnarmedMode ( )
 {
-	//GetEquipment ( )->Unequip ( );
+	CheckFalse ( IsIdleMode ( ) );
+
+	GetEquipment ( )->Unequip ( );
+
 	ChangeType ( EWeaponType::Max );
 }
 
 void UCWeaponComponent::SetFistMode ( )
 {
-
+	CheckFalse ( IsIdleMode ( ) );
+	SetMode ( EWeaponType::Fist );
 }
 
 void UCWeaponComponent::SetKatanaMode ( )
 {
-
+	CheckFalse ( IsIdleMode ( ) );
+	SetMode ( EWeaponType::Katana );
 }
 
 void UCWeaponComponent::SetSwordMode ( )
 {
+	CheckFalse ( IsIdleMode ( ) );
+	SetMode ( EWeaponType::Sword );
+}
 
+void UCWeaponComponent::DoAction ( )
+{
+	if ( !!GetDoAction ( ) )
+		GetDoAction ( )->DoAction ( );
 }
 
 void UCWeaponComponent::SetMode ( EWeaponType InType )
@@ -73,6 +95,12 @@ void UCWeaponComponent::SetMode ( EWeaponType InType )
 		SetUnarmedMode ( );
 
 		return;
+	}
+	else if ( IsUnarmedMode ( ) == false )
+		GetEquipment ( )->Unequip ( );
+	if ( !!DataAssets[( int32 )InType]) {
+		DataAssets[(int32)InType]->GetEquipment ( )->Equip ( );
+		ChangeType ( InType );
 	}
 }
 

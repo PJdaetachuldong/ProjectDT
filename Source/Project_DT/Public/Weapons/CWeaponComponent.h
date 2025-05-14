@@ -38,12 +38,15 @@ public:
 
 public:
 	class ACAttachment* GetAttachment ( );
-	//class UCEquipment* GetEquipment ( );
+	class UCEquipment* GetEquipment ( );
+	class UCDoAction* GetDoAction ( );
 public:
 	void SetUnarmedMode ( );
 	void SetFistMode ( );
 	void SetKatanaMode ( );
 	void SetSwordMode ( );
+
+	void DoAction();
 
 private:
 	void SetMode ( EWeaponType InType );

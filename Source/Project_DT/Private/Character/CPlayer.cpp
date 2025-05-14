@@ -58,6 +58,8 @@ ACPlayer::ACPlayer()
 	CHelpers::GetAsset ( &IA_HorizontalLook , AssetPaths::IA_HorizontalLook );
 	CHelpers::GetAsset ( &IA_Dash , AssetPaths::IA_Dash );
 	CHelpers::GetAsset ( &IA_Avoid , AssetPaths::IA_Avoid );
+	CHelpers::GetAsset ( &IA_TestBtn , AssetPaths::IA_Test );
+	CHelpers::GetAsset ( &IA_Jump , AssetPaths::IA_Jump );
 }
 
 // Called when the game starts or when spawned
@@ -95,6 +97,8 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction ( IA_Dash , ETriggerEvent::Started , Movement , &UCMovementComponent::OnSprint);
 		playerInput->BindAction ( IA_Dash , ETriggerEvent::Completed , Movement , &UCMovementComponent::OnRun);
 		playerInput->BindAction ( IA_Avoid , ETriggerEvent::Completed , this , &ACPlayer::OnAvoid );
+		playerInput->BindAction ( IA_TestBtn , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SetKatanaMode );
+		playerInput->BindAction ( IA_Jump , ETriggerEvent::Completed , this , &ACPlayer::Jump );
 	}
 
 }
@@ -120,6 +124,12 @@ void ACPlayer::BackStep ()
 
 	Montages->PlayBackStepMode ();
 }
+
+void ACPlayer::Jump ( ){
+	CLog::Log ( "Test" );
+	ACharacter::Jump();
+}
+
 void ACPlayer::End_BackStep() {
 	//Movement->DisableControlRotation ( );
 

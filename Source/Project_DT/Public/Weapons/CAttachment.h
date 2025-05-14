@@ -22,6 +22,11 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+public:
+	UFUNCTION( BlueprintImplementableEvent )
+	void OnBeginEquip();
+	UFUNCTION (BlueprintImplementableEvent)
+	void OnUnequip ( );
 protected:
 	UPROPERTY (BlueprintReadOnly,Category="Game" )
 	class ACharacter* OwnerCharacter;

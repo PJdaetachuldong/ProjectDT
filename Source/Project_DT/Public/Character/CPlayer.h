@@ -47,6 +47,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UInputAction* IA_Avoid;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInputAction* IA_TestBtn;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInputAction* IA_Jump;
+	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
+	class UInputAction* IA_LeftAttack;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UInputMappingContext* IMC;
 
 public:
@@ -71,6 +77,8 @@ private:
 	void OnAvoid();
 private:
 	void BackStep();
+private:
+	void Jump();
 
 public:
 	void End_BackStep() override;
