@@ -23,7 +23,7 @@ private:
 	TSubclassOf<class UCEquipment> EquipmentClass;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UCEquipment> DoActionClass;
+	TSubclassOf<class UCDoAction> DoActionClass;
 
 	UPROPERTY(EditAnywhere)
 	TArray<FDoActionData> DoActionDatas;

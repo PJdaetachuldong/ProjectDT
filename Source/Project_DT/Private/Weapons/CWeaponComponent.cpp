@@ -7,6 +7,7 @@
 #include "Utilities/CHelper.h"
 #include "Component/CStateComponent.h"
 #include "Weapons/CEquipment.h"
+#include "Global.h"
 #include "Weapons/CDoAction.h"
 
 // Sets default values for this component's properties
@@ -84,8 +85,10 @@ void UCWeaponComponent::SetSwordMode ( )
 
 void UCWeaponComponent::DoAction ( )
 {
-	if ( !!GetDoAction ( ) )
-		GetDoAction ( )->DoAction ( );
+	if ( !!GetDoAction ( ) ){
+		CLog::Log ( "DoAction" );
+		GetDoAction ()->DoAction ( );
+	}
 }
 
 void UCWeaponComponent::SetMode ( EWeaponType InType )
