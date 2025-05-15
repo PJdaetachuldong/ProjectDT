@@ -13,12 +13,13 @@
 UENUM()	// 상위 스테이트 머신
 enum class EUpperState : uint8
 {
-	Start				UMETA(DisplayName = "Start"),	//시작시에만 잠시 사용
-	Idle				UMETA(DisplayName = "Idle"),
-	Move				UMETA(DisplayName = "Move"),
-	Attack				UMETA(DisplayName = "Attack"),
-	CC					UMETA(DisplayName = "CC"),
-	Uncontrolled		UMETA(DisplayName = "Uncontrolled")
+	None			UMETA(DisplayName = "None"),		// 소환 해제 대기상태
+	Start			UMETA(DisplayName = "Start"),		// 시작시에만 잠시 사용
+	Idle			UMETA(DisplayName = "Idle"),
+	Move			UMETA(DisplayName = "Move"),
+	Attack			UMETA(DisplayName = "Attack"),
+	CC				UMETA(DisplayName = "CC"),
+	Uncontrolled	UMETA(DisplayName = "Uncontrolled")
 };
 
 //========================= 하위 스테이트 머신 ==================================
@@ -82,10 +83,13 @@ private:
 	class ACFamiliarWolf* me;
 
 	UPROPERTY()
-	class ACPlayer* player;	// 쫒아갈 플레이어
+	class ACPlayer* Player;	// 쫓아갈 플레이어
 
 	UPROPERTY()	
-	TArray<ACPlayer*>EnemyList;	// 에너미 클래스로 변경해야 함. 일단은 플레이어 적어둠
+	class ACDummyForFamiliar* Enemy;
+
+	UPROPERTY()	
+	TArray<ACDummyForFamiliar*>EnemyList;	// 추후에 에너미 클래스로 변경해야 함.
 #pragma endregion Target
 
 // 스테이트 정의
@@ -106,9 +110,14 @@ public:
 #pragma endregion State 
 
 public:
-	void StartState();
-	void IdleState ( );
-public:
+	bool bIsInBattle = false;	// 전투 상태인지 확인하는 변수
+
+public:	// State 관련 함수
+	void IdleState();
+
+public:	// 실행쪽 함수
+	void SpawnFamiliar();
 	void UpdateEnemyList();
+	void SearchEnemy();
 
 };
