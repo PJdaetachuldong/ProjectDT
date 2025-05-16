@@ -14,7 +14,7 @@ UENUM()	// 상위 스테이트 머신
 enum class EUpperState : uint8
 {
 	None			UMETA(DisplayName = "None"),		// 소환 해제 대기상태
-	Start			UMETA(DisplayName = "Start"),		// 시작시에만 잠시 사용
+	Start			UMETA(DisplayName = "Start"),		// 
 	Idle			UMETA(DisplayName = "Idle"),
 	Move			UMETA(DisplayName = "Move"),
 	Attack			UMETA(DisplayName = "Attack"),
@@ -28,7 +28,9 @@ UENUM() // HFSM - 대기 상태
 enum class EIdleState : uint8
 {
 	None		UMETA(DisplayName = "None"),
-	Idle		UMETA(DisplayName = "Idle")
+	Idle		UMETA(DisplayName = "Idle"),
+	BattleIdle	UMETA(DisplayName = "BattleIdle") ,
+	Jump		UMETA(DisplayName = "Jump")
 };
 
 UENUM() // HFSM - 공격 상태
@@ -86,7 +88,7 @@ private:
 	class ACPlayer* Player;	// 쫓아갈 플레이어
 
 	UPROPERTY()	
-	class ACDummyForFamiliar* Enemy;
+	class ACDummyForFamiliar* Enemy;		// 타게팅 된 에너미
 
 	UPROPERTY()	
 	TArray<ACDummyForFamiliar*>EnemyList;	// 추후에 에너미 클래스로 변경해야 함.
@@ -110,6 +112,13 @@ public:
 #pragma endregion State 
 
 public:
+	float CurrentTime = 0.f;
+
+public:	// 스탯 관련
+	float AttackDelayTime = 2.f;	// 공격 쿨타임
+
+public:
+	bool bIsSpawned = false;	// 스폰 상태인지 확인하는 변수
 	bool bIsInBattle = false;	// 전투 상태인지 확인하는 변수
 
 public:	// State 관련 함수
@@ -118,6 +127,9 @@ public:	// State 관련 함수
 public:	// 실행쪽 함수
 	void SpawnFamiliar();
 	void UpdateEnemyList();
-	void SearchEnemy();
+	// Start, 공격 직전, 피격
+	void SearchEnemy();		// 적 리스트 갱신
+	void SetOnTarget();		// 타겟 지정하기
+	void SetTargetDir();	// 타겟 방향으로 몸 돌리기
 
 };

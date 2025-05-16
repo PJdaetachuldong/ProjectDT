@@ -62,18 +62,32 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 
 void UCWolfFSM::SpawnFamiliar ( )
 {
-	// ====== 소환 -> 탐지 -> 공격
+	// ========= 소환 -> 탐지 -> Idle =========
 
 // 소환 파트
+	bIsSpawned = true;
 	mUpState = EUpperState::Start;
 
-// 탐지 파트
+// 탐지 파트	// 바로 공격할 때 사용. 대상 지정 필요할때마다 계속 갱신
 	SearchEnemy();
 
+// Idle은 애니메이션 노티파이로 넘길 예정
 }
 
 void UCWolfFSM::IdleState ( )
 {
+	// ========= 탐지 -> 회전 -> 공격판단
+	//일정 시간마다 실행
+	CurrentTime += GetWorld()->DeltaTimeSeconds;
+
+	if (CurrentTime > AttackDelayTime )
+	{
+	}
+
+// 탐지, 대상 지정
+	SearchEnemy ( );
+// 회전
+	SetTargetDir();
 
 }
 
@@ -113,5 +127,36 @@ void UCWolfFSM::SearchEnemy ( )
 	if (!EnemyList.IsEmpty())
 	{
 		bIsInBattle = true;
+		SetOnTarget();
 	}
+}
+
+// 전투 상태인 경우에만 실행
+void UCWolfFSM::SetOnTarget ( )
+{
+	// Enemy에 가장 가까운 대상 값 넣어주기
+
+	// 1순위 - 플레이어가 공격중인 대상.
+	// ㄴ 플레이어 리스트 받아와야함.
+
+	// xx2순위 - 어그로 게이지가 가장 높은 대상
+	// xxㄴ 에너미 어그로 게이지 받아와야 함.
+
+	// 2순위 - 플레이어를 공격중인 대상.
+	// ㄴ 에너미 상태(공격중인지 불값 등) 받아와야함.
+
+
+}
+
+void UCWolfFSM::SetTargetDir ( )
+{	
+	// 현재 보는 방향과 에너미 위치 각도 크기 구하기
+	// 특정 각도(5~10도) 이상 회전하는 경우 점프 애니메이션 재생 
+	// 각도 크기만큼 돌리기
+
+	// BattleIdle 상태일 경우에만 실행
+	//에너미가 특정 각도 이상 or 특정 거리 안쪽일 때 점프로 전환
+	mIdleState = EIdleState::Jump;
+
+	//노티파이로 점프 실행 후 다시 BattleIdle 실행하도록 전환
 }
