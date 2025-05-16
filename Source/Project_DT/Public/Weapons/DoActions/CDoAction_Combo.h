@@ -23,9 +23,9 @@ public:
 	void Begin_DoAction ( ) override;
 	void End_DoAction ( ) override;
 
-//public:
-//	void OnAttachmentBeginOverlap ( class ACharacter* InAttacker , AActor* InAttackCuaser , class ACharacter* InOther ) override;
-//	void OnAttachmentEndCollision ( ) override;
+public:
+	void OnAttachmentBeginOverlap ( class ACharacter* InAttacker , AActor* InAttackCuaser , class ACharacter* InOther ) override;
+	void OnAttachmentEndCollision ( ) override;
 
 private:
 	int32 Index;

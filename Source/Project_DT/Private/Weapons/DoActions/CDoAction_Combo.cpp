@@ -4,6 +4,7 @@
 #include "Weapons/DoActions/CDoAction_Combo.h"
 #include "Global.h"
 #include "Component/CStateComponent.h"
+#include "Engine/DamageEvents.h"
 void UCDoAction_Combo::DoAction ( )
 {
 	CheckTrue ( DoActionDatas.Num ( ) < 1 );
@@ -36,4 +37,17 @@ void UCDoAction_Combo::End_DoAction ( )
 	Super::End_DoAction ( );
 
 	Index = 0;
+}
+
+void UCDoAction_Combo::OnAttachmentBeginOverlap ( class ACharacter* InAttacker , AActor* InAttackCuaser , class ACharacter* InOther )
+{
+	Super::OnAttachmentBeginOverlap ( InAttacker , InAttackCuaser , InOther );
+	CheckNull ( InOther );
+	CLog::Log ( InOther->GetName ( ) );
+	HitDatas[Index].SendDamage ( InAttacker , InAttackCuaser , InOther );
+}
+
+void UCDoAction_Combo::OnAttachmentEndCollision ( )
+{
+
 }

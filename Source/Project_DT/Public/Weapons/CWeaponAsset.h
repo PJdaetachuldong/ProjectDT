@@ -28,6 +28,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	TArray<FDoActionData> DoActionDatas;
 
+	UPROPERTY(EditAnywhere)
+	TArray<FHitData> HitDatas;
+
 public:
 	FORCEINLINE class ACAttachment* GetAttachment ( ) { return Attachment; }
 	FORCEINLINE class UCEquipment* GetEquipment ( ) { return Equipment; }
