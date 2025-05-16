@@ -60,4 +60,5 @@ private:
 
 	EWeaponType Type = EWeaponType::Max;
 
+
 };

@@ -58,11 +58,11 @@ void ACEnemy::OnStateTypeChanged ( EStateType InPrevType , EStateType InNewType 
 float ACEnemy::TakeDamage ( float DamageAmount , struct FDamageEvent const& DamageEvent , class AController* EventInstigator , AActor* DamageCauser )
 {
 	float damage = Super::TakeDamage ( DamageAmount , DamageEvent , EventInstigator , DamageCauser );
-
 	Damage.Power = damage;
 	Damage.Character = Cast<ACharacter> ( EventInstigator->GetPawn ( ) );
 	Damage.Causer = DamageCauser;
 	Damage.Event = (FActionDamageEvent*)&DamageEvent;
+	CLog::Log ( Damage.Power );
 
 	State->SetHittedMode ( );
 

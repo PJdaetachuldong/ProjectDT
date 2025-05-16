@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Utilities/CAnimNotify_EndState.h"
+#include "Notifies/CAnimNotify_EndState.h"
 #include "Utilities/CHelper.h"
 #include "Character/ICharacter.h"
 

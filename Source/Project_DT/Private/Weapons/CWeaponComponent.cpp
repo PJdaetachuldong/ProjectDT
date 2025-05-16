@@ -87,6 +87,7 @@ void UCWeaponComponent::DoAction ( )
 {
 	if ( !!GetDoAction ( ) ){
 		GetDoAction ()->DoAction ( );
+		GetDoAction ()->NormalAttack ( );
 	}
 }
 
@@ -94,6 +95,8 @@ void UCWeaponComponent::DoHeavyAction ( )
 {
 	if ( !!GetDoAction ( ) ) {
 		GetDoAction ( )->DoHeavyAction ( );
+		GetDoAction ( )->HeavyAttack ( );
+
 	}
 }
 

@@ -29,7 +29,13 @@ void UCDoAction_Combo::Begin_DoAction ( )
 	CheckFalse ( bExist );
 
 	bExist = false;
-	DoActionDatas[++Index].DoAction ( OwnerCharacter );
+	if(!isHeavyAttack ){
+		DoActionDatas[++Index].DoAction ( OwnerCharacter );
+	}
+	else{
+		DoHeavyActionDatas[++Index].DoHeavyAction ( OwnerCharacter );
+
+	}
 }
 
 void UCDoAction_Combo::End_DoAction ( )
@@ -37,11 +43,13 @@ void UCDoAction_Combo::End_DoAction ( )
 	Super::End_DoAction ( );
 
 	Index = 0;
+	HeavyIndex = 0;
+	DamageIndex = 0;
 }
 
 void UCDoAction_Combo::DoHeavyAction ( )
 {
-	CheckTrue ( DoActionDatas.Num ( ) < 1 );
+	CheckTrue ( DoHeavyActionDatas.Num ( ) < 1 );
 
 	if ( bEnable )
 	{
@@ -53,8 +61,9 @@ void UCDoAction_Combo::DoHeavyAction ( )
 
 	CheckFalse ( State->IsIdleMode ( ) );
 
-	Super::DoAction ( );
-	DoHeavyActionDatas[Index].DoHeavyAction ( OwnerCharacter );
+	Super::DoHeavyAction ( );
+	DoHeavyActionDatas[HeavyIndex].DoHeavyAction ( OwnerCharacter );
+
 }
 
 void UCDoAction_Combo::OnAttachmentBeginOverlap ( class ACharacter* InAttacker , AActor* InAttackCuaser , class ACharacter* InOther )
@@ -62,7 +71,7 @@ void UCDoAction_Combo::OnAttachmentBeginOverlap ( class ACharacter* InAttacker ,
 	Super::OnAttachmentBeginOverlap ( InAttacker , InAttackCuaser , InOther );
 	CheckNull ( InOther );
 	CLog::Log ( InOther->GetName ( ) );
-	HitDatas[Index].SendDamage ( InAttacker , InAttackCuaser , InOther );
+	HitDatas[DamageIndex].SendDamage ( InAttacker , InAttackCuaser , InOther );
 }
 
 void UCDoAction_Combo::OnAttachmentEndCollision ( )

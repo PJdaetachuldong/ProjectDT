@@ -26,9 +26,16 @@ public:
 
 public:
 	virtual void DoAction ();
-	virtual void DoHeavyAction ();
 	virtual void Begin_DoAction ( );
 	virtual void End_DoAction ( );
+
+	virtual void DoHeavyAction ();
+	virtual void Begin_DoHeavyAction ( );
+
+public:
+	void NormalAttack ( );
+	void HeavyAttack ( );
+
 public:
 	UFUNCTION()
 		virtual void OnAttachmentBeginCollision() { }
@@ -41,8 +48,10 @@ public:
 
 	UFUNCTION()
 		virtual void OnAttachmentEndOverlap(class ACharacter* InAttacker, class ACharacter* InOther) { }
+
 protected:
 	bool bBeginAction;
+	bool isHeavyAttack;
 
 	class ACharacter* OwnerCharacter;
 	class UWorld* World;

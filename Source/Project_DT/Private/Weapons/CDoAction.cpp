@@ -26,14 +26,8 @@ void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipmen
 
 void UCDoAction::DoAction ( )
 {
-	State->SetActionMode ( );
+	State->SetActionMode ();
 }
-
-void UCDoAction::DoHeavyAction ( )
-{
-	State->SetActionMode ( );
-}
-
 void UCDoAction::Begin_DoAction ( )
 {
 	bBeginAction = true;
@@ -46,5 +40,27 @@ void UCDoAction::End_DoAction ( )
 	State->SetIdleMode ( );
 	Movement->Move ( );
 	Movement->DisableFixedCamera ( );
+
+}
+
+void UCDoAction::DoHeavyAction ( )
+{
+	State->SetActionMode ( );
+}
+
+void UCDoAction::Begin_DoHeavyAction ( )
+{
+	bBeginAction = true;
+}
+
+void UCDoAction::NormalAttack ( )
+{
+	isHeavyAttack= false;
+
+}
+
+void UCDoAction::HeavyAttack ( )
+{
+	isHeavyAttack = true;
 
 }

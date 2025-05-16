@@ -25,13 +25,14 @@ public:
 
 	void DoHeavyAction ( ) override;
 
-
 public:
 	void OnAttachmentBeginOverlap ( class ACharacter* InAttacker , AActor* InAttackCuaser , class ACharacter* InOther ) override;
 	void OnAttachmentEndCollision ( ) override;
 
 private:
 	int32 Index;
+	int32 HeavyIndex;
+	int32 DamageIndex;
 
 	bool bEnable;
 	bool bExist;

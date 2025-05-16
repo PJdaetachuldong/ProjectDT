@@ -17,7 +17,7 @@ void FDoActionData::DoAction ( class ACharacter* InOwner )
 			movement->Stop ( );
 	}
 	if ( !!Montage )
-		InOwner->PlayAnimMontage ( Montage , PlayRate );
+		InOwner->PlayAnimMontage ( FDoActionData::Montage , PlayRate );
 }
 
 void FDoHeavyActionData::DoHeavyAction ( class ACharacter* InOwner )
@@ -32,7 +32,7 @@ void FDoHeavyActionData::DoHeavyAction ( class ACharacter* InOwner )
 			movement->Stop ( );
 	}
 	if ( !!Montage )
-		InOwner->PlayAnimMontage ( Montage , PlayRate );
+		InOwner->PlayAnimMontage ( FDoHeavyActionData::Montage , PlayRate );
 }
 
 /// ////////////////////////////////////////////////
@@ -42,7 +42,7 @@ void FHitData::SendDamage ( class ACharacter* InAttacker , AActor* InAttackCause
 {
 	FActionDamageEvent e;
 	e.HitData = this;
-	InOther->TakeDamage ( 20 , e, InAttacker->GetController ( ) , InAttackCauser );
+	InOther->TakeDamage ( Power , e, InAttacker->GetController ( ) , InAttackCauser );
 }
 
 void FHitData::PlayMontage ( class ACharacter* InOwner )
