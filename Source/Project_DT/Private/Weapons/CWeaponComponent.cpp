@@ -86,8 +86,14 @@ void UCWeaponComponent::SetSwordMode ( )
 void UCWeaponComponent::DoAction ( )
 {
 	if ( !!GetDoAction ( ) ){
-		CLog::Log ( "DoAction" );
 		GetDoAction ()->DoAction ( );
+	}
+}
+
+void UCWeaponComponent::DoHeavyAction ( )
+{
+	if ( !!GetDoAction ( ) ) {
+		GetDoAction ( )->DoHeavyAction ( );
 	}
 }
 

@@ -20,11 +20,13 @@ public:
 		class UCEquipment* InEquipment ,
 		class ACharacter* InOwner ,
 		class TArray<FDoActionData>& InDoActionData,
+		class TArray<FDoHeavyActionData>& InDoHeavyActionData,
 		class TArray<FHitData>& InHitData
 	);
 
 public:
-	virtual void DoAction ( );
+	virtual void DoAction ();
+	virtual void DoHeavyAction ();
 	virtual void Begin_DoAction ( );
 	virtual void End_DoAction ( );
 public:
@@ -49,6 +51,7 @@ protected:
 	class UCStateComponent* State;
 
 	TArray<FDoActionData> DoActionDatas;
+	TArray<FDoHeavyActionData> DoHeavyActionDatas;
 	TArray<FHitData> HitDatas;
 
 };

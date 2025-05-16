@@ -73,11 +73,29 @@ void ACEnemy::Hitted ( )
 {
 	Damage.Power = 0;
 
+	{
+		Change_Color ( this , FLinearColor::Red );
+
+		FTimerDelegate timerDelegate;
+		timerDelegate.BindUFunction ( this , "RestoreColor" );
+
+		GetWorld ( )->GetTimerManager ( ).SetTimer ( RestoreColor_TimerHandle , timerDelegate , 0.2f , false );
+	}
+
 	if ( !!Damage.Event && !!Damage.Event->HitData ){
 		FHitData* data = Damage.Event->HitData;
 		data->PlayMontage ( this );
+		data->PlayHitStop ( GetWorld ( ) );
 	}
 	Damage.Character = nullptr;
 	Damage.Causer = nullptr;
 	Damage.Event = nullptr;
+}
+void ACEnemy::RestoreColor ( )
+{
+	CLog::Log ( "RestoreColor" );
+
+	Change_Color ( this , OriginColor );
+
+	GetWorld ( )->GetTimerManager ( ).ClearTimer ( RestoreColor_TimerHandle );
 }

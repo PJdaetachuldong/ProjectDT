@@ -5,7 +5,7 @@
 #include "Global.h"
 #include "Component/CStateComponent.h"
 #include "Engine/DamageEvents.h"
-void UCDoAction_Combo::DoAction ( )
+void UCDoAction_Combo::DoAction ()
 {
 	CheckTrue ( DoActionDatas.Num ( ) < 1 );
 
@@ -19,7 +19,7 @@ void UCDoAction_Combo::DoAction ( )
 
 	CheckFalse ( State->IsIdleMode ( ) );
 
-	Super::DoAction ( );
+	Super::DoAction ();
 	DoActionDatas[Index].DoAction ( OwnerCharacter );
 }
 
@@ -37,6 +37,24 @@ void UCDoAction_Combo::End_DoAction ( )
 	Super::End_DoAction ( );
 
 	Index = 0;
+}
+
+void UCDoAction_Combo::DoHeavyAction ( )
+{
+	CheckTrue ( DoActionDatas.Num ( ) < 1 );
+
+	if ( bEnable )
+	{
+		bEnable = false;
+		bExist = true;
+
+		return;
+	}
+
+	CheckFalse ( State->IsIdleMode ( ) );
+
+	Super::DoAction ( );
+	DoHeavyActionDatas[Index].DoHeavyAction ( OwnerCharacter );
 }
 
 void UCDoAction_Combo::OnAttachmentBeginOverlap ( class ACharacter* InAttacker , AActor* InAttackCuaser , class ACharacter* InOther )

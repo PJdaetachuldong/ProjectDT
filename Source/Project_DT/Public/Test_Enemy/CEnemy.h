@@ -47,6 +47,10 @@ public:
 protected:
 	virtual void Hitted ( );
 
+private:
+	UFUNCTION()
+	void RestoreColor();
+
 
 private:
 	struct FDamageData
@@ -57,4 +61,6 @@ private:
 
 		struct FActionDamageEvent* Event;
 	} Damage;
+private:
+	FTimerHandle RestoreColor_TimerHandle;
 };

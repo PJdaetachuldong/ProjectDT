@@ -16,10 +16,11 @@ namespace AssetPaths
     constexpr const TCHAR* IA_Dash = TEXT ( "/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Dash.IA_Dash'" );
     constexpr const TCHAR* IA_Avoid = TEXT ( "/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Avoid.IA_Avoid'" );
     constexpr const TCHAR* IA_Jump = TEXT ( "/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Jump.IA_Jump'" );
+    constexpr const TCHAR* IA_LeftClick = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_LeftClick.IA_LeftClick'" );
+    constexpr const TCHAR* IA_RightClick = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_RightClick.IA_RightClick'" );
 
     constexpr const TCHAR* IMC = TEXT ( "/Script/EnhancedInput.InputMappingContext'/Game/LHW/Input/IMC_Player.IMC_Player'" );
     constexpr const TCHAR* IA_Test = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Test.IA_Test'" );
-    constexpr const TCHAR* IA_LeftClick = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_LeftClick.IA_LeftClick'" );
 
 
 }

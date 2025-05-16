@@ -47,6 +47,7 @@ public:
 	void SetSwordMode ( );
 
 	void DoAction();
+	void DoHeavyAction();
 
 private:
 	void SetMode ( EWeaponType InType );

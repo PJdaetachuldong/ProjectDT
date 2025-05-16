@@ -23,6 +23,9 @@ public:
 	void Begin_DoAction ( ) override;
 	void End_DoAction ( ) override;
 
+	void DoHeavyAction ( ) override;
+
+
 public:
 	void OnAttachmentBeginOverlap ( class ACharacter* InAttacker , AActor* InAttackCuaser , class ACharacter* InOther ) override;
 	void OnAttachmentEndCollision ( ) override;

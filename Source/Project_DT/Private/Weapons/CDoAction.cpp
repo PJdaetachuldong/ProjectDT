@@ -11,7 +11,7 @@ UCDoAction::UCDoAction ( )
 
 }
 
-void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipment* InEquipment , class ACharacter* InOwner , class TArray<FDoActionData>& InDoActionData , TArray<FHitData>& InHitData )
+void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipment* InEquipment , class ACharacter* InOwner , class TArray<FDoActionData>& InDoActionData , class TArray<FDoHeavyActionData>& InDoHeavyActionData ,TArray<FHitData>& InHitData )
 {
 	OwnerCharacter = InOwner;
 	World = OwnerCharacter->GetWorld ( );
@@ -20,10 +20,16 @@ void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipmen
 	Movement = CHelpers::GetComponent<UCMovementComponent> ( InOwner );
 
 	DoActionDatas = InDoActionData;
+	DoHeavyActionDatas = InDoHeavyActionData;
 	HitDatas = InHitData;
 }
 
 void UCDoAction::DoAction ( )
+{
+	State->SetActionMode ( );
+}
+
+void UCDoAction::DoHeavyAction ( )
 {
 	State->SetActionMode ( );
 }
