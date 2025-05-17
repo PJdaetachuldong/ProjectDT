@@ -17,6 +17,8 @@ class PROJECT_DT_API UCDoAction_Combo : public UCDoAction
 public:
 	FORCEINLINE void EnableCombo ( ) { bEnable = true; }
 	FORCEINLINE void DisableCombo ( ) { bEnable = false; }
+	void AddComboArray ( FString NewCombo );
+	bool IsLeftMajority ( );
 
 public:
 	void DoAction ( ) override;
@@ -25,18 +27,20 @@ public:
 
 	void DoHeavyAction ( ) override;
 
+	void DoSpecialAction ( ) override;
+
+
 public:
 	void OnAttachmentBeginOverlap ( class ACharacter* InAttacker , AActor* InAttackCuaser , class ACharacter* InOther ) override;
-	void OnAttachmentEndCollision ( ) override;
 
 private:
-	int32 Index;
-	int32 HeavyIndex;
+	int32 Index=0;
+	int32 HeavyIndex=0;
 	int32 DamageIndex;
 
 	bool bEnable;
 	bool bExist;
 
-//private:
-//	TArray<class ACharacter*> Hitted;
+	TArray<FString> ComboArray;
+
 };

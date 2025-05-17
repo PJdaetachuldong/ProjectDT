@@ -6,6 +6,10 @@
 #include "UObject/NoExportTypes.h"
 #include "CWeaponStuctures.h"
 #include "CDoAction.generated.h"
+UENUM(BlueprintType)
+enum class EActionState : uint8 {
+	Normal,Heavy, Special,Max
+};
 
 UCLASS(Abstract,NotBlueprintable)
 class PROJECT_DT_API UCDoAction : public UObject
@@ -21,6 +25,7 @@ public:
 		class ACharacter* InOwner ,
 		class TArray<FDoActionData>& InDoActionData,
 		class TArray<FDoHeavyActionData>& InDoHeavyActionData,
+		class TArray<FDoSpecialActionData>& InDoSpecialActionData ,
 		class TArray<FHitData>& InHitData
 	);
 
@@ -32,9 +37,13 @@ public:
 	virtual void DoHeavyAction ();
 	virtual void Begin_DoHeavyAction ( );
 
+	virtual void DoSpecialAction ( );
+
+
 public:
-	void NormalAttack ( );
-	void HeavyAttack ( );
+	FORCEINLINE void NormalAttack ( ) { ActionState = EActionState::Normal; };
+	FORCEINLINE void HeavyAttack ( ) { ActionState = EActionState::Heavy; };
+	FORCEINLINE void SpecialAttack ( ) { ActionState = EActionState::Special; };
 
 public:
 	UFUNCTION()
@@ -51,7 +60,7 @@ public:
 
 protected:
 	bool bBeginAction;
-	bool isHeavyAttack;
+	EActionState ActionState=EActionState::Max;
 
 	class ACharacter* OwnerCharacter;
 	class UWorld* World;
@@ -61,6 +70,7 @@ protected:
 
 	TArray<FDoActionData> DoActionDatas;
 	TArray<FDoHeavyActionData> DoHeavyActionDatas;
+	TArray<FDoSpecialActionData> DoSpecialActionData;
 	TArray<FHitData> HitDatas;
 
 };

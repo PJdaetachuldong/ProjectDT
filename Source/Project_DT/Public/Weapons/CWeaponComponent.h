@@ -48,6 +48,7 @@ public:
 
 	void DoAction();
 	void DoHeavyAction();
+	void DoSpeciaAction();
 
 private:
 	void SetMode ( EWeaponType InType );

@@ -20,7 +20,8 @@ void UCDoAction_Combo::DoAction ()
 	CheckFalse ( State->IsIdleMode ( ) );
 
 	Super::DoAction ();
-	DoActionDatas[Index].DoAction ( OwnerCharacter );
+	AddComboArray(DoActionDatas[0].DoAction ( OwnerCharacter ));
+	DamageIndex = 0;
 }
 
 void UCDoAction_Combo::Begin_DoAction ( )
@@ -29,12 +30,28 @@ void UCDoAction_Combo::Begin_DoAction ( )
 	CheckFalse ( bExist );
 
 	bExist = false;
-	if(!isHeavyAttack ){
-		DoActionDatas[++Index].DoAction ( OwnerCharacter );
+	switch ( ActionState )
+	{
+	case EActionState::Normal:{
+		AddComboArray(DoActionDatas[++Index].DoAction ( OwnerCharacter ));
+		DamageIndex = Index;
 	}
-	else{
-		DoHeavyActionDatas[++Index].DoHeavyAction ( OwnerCharacter );
-
+		break;
+	case EActionState::Heavy:{
+		AddComboArray(DoHeavyActionDatas[++Index].DoHeavyAction ( OwnerCharacter ));
+		DamageIndex = Index + 3;
+		}
+		break;
+	case EActionState::Special:{
+		if ( !IsLeftMajority ( ) )
+			DoSpecialActionData[0].DoSpecialAction ( OwnerCharacter );
+		else
+			DoSpecialActionData[1].DoSpecialAction ( OwnerCharacter );
+		DamageIndex = 5;
+		}
+		break;
+	default:
+		break;
 	}
 }
 
@@ -44,7 +61,6 @@ void UCDoAction_Combo::End_DoAction ( )
 
 	Index = 0;
 	HeavyIndex = 0;
-	DamageIndex = 0;
 }
 
 void UCDoAction_Combo::DoHeavyAction ( )
@@ -62,19 +78,68 @@ void UCDoAction_Combo::DoHeavyAction ( )
 	CheckFalse ( State->IsIdleMode ( ) );
 
 	Super::DoHeavyAction ( );
-	DoHeavyActionDatas[HeavyIndex].DoHeavyAction ( OwnerCharacter );
+	AddComboArray(DoHeavyActionDatas[0].DoHeavyAction ( OwnerCharacter ));
+	DamageIndex = 3;
 
+}
+
+void UCDoAction_Combo::DoSpecialAction ( )
+{
+	CheckTrue ( DoHeavyActionDatas.Num ( ) < 1 );
+
+	if ( bEnable )
+	{
+		bEnable = false;
+		bExist = true;
+
+		return;
+	}
+
+	CheckFalse ( State->IsIdleMode ( ) );
+
+	Super::DoSpecialAction ( );
+	if(!IsLeftMajority ( ))
+		DoSpecialActionData[0].DoSpecialAction ( OwnerCharacter );
+	else
+		DoSpecialActionData[1].DoSpecialAction ( OwnerCharacter );
+	DamageIndex = 5;
 }
 
 void UCDoAction_Combo::OnAttachmentBeginOverlap ( class ACharacter* InAttacker , AActor* InAttackCuaser , class ACharacter* InOther )
 {
 	Super::OnAttachmentBeginOverlap ( InAttacker , InAttackCuaser , InOther );
 	CheckNull ( InOther );
-	CLog::Log ( InOther->GetName ( ) );
 	HitDatas[DamageIndex].SendDamage ( InAttacker , InAttackCuaser , InOther );
 }
 
-void UCDoAction_Combo::OnAttachmentEndCollision ( )
+void UCDoAction_Combo::AddComboArray ( FString NewCombo )
 {
+	if ( ComboArray.Num ( ) >= 3 )
+	{
+		ComboArray.RemoveAt ( 0 );
+	}
+
+	ComboArray.Add ( NewCombo );
 
 }
+
+bool UCDoAction_Combo::IsLeftMajority ( )
+{
+	int32 LeftCount = 0;
+	int32 OtherCount = 0;
+
+	for ( const FString& Combo : ComboArray )
+	{
+		if ( Combo.Equals ( TEXT ( "Left" ) , ESearchCase::IgnoreCase ) )
+		{
+			LeftCount++;
+		}
+		else
+		{
+			OtherCount++;
+		}
+	}
+
+	return LeftCount <= OtherCount;
+}
+

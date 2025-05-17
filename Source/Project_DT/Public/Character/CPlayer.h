@@ -54,6 +54,8 @@ public:
 	class UInputAction* IA_LeftAttack;
 	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
 	class UInputAction* IA_RightAttack;
+	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
+	class UInputAction* IA_SpecialAttack;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UInputMappingContext* IMC;
 

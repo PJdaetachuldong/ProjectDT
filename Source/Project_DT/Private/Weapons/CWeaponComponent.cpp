@@ -96,6 +96,14 @@ void UCWeaponComponent::DoHeavyAction ( )
 	if ( !!GetDoAction ( ) ) {
 		GetDoAction ( )->DoHeavyAction ( );
 		GetDoAction ( )->HeavyAttack ( );
+	}
+}
+
+void UCWeaponComponent::DoSpeciaAction ( )
+{
+	if ( !!GetDoAction ( ) ) {
+		GetDoAction ( )->DoSpecialAction ( );
+		GetDoAction ( )->SpecialAttack ( );
 
 	}
 }

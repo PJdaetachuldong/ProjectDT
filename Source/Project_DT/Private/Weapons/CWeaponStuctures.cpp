@@ -5,7 +5,7 @@
 #include "Global.h"
 #include "Component/CMovementComponent.h"
 
-void FDoActionData::DoAction ( class ACharacter* InOwner )
+FString FDoActionData::DoAction ( class ACharacter* InOwner )
 {
 	UCMovementComponent* movement = CHelpers::GetComponent<UCMovementComponent> ( InOwner );
 
@@ -18,9 +18,10 @@ void FDoActionData::DoAction ( class ACharacter* InOwner )
 	}
 	if ( !!Montage )
 		InOwner->PlayAnimMontage ( FDoActionData::Montage , PlayRate );
+	return TEXT ( "Left" );
 }
 
-void FDoHeavyActionData::DoHeavyAction ( class ACharacter* InOwner )
+FString FDoHeavyActionData::DoHeavyAction ( class ACharacter* InOwner )
 {
 	UCMovementComponent* movement = CHelpers::GetComponent<UCMovementComponent> ( InOwner );
 
@@ -33,6 +34,7 @@ void FDoHeavyActionData::DoHeavyAction ( class ACharacter* InOwner )
 	}
 	if ( !!Montage )
 		InOwner->PlayAnimMontage ( FDoHeavyActionData::Montage , PlayRate );
+	return TEXT ( "Right" );
 }
 
 /// ////////////////////////////////////////////////
@@ -105,3 +107,17 @@ void FHitData::PlayEffect ( UWorld* InWorld , const FVector& InLocation , const 
 	CHelpers::PlayEffect ( InWorld , Effect , transform );
 }
 
+void FDoSpecialActionData::DoSpecialAction ( class ACharacter* InOwner )
+{
+	UCMovementComponent* movement = CHelpers::GetComponent<UCMovementComponent> ( InOwner );
+
+	if ( !!movement ) {
+		if ( bFixedCamera )
+			movement->EnableFixedCamera ( );
+
+		if ( bCanMove == false )
+			movement->Stop ( );
+	}
+	if ( !!Montage )
+		InOwner->PlayAnimMontage ( FDoSpecialActionData::Montage , PlayRate );
+}

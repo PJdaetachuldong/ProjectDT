@@ -11,7 +11,7 @@ UCDoAction::UCDoAction ( )
 
 }
 
-void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipment* InEquipment , class ACharacter* InOwner , class TArray<FDoActionData>& InDoActionData , class TArray<FDoHeavyActionData>& InDoHeavyActionData ,TArray<FHitData>& InHitData )
+void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipment* InEquipment , class ACharacter* InOwner , class TArray<FDoActionData>& InDoActionData , class TArray<FDoHeavyActionData>& InDoHeavyActionData , class TArray<FDoSpecialActionData>& InDoSpecialActionData , TArray<FHitData>& InHitData )
 {
 	OwnerCharacter = InOwner;
 	World = OwnerCharacter->GetWorld ( );
@@ -21,6 +21,7 @@ void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipmen
 
 	DoActionDatas = InDoActionData;
 	DoHeavyActionDatas = InDoHeavyActionData;
+	DoSpecialActionData = InDoSpecialActionData;
 	HitDatas = InHitData;
 }
 
@@ -53,14 +54,8 @@ void UCDoAction::Begin_DoHeavyAction ( )
 	bBeginAction = true;
 }
 
-void UCDoAction::NormalAttack ( )
+void UCDoAction::DoSpecialAction ( )
 {
-	isHeavyAttack= false;
-
-}
-
-void UCDoAction::HeavyAttack ( )
-{
-	isHeavyAttack = true;
+	State->SetActionMode ( );
 
 }
