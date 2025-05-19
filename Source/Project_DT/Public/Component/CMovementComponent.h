@@ -27,7 +27,7 @@ private:
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Speed")
-		float Speed[(int32)ESpeedType::Max] = { 200, 400, 600 };
+		float Speed[(int32)ESpeedType::Max] = { 200, 200, 600 };
 
 public:
 	FORCEINLINE bool CanMove() { return bCanMove; }
