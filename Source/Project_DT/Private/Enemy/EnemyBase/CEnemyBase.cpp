@@ -16,8 +16,9 @@ ACEnemyBase::ACEnemyBase()
 	ShieldAmount = 0.0f;
 	DamageAmount = 10.0f;
 	SphereRadius = 300.0f;
+	AttackRange = 250.0f;
 
-	FSMComponent = CreateDefaultSubobject<UCMeleeEnemyFSM> (TEXT("FSMComp"));
+	/*FSMComponent = CreateDefaultSubobject<UCMeleeEnemyFSM> (TEXT("FSMComp"));*/
 }
 
 // Called when the game starts or when spawned
@@ -58,7 +59,8 @@ void ACEnemyBase::AttackRandomInt()
 // 	}
 }
 
-void ACEnemyBase::EnemyHitDamage(float Damage)
+void ACEnemyBase::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+bool bFromSweep, const FHitResult& SweepResult)
 {
 	// 	float ActualDamage = FMath::Max(0.0f, Damage /*- Defence*/);
 	// 	CurHP = FMath::Clamp(CurHP - ActualDamage, 0.0f, MaxHP);
@@ -87,6 +89,7 @@ void ACEnemyBase::LoadStatsFromAsset()
 		ShieldAmount = Stats.ShieldAmount;
 		DamageAmount = Stats.DamageAmount;
 		SphereRadius = Stats.SphereRadius;
+		AttackRange = Stats.AttackRange;
 	}
 }
 

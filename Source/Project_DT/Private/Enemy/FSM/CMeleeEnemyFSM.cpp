@@ -3,8 +3,8 @@
 
 #include "Enemy/FSM/CMeleeEnemyFSM.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "AIController.h"
 #include "NavigationSystem.h"
+#include "Enemy/AIController/CMeleeAIController.h"
 
 // Sets default values for this component's properties
 UCMeleeEnemyFSM::UCMeleeEnemyFSM()
@@ -52,7 +52,11 @@ void UCMeleeEnemyFSM::IDLEState()
 
 void UCMeleeEnemyFSM::CHASEState()
 {
-	LookAtTarget();
+	/*LookAtTarget();*/
+	if (MyEnemy->Target, MyEnemy)
+	{
+		AI->SetRotation(MyEnemy->Target, MyEnemy);
+	}
 
 	//플레이어와 거리를 계산해서 거리에 따라 어떠한 이동 로직을 갖을지 정함
 	float DistPlayer = FVector::Dist (MyEnemy->GetActorLocation(), MyEnemy->Target->GetActorLocation());
@@ -67,27 +71,34 @@ void UCMeleeEnemyFSM::CHASEState()
 
 void UCMeleeEnemyFSM::WANDERState()
 {
+	if ( MyEnemy->GetCharacterMovement ( )->bOrientRotationToMovement == true )
+	{
+		MyEnemy->GetCharacterMovement ( )->bOrientRotationToMovement = false;
+		MyEnemy->GetCharacterMovement ( )->bUseControllerDesiredRotation = false;
+	}
+
 	if ( !IsWanderMoveSet )
 	{
 		/*LookAtTarget();*/
 
 		//만약 플레이어가 자신에게 다가오면 뒤로 물러나게 만듦
-		if (FVector::Dist(MyEnemy->GetActorLocation(), MyEnemy->Target->GetActorLocation()) <= WanderRadius)
-		{
-			FVector RetreatPosition = BackstepPosition();
+// 		if (FVector::Dist(MyEnemy->GetActorLocation(), MyEnemy->Target->GetActorLocation()) <= WanderRadius)
+// 		{
+// 			FVector RetreatPosition = BackstepPosition();
+// 
+// 			UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(GetWorld());
+// 			if ( NavSys )
+// 			{
+// 				FNavLocation ProjectedLocation;
+// 				// NavMesh에 목표 위치 투영
+// 				if (NavSys->ProjectPointToNavigation(RetreatPosition, ProjectedLocation))
+// 				{
+// 					AI->MoveToLocation( RetreatPosition , 10.0f);
+// 					IsWanderMoveSet = true;
+// 				}
+// 			}
+// 		}
 
-			UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(GetWorld());
-			if ( NavSys )
-			{
-				FNavLocation ProjectedLocation;
-				// NavMesh에 목표 위치 투영
-				if (NavSys->ProjectPointToNavigation(RetreatPosition, ProjectedLocation, FVector(100.0f)))
-				{
-					AI->MoveToLocation(ProjectedLocation.Location, 10.0f);
-					IsWanderMoveSet = true;
-				}
-			}
-		}
 		//특정 시간 안에 불리도록 설정
 		//이동해야하는 곳 위치 선정
 		CurWanderDelayTime += GetWorld()->GetDeltaSeconds();
@@ -125,7 +136,9 @@ void UCMeleeEnemyFSM::WANDERState()
 		}
 	}
 
-	LookAtTarget();
+	/*LookAtTarget();*/
+
+	AI->SetRotation(MyEnemy->Target, MyEnemy);
 }
 
 void UCMeleeEnemyFSM::ATTACKState()
@@ -136,13 +149,13 @@ void UCMeleeEnemyFSM::ATTACKState()
 		MyEnemy->GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	}
 
-
 	if (IsSetAttackRandomLocation)
 	{
 		AI->MoveToLocation(AttackRandomLocation);
 		DrawDebugSphere (GetWorld(), AttackRandomLocation, 20.0f, 15, FColor::Red, false, 0.1f ); // 디버그용
 
-		if (FVector::Dist(MyEnemy->GetActorLocation(), AttackRandomLocation) <= 90.0f)
+		//자신과 공격랜덤 위치가 120이하일 경우
+		if (FVector::Dist(MyEnemy->GetActorLocation(), AttackRandomLocation) <= 120.0f)
 		{
 			CurAttackMoveTime += GetWorld()->GetDeltaSeconds();
 			if ( CurAttackMoveTime >= 2.4f )
@@ -175,14 +188,6 @@ void UCMeleeEnemyFSM::ATTACKState()
 	}
 	else
 	{
-		/*LookAtTarget();*/
-
-// 		//플레이어를 바라보도록 만듦
-// 		FVector DirectionToPlayer = (MyEnemy->Target->GetActorLocation() - MyEnemy->GetActorLocation()).GetSafeNormal();
-// 		FRotator TargetRotation = DirectionToPlayer.Rotation();
-// 		TargetRotation.Pitch = 0;
-// 		MyEnemy->SetActorRotation(FMath::RInterpTo(MyEnemy->GetActorRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), 5.0f));
-
 		FVector DirectionToPlayer = (MyEnemy->Target->GetActorLocation() - MyEnemy->GetActorLocation()).GetSafeNormal();
 
 		int32 Direction = FMath::RandRange(0, 2); // 0: 좌, 1: 우, 2: 뒤,	3: 공격
@@ -221,7 +226,8 @@ void UCMeleeEnemyFSM::ATTACKState()
 		}
 	}
 
-	LookAtTarget();
+	/*LookAtTarget();*/
+	AI->SetRotation(MyEnemy->Target, MyEnemy );
 }
 
 void UCMeleeEnemyFSM::DMAGEState()
@@ -252,16 +258,16 @@ void UCMeleeEnemyFSM::SetWanderMoveLocation()
 	UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(GetWorld());
 		FNavLocation NavPoint;
 
-	if ( NavSys->ProjectPointToNavigation(WanderMoveLocation, NavPoint))
-	{
+// 	if ( NavSys->ProjectPointToNavigation(WanderMoveLocation, NavPoint))
+// 	{
 		IsWanderMoveSet = true;
 		CurWanderDelayTime = 0.0f;
-	}
-
-	else
-	{
-		SetWanderMoveLocation();
-	}
+// 	}
+// 
+// 	else
+// 	{
+// 		SetWanderMoveLocation();
+// 	}
 
 // 	IsWanderMoveSet = true;
 // 	CurWanderDelayTime = 0.0f;
@@ -272,18 +278,35 @@ void UCMeleeEnemyFSM::GetOnwerEnemy()
 {
 	MyEnemy = Cast<ACMeleeEnemy>(GetOwner());
 
-	AI = Cast<AAIController>(MyEnemy->GetController());
+	AI = Cast<ACMeleeAIController>(MyEnemy->GetController());
 }
 
 void UCMeleeEnemyFSM::LookAtTarget()
 {
-	FVector DirectionToPlayer = (MyEnemy->Target->GetActorLocation() - MyEnemy->GetActorLocation()).GetSafeNormal2D();
-	FRotator TargetRotation = DirectionToPlayer.Rotation();
-	FRotator CurrentRotation = MyEnemy->GetActorRotation();
-	float DeltaYaw = FMath::FindDeltaAngleDegrees(CurrentRotation.Yaw, TargetRotation.Yaw);
-	TargetRotation.Yaw = CurrentRotation.Yaw + DeltaYaw;
+// 	FVector DirectionToPlayer = (MyEnemy->Target->GetActorLocation() - MyEnemy->GetActorLocation()).GetSafeNormal2D();
+// 	FRotator TargetRotation = DirectionToPlayer.Rotation();
+// 	FRotator CurrentRotation = MyEnemy->GetActorRotation();
+// 	float DeltaYaw = FMath::FindDeltaAngleDegrees(CurrentRotation.Yaw, TargetRotation.Yaw);
+// 	TargetRotation.Yaw = CurrentRotation.Yaw + DeltaYaw;
+// 
+// 	MyEnemy->SetActorRotation(FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 10.0f));
 
-	MyEnemy->SetActorRotation(FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 10.0f));
+// 	// 플레이어 방향 계산
+// 	FVector PlayerLocation = MyEnemy->Target->GetActorLocation ( );
+// 	FVector PawnLocation = MyEnemy->GetActorLocation ( );
+// 	FVector DirectionToPlayer = ( PlayerLocation - PawnLocation ).GetSafeNormal ( );
+// 
+// 	// Yaw 회전만 조정 (Pitch는 유지)
+// 	FRotator TargetRotation = FRotationMatrix::MakeFromX ( DirectionToPlayer ).Rotator ( );
+// 	TargetRotation.Pitch = 0.0f; // Pitch를 0으로 설정해 수평 회전만 적용
+// 	TargetRotation.Roll = 0.0f;
+// 
+// 	// 부드러운 회전을 위해 Interp 사용 (선택 사항)
+// 	FRotator CurrentRotation = MyEnemy->GetActorRotation ( );
+// 	FRotator NewRotation = FMath::RInterpTo ( CurrentRotation , TargetRotation , GetWorld()->GetDeltaSeconds(),20.0f);
+// 
+// 	// Pawn 회전 설정
+// 	MyEnemy->SetActorRotation ( NewRotation );
 }
 
 FVector UCMeleeEnemyFSM::BackstepPosition()

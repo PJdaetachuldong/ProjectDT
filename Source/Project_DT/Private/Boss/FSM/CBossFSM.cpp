@@ -107,3 +107,10 @@ void UCBossFSM::SPATTACKState()
 
 }
 
+void UCBossFSM::SetRANGEDATTACKState(int32 RandomComboAttack)
+{
+	AttackState = EBossATTACKState::RANGEDATTACK;
+
+	ComboAttackIndex = RandomComboAttack;
+}
+

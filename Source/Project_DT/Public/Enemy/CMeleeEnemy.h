@@ -24,6 +24,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// FSM 컴포넌트
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    class UCMeleeEnemyFSM* FSMComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
     float ChaseDistance;    //CHASE상태에서 CHASE상태가 유지되는 거리
 
@@ -42,5 +46,7 @@ public:
 
 	virtual void SetStateCHASE(ACharacter* Player) override;
 
-	virtual void EnemyHitDamage(float Damage) override;
+	UFUNCTION(BlueprintCallable)
+	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+bool bFromSweep, const FHitResult& SweepResult) override;
 };

@@ -5,6 +5,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Enemy/FSM/CMeleeEnemyFSM.h"
 #include "Character/CPlayer.h"
+#include "Components/CapsuleComponent.h"
+#include "Weapons/CAttachment.h"
+#include "Enemy/AIController/CMeleeAIController.h"
 
 // Sets default values
 ACMeleeEnemy::ACMeleeEnemy()
@@ -20,15 +23,22 @@ ACMeleeEnemy::ACMeleeEnemy()
 	GetCharacterMovement ( )->bUseRVOAvoidance = true;
 	GetCharacterMovement ( )->AvoidanceConsiderationRadius = 200.0f;
 	GetCharacterMovement ( )->AvoidanceWeight = 0.2f;
-	GetCharacterMovement ( )->SetAvoidanceGroup ( 1 );
-	GetCharacterMovement ( )->SetGroupsToAvoid ( 1 );
+	GetCharacterMovement ( )->SetAvoidanceGroup (1);
+	GetCharacterMovement ( )->SetGroupsToAvoid (1);
+	
+	GetCapsuleComponent()->SetCollisionProfileName(FName("TestEnemy"));
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ACMeleeEnemy::EnemyHitDamage);
+
+	FSMComponent = CreateDefaultSubobject<UCMeleeEnemyFSM> ( TEXT ( "FSMComp" ) );
+
+	AIControllerClass = ACMeleeAIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 // Called when the game starts or when spawned
 void ACMeleeEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -36,12 +46,15 @@ void ACMeleeEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	CheckPlayerInRange();
+	if ( FSMComponent->State == EMeleeEnemyState::IDLE )
+	{
+		CheckPlayerInRange();
+	}
 
 	if (FSMComponent->State == EMeleeEnemyState::CHASE && Target)
 	{
 		float Distance = FVector::Dist(GetActorLocation(), Target->GetActorLocation());
-		if (Distance <= ChaseDistance)
+		if (Distance <= AttackRange)
 		{
 			//공격권이 있으면 ATTACK상태로 변환
 			if (IsCanAttack)
@@ -63,7 +76,7 @@ void ACMeleeEnemy::LoadStatsFromAsset()
 
 	if ( StatsAsset )
 	{
-		ChaseDistance = StatsAsset->Stats.AttackRange;
+		ChaseDistance = StatsAsset->Stats.ChaseDistance;
 	}
 }
 
@@ -73,12 +86,15 @@ void ACMeleeEnemy::CheckPlayerInRange()
 	FHitResult Hit;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
-	bool bHit = GetWorld()->SweepSingleByChannel(Hit,GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(500.0f), Params);
+	bool bHit = GetWorld()->SweepSingleByChannel(Hit,GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel3 , FCollisionShape::MakeSphere(500.0f), Params);
 
 	DrawDebugSphere(GetWorld(), GetActorLocation(), 500.0f, 21, FColor::Green, false, 0.1f);
-	
+
 	if (bHit && Hit.GetActor()->IsA(ACPlayer::StaticClass()))
 	{
+// 		UE_LOG ( LogTemp , Warning , TEXT ( "Hit Actor: %s, Class: %s" ) ,
+// 			*Hit.GetActor ( )->GetName ( ) , *Hit.GetActor ( )->GetClass ( )->GetName ( ) );
+
 		FVector ToPlayer = (Hit.GetActor()->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
 		
 		float DotProduct = FVector::DotProduct(GetActorForwardVector(), ToPlayer);
@@ -89,12 +105,12 @@ void ACMeleeEnemy::CheckPlayerInRange()
 		{
 			//플레이어 탐지하는데 장애물이 있는지 확인함
 			FHitResult LOSHit;
-			bool bLOS = GetWorld()->LineTraceSingleByChannel(LOSHit, GetActorLocation(), Hit.GetActor()->GetActorLocation(), ECC_Visibility, Params);
+			bool bLOS = GetWorld()->LineTraceSingleByChannel(LOSHit, GetActorLocation(), Hit.GetActor()->GetActorLocation(), ECC_WorldDynamic , Params);
 
-			if (bLOS && LOSHit.GetActor()->IsA(ACPlayer::StaticClass()))
+			if (bLOS && LOSHit.GetActor()->IsA( ACPlayer::StaticClass()))
 			{
 				//타겟 저장
-				Target = Cast<ACharacter>(LOSHit.GetActor());
+				Target = Cast<ACharacter>(/*LOSHit*/Hit.GetActor());
 				IsCanAttack = true;
 				FSMComponent-> State = EMeleeEnemyState::CHASE;
 
@@ -114,52 +130,60 @@ void ACMeleeEnemy::SetStateCHASE(ACharacter* Player)
 	FSMComponent->State = EMeleeEnemyState::CHASE;
 }
 
-void ACMeleeEnemy::EnemyHitDamage(float Damage)
+void ACMeleeEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+bool bFromSweep, const FHitResult& SweepResult)
 {
-	//공격을 맞았을 때 쉴드 게이지가 있다면
-	if ( ShieldAmount > 0.0f )
+	ACAttachment* Weapon = Cast<ACAttachment>(OtherActor);
+
+	if ( Weapon )
 	{
-		//쉴드게이지가 감소하도록 설정
-		ShieldAmount -= Damage;
+		GEngine->AddOnScreenDebugMessage ( 40 , 1.0f , FColor::Red , TEXT ( "Hit Enemy" ) );
 
-		//만약 쉴드게이지 감소되어서 0이 된다면
-		if ( ShieldAmount <= 0.0f )
+		//공격을 맞았을 때 쉴드 게이지가 있다면
+		if ( ShieldAmount > 0.0f )
 		{
-			//에너미가 휘청거리는 애니메이션 출력?
-			GEngine->AddOnScreenDebugMessage ( 40 , 1.0f , FColor::Red , TEXT ( "Shield Break!!" ) );
+			//쉴드게이지가 감소하도록 설정
+			ShieldAmount -= /*Damage*/10.0f;
 
-			//쉴드 게이지가 -의 값이 되면 해당 값 만큼 체력을 깎게 만듦
-			CurHP += ShieldAmount;
-
-			return;
-		}
-
-		//가드 애니메이션이 나오도록 만들어주기
-		GEngine->AddOnScreenDebugMessage ( 40 , 1.0f , FColor::Red , TEXT ( "Gard Animation" ) );
-	}
-
-	//쉴드 게이지가 없는 상태에서 맞았을 경우
-	else
-	{
-		//체력을 깎게 만들어줌
-		CurHP -= Damage;
-
-		//체력이 깎였는데 0 이하가 된다면
-		if ( CurHP <= 0.0f )
-		{
-			//사망 상태로 만듦
-			FSMComponent->State = EMeleeEnemyState::DIE;
-
-			//만약 에너미 매니저가 있다면
-			if ( Manager )
+			//만약 쉴드게이지 감소되어서 0이 된다면
+			if ( ShieldAmount <= 0.0f )
 			{
-				Manager->RemoveEnemiesList(MyUniqeID, IsCanAttack);
+				//에너미가 휘청거리는 애니메이션 출력?
+				GEngine->AddOnScreenDebugMessage ( 41 , 1.0f , FColor::Red , TEXT ( "Shield Break!!" ) );
+
+				//쉴드 게이지가 -의 값이 되면 해당 값 만큼 체력을 깎게 만듦
+				CurHP += ShieldAmount;
+
+				return;
 			}
 
-			GEngine->AddOnScreenDebugMessage ( 40 , 1.0f , FColor::Red , TEXT ( "Enemy is Dead" ) );
+			//가드 애니메이션이 나오도록 만들어주기
+			GEngine->AddOnScreenDebugMessage ( 42 , 1.0f , FColor::Red , TEXT ( "Gard Animation" ) );
 		}
 
-		//피격 애니메이션이 나오게 만듦
-		GEngine->AddOnScreenDebugMessage ( 40 , 1.0f , FColor::Red , TEXT ( "Enemy Hit Damage" ) );
+		//쉴드 게이지가 없는 상태에서 맞았을 경우
+		else
+		{
+			//체력을 깎게 만들어줌
+			CurHP -= /*Damage*/10.0f;
+
+			//체력이 깎였는데 0 이하가 된다면
+			if ( CurHP <= 0.0f )
+			{
+				//사망 상태로 만듦
+				FSMComponent->State = EMeleeEnemyState::DIE;
+
+				//만약 에너미 매니저가 있다면
+				if ( Manager )
+				{
+					Manager->RemoveEnemiesList ( MyUniqeID , IsCanAttack );
+				}
+
+				GEngine->AddOnScreenDebugMessage ( 43 , 1.0f , FColor::Red , TEXT ( "Enemy is Dead" ) );
+			}
+
+			//피격 애니메이션이 나오게 만듦
+			GEngine->AddOnScreenDebugMessage ( 44 , 1.0f , FColor::Red , TEXT ( "Enemy Hit Damage" ) );
+		}
 	}
 }

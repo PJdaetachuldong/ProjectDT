@@ -17,6 +17,7 @@ void ACEnemyManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SendManager();
 }
 
 void ACEnemyManager::SendManager()
@@ -77,6 +78,7 @@ void ACEnemyManager::RemoveEnemiesList(int32 ID, bool CanAttack)
 		//리스트와 맵에서 삭제
 		Enemies.RemoveAt(EnemyIndex);
 		EnemyMap.Remove(ID);
+		return;
 	}
 
 	//마지막 에너미가 아니면

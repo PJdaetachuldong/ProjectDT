@@ -42,6 +42,11 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	//어느 콤보 공격을 할지 저장하는 변수
+	int32 ComboAttackIndex;
+
+	//콤보공격이 될때 어떤 콤보 공격을 하지 같이 받는 함수
+	void SetRANGEDATTACKState(int32 RandomComboAttack);
 
 	//보스 FSM 관련 함수
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category =FSM)
@@ -62,4 +67,5 @@ public:
 	void COMBOATTACKState();
 	void COUNTERATTACKState();
 	void SPATTACKState();
+
 };

@@ -17,4 +17,10 @@ class PROJECT_DT_API ACMeleeAIController : public AAIController
 
 protected:
 	virtual void BeginPlay() override;
+
+private:
+	virtual void Tick(float DeltaTime) override;
+
+public:
+	void SetRotation(ACharacter* Player, ACharacter* Enemy);
 };
