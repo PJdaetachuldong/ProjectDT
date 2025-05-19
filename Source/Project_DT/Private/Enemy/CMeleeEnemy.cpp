@@ -4,6 +4,7 @@
 #include "Enemy/CMeleeEnemy.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Enemy/FSM/CMeleeEnemyFSM.h"
+#include "Character/CPlayer.h"
 
 // Sets default values
 ACMeleeEnemy::ACMeleeEnemy()
@@ -34,6 +35,8 @@ void ACMeleeEnemy::BeginPlay()
 void ACMeleeEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	CheckPlayerInRange();
 
 	if (FSMComponent->State == EMeleeEnemyState::CHASE && Target)
 	{
@@ -74,41 +77,44 @@ void ACMeleeEnemy::CheckPlayerInRange()
 
 	DrawDebugSphere(GetWorld(), GetActorLocation(), 500.0f, 21, FColor::Green, false, 0.1f);
 	
-// 	if (bHit && Hit.GetActor()->IsA(AEnemyTestCharacter::StaticClass()))
-// 	{
-// 		FVector ToPlayer = (Hit.GetActor()->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
-// 		
-// 		float DotProduct = FVector::DotProduct(GetActorForwardVector(), ToPlayer);
-// 		float AngleRad = FMath::Acos(DotProduct);
-// 		float AngleDeg = FMath::RadiansToDegrees(AngleRad);
-// 
-// 		if (AngleDeg <= 40.0f)
-// 		{
-// 			//플레이어 탐지하는데 장애물이 있는지 확인함
-// 			FHitResult LOSHit;
-// 			bool bLOS = GetWorld()->LineTraceSingleByChannel(LOSHit, GetActorLocation(), Hit.GetActor()->GetActorLocation(), ECC_Visibility, Params);
-// 
-// 			if (bLOS && LOSHit.GetActor()->IsA(AEnemyTestCharacter::StaticClass()))
-// 			{
-// 				//타겟 저장
-// 				Target = Cast<ACharacter>(LOSHit.GetActor());
-// 				IsCanAttack = true;
-// 				FSMComponent-> State = EMeleeEnemyState::CHASE;
-// 
-// 				//매니저에게 플레이어를 발견했다고 전달, 다른 에너미도 추적하도록 만듦
-// 				Manager->SendPlayerEncounter(Target, MyUniqeID);
-// 			}
-// 		}
-// 	}
+	if (bHit && Hit.GetActor()->IsA(ACPlayer::StaticClass()))
+	{
+		FVector ToPlayer = (Hit.GetActor()->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
+		
+		float DotProduct = FVector::DotProduct(GetActorForwardVector(), ToPlayer);
+		float AngleRad = FMath::Acos(DotProduct);
+		float AngleDeg = FMath::RadiansToDegrees(AngleRad);
+
+		if (AngleDeg <= 40.0f)
+		{
+			//플레이어 탐지하는데 장애물이 있는지 확인함
+			FHitResult LOSHit;
+			bool bLOS = GetWorld()->LineTraceSingleByChannel(LOSHit, GetActorLocation(), Hit.GetActor()->GetActorLocation(), ECC_Visibility, Params);
+
+			if (bLOS && LOSHit.GetActor()->IsA(ACPlayer::StaticClass()))
+			{
+				//타겟 저장
+				Target = Cast<ACharacter>(LOSHit.GetActor());
+				IsCanAttack = true;
+				FSMComponent-> State = EMeleeEnemyState::CHASE;
+
+				if ( Manager )
+				{
+					//매니저에게 플레이어를 발견했다고 전달, 다른 에너미도 추적하도록 만듦
+					Manager->SendPlayerEncounter(Target, MyUniqeID);
+				}
+			}
+		}
+	}
 }
 
-void ACMeleeEnemy::SetStateCHASE ( ACharacter* Player )
+void ACMeleeEnemy::SetStateCHASE(ACharacter* Player)
 {
 	Target = Player;
 	FSMComponent->State = EMeleeEnemyState::CHASE;
 }
 
-void ACMeleeEnemy::EnemyHitDamage ( float Damage )
+void ACMeleeEnemy::EnemyHitDamage(float Damage)
 {
 	//공격을 맞았을 때 쉴드 게이지가 있다면
 	if ( ShieldAmount > 0.0f )
@@ -120,7 +126,6 @@ void ACMeleeEnemy::EnemyHitDamage ( float Damage )
 		if ( ShieldAmount <= 0.0f )
 		{
 			//에너미가 휘청거리는 애니메이션 출력?
-			//아니면 일정시간 동안 그로기?
 			GEngine->AddOnScreenDebugMessage ( 40 , 1.0f , FColor::Red , TEXT ( "Shield Break!!" ) );
 
 			//쉴드 게이지가 -의 값이 되면 해당 값 만큼 체력을 깎게 만듦
@@ -144,6 +149,12 @@ void ACMeleeEnemy::EnemyHitDamage ( float Damage )
 		{
 			//사망 상태로 만듦
 			FSMComponent->State = EMeleeEnemyState::DIE;
+
+			//만약 에너미 매니저가 있다면
+			if ( Manager )
+			{
+				Manager->RemoveEnemiesList(MyUniqeID, IsCanAttack);
+			}
 
 			GEngine->AddOnScreenDebugMessage ( 40 , 1.0f , FColor::Red , TEXT ( "Enemy is Dead" ) );
 		}

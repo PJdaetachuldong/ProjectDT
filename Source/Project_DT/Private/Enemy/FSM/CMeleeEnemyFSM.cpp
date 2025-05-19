@@ -121,7 +121,7 @@ void UCMeleeEnemyFSM::WANDERState()
 		}
 		else
 		{
-
+			
 		}
 	}
 
@@ -247,8 +247,25 @@ void UCMeleeEnemyFSM::SetWanderMoveLocation()
 
 	WanderMoveLocation = PlayerLocation + WanderOffset;
 
-	IsWanderMoveSet = true;
-	CurWanderDelayTime = 0.0f;
+	//위치로 정한곳이 NavMesh로 이동할 수 있는지 체크
+
+	UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(GetWorld());
+		FNavLocation NavPoint;
+
+	if ( NavSys->ProjectPointToNavigation(WanderMoveLocation, NavPoint))
+	{
+		IsWanderMoveSet = true;
+		CurWanderDelayTime = 0.0f;
+	}
+
+	else
+	{
+		SetWanderMoveLocation();
+	}
+
+// 	IsWanderMoveSet = true;
+// 	CurWanderDelayTime = 0.0f;
+	
 }
 
 void UCMeleeEnemyFSM::GetOnwerEnemy()
