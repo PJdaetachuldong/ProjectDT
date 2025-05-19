@@ -23,8 +23,12 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
 	class UCWolfFSM* WolfFSM;
+
 public://오버라이드 할 것 같은 항목
 	// virtual void OnWeaponChanged ( );	// 무기에 따른 소환수 변화
 	// virtual void AssistAttack ( );	// 보조 공격
 	// virtual void SetTarget ( );		// 타겟 지정
+
+public:	// 기타 함수
+	void Landed ( const FHitResult& Hit );	// 착지 확인 델리게이트
 };

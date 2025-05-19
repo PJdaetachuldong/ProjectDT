@@ -123,13 +123,17 @@ public:
 
 public:	// State 관련 함수
 	void IdleState();
+	void JumpState();
 
 public:	// 실행쪽 함수
 	void SpawnFamiliar();
 	void UpdateEnemyList();
+
 	// Start, 공격 직전, 피격
 	void SearchEnemy();		// 적 리스트 갱신
 	void SetOnTarget();		// 타겟 지정하기
 	void SetTargetDir();	// 타겟 방향으로 몸 돌리기
+
+
 
 };
