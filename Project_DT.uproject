@@ -11,6 +11,8 @@
 			"AdditionalDependencies": [
 				"Engine",
 				"AIModule"
+				"MotionTrajectory",
+				"CoreUObject"
 			]
 		}
 	],
@@ -21,6 +23,18 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+		},
+		{
+			"Name": "PoseSearch",
+			"Enabled": true
+		},
+		{
+			"Name": "MotionTrajectory",
+			"Enabled": true
+		},
+		{
+			"Name": "Chooser",
+			"Enabled": true
 		}
 	]
 }
