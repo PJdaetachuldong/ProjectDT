@@ -40,7 +40,6 @@ void ACEnemy::BeginPlay ( )
 
 	Movement->OnWalk ( );
 
-
 	Create_DynamicMeterical ( this );
 	Change_Color ( this , OriginColor );
 
@@ -86,6 +85,15 @@ void ACEnemy::Hitted ( )
 		FHitData* data = Damage.Event->HitData;
 		data->PlayMontage ( this );
 		data->PlayHitStop ( GetWorld ( ) );
+		{
+			FVector start = GetActorLocation();
+			FVector target = Damage.Character->GetActorLocation();
+			FVector direction = target - start;
+			direction.Normalize();
+
+			LaunchCharacter(-direction * data->Launch, false, false);
+			SetActorRotation(UKismetMathLibrary::FindLookAtRotation(start, target));
+		}
 	}
 	Damage.Character = nullptr;
 	Damage.Causer = nullptr;

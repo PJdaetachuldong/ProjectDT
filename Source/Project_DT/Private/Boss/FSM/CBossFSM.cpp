@@ -31,7 +31,7 @@ void UCBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 	switch ( State )
 	{
-		case EBossState::IDLE: { IDLEState(); } break;
+	case EBossState::IDLE: { IDLEState ( ); } break;
 		case EBossState::CHASE: { CHASEState ( ); } break;
 		case EBossState::ATTACK: { ATTACKState ( ); } break;
 		case EBossState::DAMAGE: { DAMAGEState ( ); } break;
