@@ -20,7 +20,7 @@ void UCBossFSM::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+
 }
 
 
@@ -32,10 +32,10 @@ void UCBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	switch ( State )
 	{
 		case EBossState::IDLE: { IDLEState(); } break;
-		case EBossState::CHASE: { CHASEState() } break;
-		case EBossState::ATTACK: { ATTACKState() } break;
-		case EBossState::DAMAGE: { DAMAGEState() } break;
-		case EBossState::DIE: { DIEState() }	break;
+		case EBossState::CHASE: { CHASEState ( ); } break;
+		case EBossState::ATTACK: { ATTACKState ( ); } break;
+		case EBossState::DAMAGE: { DAMAGEState ( ); } break;
+		case EBossState::DIE: { DIEState ( ); }	break;
 	}
 
 	if ( State == EBossState::ATTACK )
@@ -54,56 +54,56 @@ void UCBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 void UCBossFSM::IDLEState()
 {
-	
+
 }
 
 void UCBossFSM::CHASEState()
 {
-	
+
 }
 
 void UCBossFSM::ATTACKState()
 {
-	
+
 }
 
 void UCBossFSM::DAMAGEState()
 {
-	
+
 }
 
 void UCBossFSM::DIEState()
 {
-	
+
 }
 
 void UCBossFSM::NONEState()
 {
-	
+
 }
 
 void UCBossFSM::RANGEDATTACKState()
 {
-	
+
 }
 
 void UCBossFSM::DASHATTACKState()
 {
-	
+
 }
 
 void UCBossFSM::COMBOATTACKState()
 {
-	
+
 }
 
 void UCBossFSM::COUNTERATTACKState()
 {
-	
+
 }
 
 void UCBossFSM::SPATTACKState()
 {
-	
+
 }
 
