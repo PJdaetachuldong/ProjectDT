@@ -78,22 +78,6 @@ public:
 	virtual void TickComponent ( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction ) override;
 #pragma endregion Base
 
-// 본인, 플레이어, 에너미리스트
-#pragma region Target
-private:
-	UPROPERTY()
-	class ACFamiliarWolf* me;
-
-	UPROPERTY()
-	class ACPlayer* Player;	// 쫓아갈 플레이어
-
-	UPROPERTY()	
-	class ACDummyForFamiliar* Enemy;		// 타게팅 된 에너미
-
-	UPROPERTY()	
-	TArray<ACDummyForFamiliar*>EnemyList;	// 추후에 에너미 클래스로 변경해야 함.
-#pragma endregion Target
-
 // 스테이트 정의
 #pragma region State
 public:
@@ -108,18 +92,30 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
 	EOverridenState mOverState = EOverridenState::None;
-
 #pragma endregion State 
+
+
+// 본인, 플레이어, 에너미리스트
+#pragma region Target
+private:
+	UPROPERTY()
+	class ACFamiliarWolf* Me;
+	UPROPERTY()
+	class ACPlayer* Player;	// 쫓아갈 플레이어
+	UPROPERTY()	
+	class ACEnemyBase* TargetEnemy;		// 타게팅 된 에너미
+
+	UPROPERTY()	
+	TArray<ACEnemyBase*>EnemyList;
+	TArray<AActor*> HitActors;	// 다단히트 방지
+#pragma endregion Target
 
 public:
 	float CurrentTime = 0.f;
 
-public:	// 스탯 관련
-	float AttackDelayTime = 2.f;	// 공격 쿨타임
-
 public:
-	bool bIsSpawned = false;	// 스폰 상태인지 확인하는 변수
-	bool bIsInBattle = false;	// 전투 상태인지 확인하는 변수
+	bool IsSpawned = false;		// 스폰 상태인지 확인하는 변수
+	bool IsInBattle = false;	// 전투 상태인지 확인하는 변수
 
 public:	// State 관련 함수
 	void IdleState();
@@ -130,10 +126,11 @@ public:	// 실행쪽 함수
 	void UpdateEnemyList();
 
 	// Start, 공격 직전, 피격
-	void SearchEnemy();		// 적 리스트 갱신
-	void SetOnTarget();		// 타겟 지정하기
-	void SetTargetDir();	// 타겟 방향으로 몸 돌리기
-
+	void SearchEnemy();			// 적 리스트 갱신
+	void SetOnTarget();			// 타겟 지정하기
+	void SetOnRandTarget ( );	// 임시타겟. 리스트 랜덤돌림.
+	FVector TargetDir ();		// 타겟 Dir 구하기
+	void TurnToTarget();		// 타겟 방향으로 몸 돌리기
 
 
 };
