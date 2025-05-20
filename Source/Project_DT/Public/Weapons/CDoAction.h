@@ -8,7 +8,7 @@
 #include "CDoAction.generated.h"
 UENUM(BlueprintType)
 enum class EActionState : uint8 {
-	Normal,Heavy, Special,Max
+	Normal,Heavy, Special, Guard ,Max
 };
 
 UCLASS(Abstract,NotBlueprintable)
@@ -26,6 +26,7 @@ public:
 		class TArray<FDoActionData>& InDoActionData,
 		class TArray<FDoHeavyActionData>& InDoHeavyActionData,
 		class TArray<FDoSpecialActionData>& InDoSpecialActionData ,
+		class TArray<FDoGuardActionData>& InDoGuardActionData ,
 		class TArray<FHitData>& InHitData
 	);
 
@@ -39,11 +40,16 @@ public:
 
 	virtual void DoSpecialAction ( );
 
+	virtual void DoGuardStarted ( );
+	virtual void DoGuardTrriger ( ) {};
+	virtual void DoGuardComplete ( );
+
 
 public:
 	FORCEINLINE void NormalAttack ( ) { ActionState = EActionState::Normal; };
 	FORCEINLINE void HeavyAttack ( ) { ActionState = EActionState::Heavy; };
 	FORCEINLINE void SpecialAttack ( ) { ActionState = EActionState::Special; };
+	FORCEINLINE void OnGuard ( ) { ActionState = EActionState::Guard; };
 
 public:
 	UFUNCTION()
@@ -71,6 +77,7 @@ protected:
 	TArray<FDoActionData> DoActionDatas;
 	TArray<FDoHeavyActionData> DoHeavyActionDatas;
 	TArray<FDoSpecialActionData> DoSpecialActionData;
+	TArray<FDoGuardActionData> DoGuardActionData;
 	TArray<FHitData> HitDatas;
 
 };

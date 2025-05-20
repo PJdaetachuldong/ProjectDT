@@ -80,6 +80,7 @@ ACPlayer::ACPlayer()
 	CHelpers::GetAsset ( &IA_LeftAttack , AssetPaths::IA_LeftClick );
 	CHelpers::GetAsset ( &IA_RightAttack , AssetPaths::IA_RightClick );
 	CHelpers::GetAsset ( &IA_SpecialAttack , AssetPaths::IA_SpecialClick );
+	CHelpers::GetAsset ( &IA_Guard , AssetPaths::IA_GuardBtn );
 }
 
 void ACPlayer::BeginPlay()
@@ -121,6 +122,8 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction ( IA_LeftAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoAction );
 		playerInput->BindAction ( IA_RightAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoHeavyAction );
 		playerInput->BindAction ( IA_SpecialAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoSpeciaAction);
+		playerInput->BindAction ( IA_Guard , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoGuardActionStart);
+		playerInput->BindAction ( IA_Guard , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::DoGuardActionEnd);
 	}
 }
 

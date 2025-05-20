@@ -5,13 +5,13 @@
 #include "Utilities/CHelper.h"
 #include "Component/CMovementComponent.h"
 #include "Component/CStateComponent.h"
-
+#include "Global.h"
 UCDoAction::UCDoAction ( )
 {
 
 }
 
-void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipment* InEquipment , class ACharacter* InOwner , class TArray<FDoActionData>& InDoActionData , class TArray<FDoHeavyActionData>& InDoHeavyActionData , class TArray<FDoSpecialActionData>& InDoSpecialActionData , TArray<FHitData>& InHitData )
+void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipment* InEquipment , class ACharacter* InOwner , class TArray<FDoActionData>& InDoActionData , class TArray<FDoHeavyActionData>& InDoHeavyActionData , class TArray<FDoSpecialActionData>& InDoSpecialActionData , class TArray<FDoGuardActionData>& InDoGuardActionData , TArray<FHitData>& InHitData )
 {
 	OwnerCharacter = InOwner;
 	World = OwnerCharacter->GetWorld ( );
@@ -22,6 +22,7 @@ void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipmen
 	DoActionDatas = InDoActionData;
 	DoHeavyActionDatas = InDoHeavyActionData;
 	DoSpecialActionData = InDoSpecialActionData;
+	DoGuardActionData = InDoGuardActionData;
 	HitDatas = InHitData;
 }
 
@@ -57,5 +58,18 @@ void UCDoAction::Begin_DoHeavyAction ( )
 void UCDoAction::DoSpecialAction ( )
 {
 	State->SetActionMode ( );
+
+}
+
+void UCDoAction::DoGuardStarted ( )
+{
+	State->SetGuardMode ( );
+	CLog::Log ( "asdjasibdihasbdsad" );
+
+}
+
+void UCDoAction::DoGuardComplete ( )
+{
+	State->SetIdleMode ( );
 
 }

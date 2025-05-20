@@ -104,8 +104,23 @@ void UCWeaponComponent::DoSpeciaAction ( )
 	if ( !!GetDoAction ( ) ) {
 		GetDoAction ( )->DoSpecialAction ( );
 		GetDoAction ( )->SpecialAttack ( );
+	}
+}
+
+void UCWeaponComponent::DoGuardActionStart ( )
+{
+	if ( !!GetDoAction ( ) ) {
+		GetDoAction ( )->DoGuardStarted ( );
 
 	}
+}
+
+void UCWeaponComponent::DoGuardActionEnd ( )
+{
+	if ( !!GetDoAction ( ) ) {
+		GetDoAction ( )->DoGuardComplete ( );
+	}
+
 }
 
 void UCWeaponComponent::SetMode ( EWeaponType InType )

@@ -28,6 +28,7 @@ void UCPlayerAnim::NativeUpdateAnimation ( float DeltaSeconds )
 	auto Owner = Cast<ACPlayer> ( TryGetPawnOwner ( ) );
 	Movement = Owner->GetCharacterMovement();
 	Trajectory = Owner->Trajectory;
+	WeaponType = Weapon->GetWeaponType ( );
 }
 
 void UCPlayerAnim::OnWeaponTypeChanged ( EWeaponType InPrevType , EWeaponType InNewType )

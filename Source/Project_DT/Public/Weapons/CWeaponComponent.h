@@ -27,6 +27,7 @@ public:
 	FORCEINLINE bool IsFistMode ( ) { return Type == EWeaponType::Fist; }
 	FORCEINLINE bool IsKatanaMode ( ) { return Type == EWeaponType::Katana; }
 	FORCEINLINE bool IsSwordMode ( ) { return Type == EWeaponType::Sword; }
+	FORCEINLINE EWeaponType GetWeaponType ( ) { return Type; }
 public:
 	UCWeaponComponent();
 
@@ -49,6 +50,10 @@ public:
 	void DoAction();
 	void DoHeavyAction();
 	void DoSpeciaAction();
+
+	void DoGuardActionStart();
+	void DoGuardActionEnd();
+
 
 private:
 	void SetMode ( EWeaponType InType );

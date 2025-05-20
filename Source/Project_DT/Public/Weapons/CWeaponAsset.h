@@ -35,6 +35,9 @@ private:
 	TArray<FDoSpecialActionData> DoSpecialActionData;
 
 	UPROPERTY(EditAnywhere)
+	TArray<FDoGuardActionData> DoGuardActionData;
+
+	UPROPERTY(EditAnywhere)
 	TArray<FHitData> HitDatas;
 
 public:
