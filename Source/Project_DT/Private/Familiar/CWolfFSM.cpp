@@ -35,13 +35,13 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 
 #pragma region LogMessageState
 
-	FString logMsgUpState = UEnum::GetValueAsString( mUpState );
+	FString logMsgUpState = UEnum::GetValueAsString( MUpState );
 	GEngine->AddOnScreenDebugMessage(0, 1, FColor::Yellow, logMsgUpState );
 
 #pragma endregion LogMessageState
 
 // 최상위 State
-	switch ( mUpState )
+	switch ( MUpState )
 	{
 	//case EUpperState::Start: { }	break;		// 소환이 이루어질 때 Spawn 함수를 호출하는게 나을듯.
 		case EUpperState::Idle:			{ }	break;
@@ -51,7 +51,7 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 		case EUpperState::Uncontrolled: { }	break;
 	}
 
-	switch ( mIdleState )
+	switch ( MIdleState )
 	{
 		case EIdleState::None:		{ }	break;
 		case EIdleState::Idle:		{ }	break;
@@ -59,7 +59,7 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 		case EIdleState::Jump:		{ JumpState(); } break;
 	}
 
-	switch ( mJumpState )
+	switch ( MJumpState )
 	{
 	case EJumpState::None:		{ }	break;
 	case EJumpState::StopJump:	{ }	break;
@@ -70,7 +70,7 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 	case EJumpState::RightJump: { }	break;
 	}
 
-	switch ( mAttState )
+	switch ( MAttState )
 	{
 		case EAttackState::None:	{ }	break;
 		case EAttackState::Attack:	{ }	break;
@@ -86,7 +86,7 @@ void UCWolfFSM::SpawnFamiliar ( )
 
 // 소환 파트
 	IsSpawned = true;
-	mUpState = EUpperState::Start;
+	MUpState = EUpperState::Start;
 
 // 탐지 파트	// 바로 공격할 때 사용. 대상 지정 필요할때마다 계속 갱신
 	SearchEnemy();
@@ -107,8 +107,8 @@ void UCWolfFSM::IdleState ( )
 
 	if ( CurrentTime > Me->AttackDelayTime )
 	{
-		mUpState = EUpperState::Attack;		// 공격중인 상태
-		mAttState = EAttackState::Attack;	 // 어떤 공격할지 바꾸기
+		MUpState = EUpperState::Attack;		// 공격중인 상태
+		MAttState = EAttackState::Attack;	 // 어떤 공격할지 바꾸기
 
 		// 공격 실행은 노티파이로, 점프공격 애니메이션이 있으면 좋을듯. 
 			// (없으면 물기 + Launch)
@@ -226,7 +226,7 @@ void UCWolfFSM::TurnToTarget ( )
 
 	// BattleIdle 상태일 경우에만 실행
 	//에너미가 특정 각도 이상 or 특정 거리 안쪽일 때 점프로 전환
-	mIdleState = EIdleState::Jump;
+	MIdleState = EIdleState::Jump;
 
 	// xxxxxxxxxxxxx
 	//노티파이로 점프 실행 후 다시 BattleIdle 실행하도록 전환

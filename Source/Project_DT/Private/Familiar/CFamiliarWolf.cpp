@@ -27,7 +27,6 @@ ACFamiliarWolf::ACFamiliarWolf ( )
 	
 
 	WolfFSM = CreateDefaultSubobject<UCWolfFSM> ( TEXT ( "WolfFSM" ) );
-	
 	WolfAnim = Cast<UCWolfAnimInstance> ( GetMesh ( )->GetAnimInstance ( ) );
 
 	/*

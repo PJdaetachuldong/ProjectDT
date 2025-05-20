@@ -87,19 +87,19 @@ public:
 #pragma region State
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
-	EUpperState mUpState = EUpperState::Idle;
+	EUpperState MUpState = EUpperState::Start;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
-	EIdleState mIdleState = EIdleState::None;
+	EIdleState MIdleState = EIdleState::None;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
-	EJumpState mJumpState = EJumpState::None;
+	EJumpState MJumpState = EJumpState::None;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
-	EAttackState mAttState = EAttackState::None;
+	EAttackState MAttState = EAttackState::None;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
-	EOverridenState mOverState = EOverridenState::None;
+	EOverridenState MOverState = EOverridenState::None;
 #pragma endregion State 
 
 
