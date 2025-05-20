@@ -40,14 +40,19 @@ enum class EAttackState : uint8
 	Attack		UMETA(DisplayName = "Attack")
 };
 
-UENUM() // HFSM - 이동 상태
-enum class EMoveState : uint8
+UENUM() // HFSM - 이동 상태 (점프로 각도 조정등 수행)
+enum class EJumpState : uint8
 {
 	None		UMETA(DisplayName = "None"),
-	Move		UMETA(DisplayName = "Move")
+	StopJump	UMETA(DisplayName = "StopJump"),
+
+	FrontJump	UMETA(DisplayName = "FrontJump"),
+	BackJump	UMETA(DisplayName = "BackJump"),
+	LeftJump	UMETA(DisplayName = "LeftJump"),
+	RightJump	UMETA(DisplayName = "RightJump")
 };
 
-UENUM() // HFSM - 이동 상태
+UENUM() // HFSM - 강제 컨트롤 상태
 enum class EOverridenState : uint8
 {
 	None			UMETA(DisplayName = "None"),
@@ -86,6 +91,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
 	EIdleState mIdleState = EIdleState::None;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
+	EJumpState mJumpState = EJumpState::None;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
 	EAttackState mAttState = EAttackState::None;

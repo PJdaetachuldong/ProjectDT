@@ -3,6 +3,8 @@
 
 #include "Familiar/CFamiliarWolf.h"
 #include "Familiar/CWolfFSM.h"
+#include "Familiar/CWolfAnimInstance.h"
+#include "Engine/SkeletalMesh.h"
 
 ACFamiliarWolf::ACFamiliarWolf ( )
 {
@@ -11,22 +13,22 @@ ACFamiliarWolf::ACFamiliarWolf ( )
 #pragma region Components
 
 	WolfComponent = GetMesh ( );
-	/*
-	ConstructorHelpers::FObjectFinder<USkeletalMesh>TmpBody ( TEXT ( "경로" ) );
+	
+	ConstructorHelpers::FObjectFinder<USkeletalMesh>TmpBody ( TEXT ("/Script/Engine.SkeletalMesh'/Game/KJY/Wolf/Mesh/SKM_Wolf.SKM_Wolf'") );
 	if ( TmpBody.Succeeded ( ) )
 	{
 		WolfComponent->SetSkeletalMesh ( TmpBody.Object );
-		WolfComponent->SetRelativeLocation ( FVector ( 0.f ) );
-		WolfComponent->SetRelativeRotation ( FRotator ( 0.f) );
+		WolfComponent->SetRelativeLocation ( FVector ( -20.f, 0.f, -48.f ) );
+		WolfComponent->SetRelativeRotation ( FRotator ( 0.f, -90.f, 0.f ) );
 
-		WolfComponent->SetRelativeScale3D ( FVector ( 1.f ) );
+		WolfComponent->SetRelativeScale3D ( FVector ( 1.0f ) );
 		WolfComponent->SetCollisionProfileName ( TEXT ( "WolfBody" ) );
 	}
-	*/
+	
 
 	WolfFSM = CreateDefaultSubobject<UCWolfFSM> ( TEXT ( "WolfFSM" ) );
 	
-	// Anim = Cast<UCSafiAnimInstance> ( GetMesh ( )->GetAnimInstance ( ) );
+	WolfAnim = Cast<UCWolfAnimInstance> ( GetMesh ( )->GetAnimInstance ( ) );
 
 	/*
 	USkeletalMeshComponent* SkeletalMeshComp = GetMesh ( );

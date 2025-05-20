@@ -40,29 +40,40 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 
 #pragma endregion LogMessageState
 
-	//state 변경
+// 최상위 State
 	switch ( mUpState )
 	{
 	//case EUpperState::Start: { }	break;		// 소환이 이루어질 때 Spawn 함수를 호출하는게 나을듯.
-		case EUpperState::Idle:	 { }	break;
-		case EUpperState::Move:	 { }	break;
-		case EUpperState::Attack:{ }	break;
-		case EUpperState::CC:	 { }	break;
+		case EUpperState::Idle:			{ }	break;
+		case EUpperState::Move:			{ }	break;
+		case EUpperState::Attack:		{ }	break;
+		case EUpperState::CC:			{ }	break;
 		case EUpperState::Uncontrolled: { }	break;
 	}
 
 	switch ( mIdleState )
 	{
-		case EIdleState::None: { }				break;
-		case EIdleState::Idle: { }				break;
-		case EIdleState::BattleIdle: { }		break;
-		case EIdleState::Jump: { JumpState(); }	break;
+		case EIdleState::None:		{ }	break;
+		case EIdleState::Idle:		{ }	break;
+		case EIdleState::BattleIdle:{ }	break;
+		case EIdleState::Jump:		{ JumpState(); } break;
+	}
+
+	switch ( mJumpState )
+	{
+	case EJumpState::None:		{ }	break;
+	case EJumpState::StopJump:	{ }	break;
+
+	case EJumpState::FrontJump: { }	break;
+	case EJumpState::BackJump:	{ }	break;
+	case EJumpState::LeftJump:	{ }	break;
+	case EJumpState::RightJump: { }	break;
 	}
 
 	switch ( mAttState )
 	{
-		case EAttackState::None: {}	break;
-		case EAttackState::Attack: {}	break;
+		case EAttackState::None:	{ }	break;
+		case EAttackState::Attack:	{ }	break;
 	}
 
 

@@ -20,12 +20,16 @@ protected:
 
 public:
 	virtual void Tick ( float DeltaTime ) override;
-public:
+
+public:	// 기본 세팅 파트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
+	class UCWolfFSM* WolfFSM;
+
 	UPROPERTY(EditDefaultsOnly)
 	class USkeletalMeshComponent* WolfComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
-	class UCWolfFSM* WolfFSM;
+	UPROPERTY()
+	class UCWolfAnimInstance* WolfAnim;
 
 public:	// 스탯 관련
 	float AttackDelayTime = 2.f;	// 공격 쿨타임
