@@ -114,7 +114,7 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction ( IA_MoveRight , ETriggerEvent::Triggered , Movement , &UCMovementComponent::OnMoveRight );
 		playerInput->BindAction ( IA_VerticalLook , ETriggerEvent::Triggered , Movement , &UCMovementComponent::OnVerticalLook );
 		playerInput->BindAction ( IA_HorizontalLook , ETriggerEvent::Triggered , Movement , &UCMovementComponent::OnHorizontalLook );
-		playerInput->BindAction ( IA_Dash , ETriggerEvent::Started , Movement , &UCMovementComponent::OnSprint);
+		playerInput->BindAction ( IA_Dash , ETriggerEvent::Started , this , &ACPlayer::OnSprint);
 		playerInput->BindAction ( IA_Dash , ETriggerEvent::Completed , Movement , &UCMovementComponent::OnRun);
 		playerInput->BindAction ( IA_Avoid , ETriggerEvent::Completed , this , &ACPlayer::OnAvoid );
 		playerInput->BindAction ( IA_TestBtn , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SetKatanaMode );
@@ -151,6 +151,20 @@ void ACPlayer::BackStep ()
 void ACPlayer::Jump ( ){
 	CLog::Log ( "Test" );
 	ACharacter::Jump();
+}
+
+void ACPlayer::OnSprint ( )
+{
+	if ( State->GetStateType ( ) == EStateType::Guard )
+		return;
+	Movement->OnSprint ( );
+
+}
+
+void ACPlayer::DoGuardActionStart ( )
+{
+	Movement->OnWalk ( );
+	Weapon->DoGuardActionStart();
 }
 
 void ACPlayer::End_BackStep() {

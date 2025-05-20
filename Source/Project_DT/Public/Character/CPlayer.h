@@ -85,6 +85,10 @@ private:
 	void BackStep();
 private:
 	void Jump();
+private:
+	void OnSprint ( );
+private:
+	void DoGuardActionStart ( );
 
 public:
 	void End_BackStep() override;
