@@ -62,7 +62,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category =FSM)
 	EMeleeEnemyState State = EMeleeEnemyState::IDLE;
 
-	void GetOnwerEnemy();
+	void GetOwnerEnemy();
 
 	void LookAtTarget();
 

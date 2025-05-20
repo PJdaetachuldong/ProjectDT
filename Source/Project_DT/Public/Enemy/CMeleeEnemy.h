@@ -46,7 +46,5 @@ public:
 
 	virtual void SetStateCHASE(ACharacter* Player) override;
 
-	UFUNCTION(BlueprintCallable)
-	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-bool bFromSweep, const FHitResult& SweepResult) override;
+	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 };

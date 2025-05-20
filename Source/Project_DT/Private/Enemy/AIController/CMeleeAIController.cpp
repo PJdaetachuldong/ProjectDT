@@ -30,8 +30,6 @@ void ACMeleeAIController::SetRotation(ACharacter* Player, ACharacter* Enemy)
 	if (!GetWorld ( ) )
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "SetRotation: World is null" ) );
-
-		CLog::Log("asdasdasdad" );
 		return;
 	}
 

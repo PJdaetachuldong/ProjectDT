@@ -25,17 +25,17 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	//플레이어와의 거리를 저장하는 변수
-	float TargetDist = 0.0f;
-
-	//어느 거리가 먼 거리인지 설정하는 변수
-	float LongDist = 700.0f;
-
-	//거리가 먼 상태에서 시간이 얼마나 지났는지 저장하는 변수
-	float CurChaseTime = 0.0f;
-
-	//대쉬 공격이 실행되는 쿨타임 변수
-	float DashAttackCooltime = 25.0f;
+// 	//플레이어와의 거리를 저장하는 변수
+// 	float TargetDist = 0.0f;
+// 
+// 	//어느 거리가 먼 거리인지 설정하는 변수
+// 	float LongDist = 700.0f;
+// 
+// 	//거리가 먼 상태에서 시간이 얼마나 지났는지 저장하는 변수
+// 	float CurChaseTime = 0.0f;
+// 
+// 	//대쉬 공격이 실행되는 쿨타임 변수
+// 	float DashAttackCooltime = 25.0f;
 	
 	//콤보 공격을 저장하는 변수
 	
@@ -60,8 +60,6 @@ public:
 	// FSM 컴포넌트
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     class UCBossFSM* FSMComponent;
-
-	UFUNCTION(BlueprintCallable)
-	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-bool bFromSweep, const FHitResult& SweepResult) override;
+	
+	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 };

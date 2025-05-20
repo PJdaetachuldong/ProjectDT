@@ -45,7 +45,7 @@ void ACMeleeEnemy::BeginPlay()
 void ACMeleeEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 	if ( FSMComponent->State == EMeleeEnemyState::IDLE )
 	{
 		CheckPlayerInRange();

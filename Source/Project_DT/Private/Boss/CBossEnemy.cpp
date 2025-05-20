@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Boss/FSM/CBossFSM.h"
 #include "Weapons/CAttachment.h"
+#include "Kismet/GameplayStatics.h"
 
 ACBossEnemy::ACBossEnemy()
 {
@@ -21,73 +22,75 @@ ACBossEnemy::ACBossEnemy()
 void ACBossEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Target = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 }
 
 void ACBossEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//추적 상태에서 거리를 체크해서 거리가 멀 경우
-	TargetDist = FVector::Dist(Target->GetActorLocation(), GetActorLocation());
-	
-	if (FSMComponent->State == EBossState:: CHASE)
-	{
-		//거리를 체크해서 거리가 멀 경우
-		if ( TargetDist >= LongDist )
-		{		
-			//거리가 먼 상태가 얼마나 지속되었는지 체크한다
-			CurChaseTime += DeltaTime;
-		}
-
-		//만약 거리가 먼 상태가 일정 시간 유지되었다면
-		if ( CurChaseTime >= DashAttackCooltime )
-		{
-			//공격 상태로 변환
-			FSMComponent->State=EBossState::ATTACK;
-			//그리고 대쉬 공격이 이루어지도록 공격상태도 변환
-			FSMComponent->AttackState = EBossATTACKState::DASHATTACK;
-
-			//뒤에 코드 실행 안되게 리턴
-			return;
-		}
-
-		//그냥 추적 상태인데 플레이어가 물약 마시는 모션을 할 경우
-// 		if ()
-// 		{
-// 			//공격 상태로 변환하고
-// 			FSMComponent->State == EBossState::ATTACK;
-// 			//바로 원거리 공격하게 변환
-// 			FSMComponent->AttackState == EBossATTACKState::RANGEDATTACK;
+// 	//추적 상태에서 거리를 체크
+// 	TargetDist = FVector::Dist(Target->GetActorLocation(), GetActorLocation());
+// 	
+// 	if (FSMComponent->State == EBossState:: CHASE)
+// 	{
+// 		//거리를 체크해서 거리가 멀 경우
+// 		if ( TargetDist >= LongDist )
+// 		{		
+// 			//거리가 먼 상태가 얼마나 지속되었는지 체크한다
+// 			CurChaseTime += DeltaTime;
 // 		}
-		//그냥 추적 상태인데 플레이어가 물약 마시는 모션을 할 경우
-	}
-	//추적 상태에서 거리를 체크해서 거리가 멀 경우
+// 
+// 		//만약 거리가 먼 상태가 일정 시간 유지되었다면
+// 		if ( CurChaseTime >= DashAttackCooltime )
+// 		{
+// 			//공격 상태로 변환
+// 			FSMComponent->State=EBossState::ATTACK;
+// 			//그리고 대쉬 공격이 이루어지도록 공격상태도 변환
+// 			FSMComponent->AttackState = EBossATTACKState::DASHATTACK;
+// 
+// 			//뒤에 코드 실행 안되게 리턴
+// 			return;
+// 		}
+// 
+// 		//그냥 추적 상태인데 플레이어가 물약 마시는 모션을 할 경우
+// // 		if ()
+// // 		{
+// // 			//공격 상태로 변환하고
+// // 			FSMComponent->State == EBossState::ATTACK;
+// // 			//바로 원거리 공격하게 변환
+// // 			FSMComponent->AttackState == EBossATTACKState::RANGEDATTACK;
+// // 		}
+// 		//그냥 추적 상태인데 플레이어가 물약 마시는 모션을 할 경우
+// 	}
+// 	//추적 상태에서 거리를 체크해서 거리가 멀 경우
 
 	//만약 공격 상태이면서 아직 어떤 공격을 할지 정하지 않았을 경우
-	if(FSMComponent->State == EBossState::ATTACK && FSMComponent->AttackState == EBossATTACKState::NONE)
-	{
-		//가드 게이지를 채워줌
-		GuardGage += DeltaTime;
-		//가드 게이지를 채워줌
-
-		//만약 가드 조건이 충족되었을 경우
-		if ( GuardGage <= GuardPlaying )
-		{
-			//가드 상태로 변화
-			FSMComponent->AttackState = EBossATTACKState::COUNTERATTACK;
-			//초기화
-			GuardGage = 0.0f;
-
-			//밑에 코드 안 일어나게 리턴
-			return;
-		}
-
-		//플레이어가 공격범위 이내일경우
-		if ( TargetDist <= AttackRange )
-		{
-			FSMComponent->SetRANGEDATTACKState(FMath::RandRange(0,2));
-		}
-	}
+// 	if(FSMComponent->State == EBossState::ATTACK && FSMComponent->AttackState == EBossATTACKState::NONE)
+// 	{
+// 		//가드 게이지를 채워줌
+// 		GuardGage += DeltaTime;
+// 		//가드 게이지를 채워줌
+// 
+// 		//만약 가드 조건이 충족되었을 경우
+// 		if ( GuardGage <= GuardPlaying )
+// 		{
+// 			//가드 상태로 변화
+// 			FSMComponent->AttackState = EBossATTACKState::COUNTERATTACK;
+// 			//초기화
+// 			GuardGage = 0.0f;
+// 
+// 			//밑에 코드 안 일어나게 리턴
+// 			return;
+// 		}
+// 
+// 		//플레이어가 공격범위 이내일경우
+// 		if ( TargetDist <= AttackRange )
+// 		{
+// 			FSMComponent->SetRANGEDATTACKState(FMath::RandRange(0,2));
+// 		}
+// 	}
 	//만약 공격 상태이면서 아직 어떤 공격을 할지 정하지 않았을 경우
 
 	//스페셜 공격에 들어갔을 경우
@@ -99,10 +102,10 @@ void ACBossEnemy::Tick(float DeltaTime)
 
 void ACBossEnemy::SPBreak()
 {
-
+	
 }
 
-void ACBossEnemy::EnemyHitDamage ( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult )
+void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//스페셜 공격때 데미지량 저장하는 코드를 적어야함
 
@@ -110,7 +113,25 @@ void ACBossEnemy::EnemyHitDamage ( UPrimitiveComponent* OverlappedComponent , AA
 
 	if ( Weapon )
 	{
-		GEngine->AddOnScreenDebugMessage ( 40 , 1.0f , FColor::Red , TEXT ( "Hit Enemy" ) );
+		GEngine->AddOnScreenDebugMessage ( 80 , 1.0f , FColor::Red , TEXT ( "Hit Boss" ) );
+
+		//현재 필살기를 공격하려고 준비중이라면
+		if ( FSMComponent->AttackState == EBossATTACKState::SPATTACK )
+		{
+			//받은 데미지 량을 전부 저장
+			OnSPDamage += 10;
+
+			//만약 데미지 량이 패턴 파훼조건을 만족했다면
+			if ( OnSPDamage >= SPBreakDamageAmount )
+			{
+				GEngine->AddOnScreenDebugMessage ( 85 , 1.0f , FColor::Red , TEXT ( "SPAttack Break!!" ) );
+				
+				//공격 상태를 NONE으로 불발되게 전환
+				FSMComponent->AttackState = EBossATTACKState::NONE;
+				//Break 상태로 변환
+				FSMComponent->State = EBossState::BREAK;
+			}
+		}
 
 		//공격을 맞았을 때 쉴드 게이지가 있다면
 		if ( ShieldAmount > 0.0f )
@@ -121,8 +142,11 @@ void ACBossEnemy::EnemyHitDamage ( UPrimitiveComponent* OverlappedComponent , AA
 			//만약 쉴드게이지 감소되어서 0이 된다면
 			if ( ShieldAmount <= 0.0f )
 			{
-				//에너미가 휘청거리는 애니메이션 출력?
-				GEngine->AddOnScreenDebugMessage ( 41 , 1.0f , FColor::Red , TEXT ( "Shield Break!!" ) );
+				//에너미가 휘청거리는 애니메이션 출력? / 단 필살기 준비중에는 일어나지 않게 / 브레이크 상태에서도 나오지 않게
+				if ( FSMComponent->AttackState != EBossATTACKState::SPATTACK || FSMComponent->State != EBossState::BREAK )
+				{
+					GEngine->AddOnScreenDebugMessage ( 81 , 1.0f , FColor::Red , TEXT ( "Boss Shield Break!!" ) );
+				}
 
 				//쉴드 게이지가 -의 값이 되면 해당 값 만큼 체력을 깎게 만듦
 				CurHP += ShieldAmount;
@@ -130,8 +154,11 @@ void ACBossEnemy::EnemyHitDamage ( UPrimitiveComponent* OverlappedComponent , AA
 				return;
 			}
 
-			//가드 애니메이션이 나오도록 만들어주기
-			GEngine->AddOnScreenDebugMessage ( 42 , 1.0f , FColor::Red , TEXT ( "Gard Animation" ) );
+			//가드 애니메이션이 나오도록 만들어주기 / 단 필살기 준비중에는 일어나지 않게 / 브레이크 상태에서도 나오지 않게
+			if ( FSMComponent->AttackState != EBossATTACKState::SPATTACK || FSMComponent->State != EBossState::BREAK )
+			{
+				GEngine->AddOnScreenDebugMessage ( 82 , 1.0f , FColor::Red , TEXT ( "Boss Gard Animation" ) );
+			}
 		}
 
 		//쉴드 게이지가 없는 상태에서 맞았을 경우
@@ -152,11 +179,14 @@ void ACBossEnemy::EnemyHitDamage ( UPrimitiveComponent* OverlappedComponent , AA
 					Manager->RemoveEnemiesList ( MyUniqeID , IsCanAttack );
 				}
 
-				GEngine->AddOnScreenDebugMessage ( 43 , 1.0f , FColor::Red , TEXT ( "Enemy is Dead" ) );
+				GEngine->AddOnScreenDebugMessage ( 83 , 1.0f , FColor::Red , TEXT ( "Boss is Dead" ) );
 			}
 
-			//피격 애니메이션이 나오게 만듦
-			GEngine->AddOnScreenDebugMessage ( 44 , 1.0f , FColor::Red , TEXT ( "Enemy Hit Damage" ) );
+			//피격 애니메이션이 나오게 만듦 / 단 필살기 준비중에는 일어나지 않게 / 브레이크 상태에서도 나오지 않게
+			if ( FSMComponent->AttackState != EBossATTACKState::SPATTACK || FSMComponent->State != EBossState::BREAK )
+			{
+				GEngine->AddOnScreenDebugMessage ( 84 , 1.0f , FColor::Red , TEXT ( "Boss Hit Damage" ) );
+			}
 		}
 	}
 }

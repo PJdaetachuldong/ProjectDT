@@ -22,7 +22,7 @@ void UCMeleeEnemyFSM::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetOnwerEnemy();
+	GetOwnerEnemy();
 }
 
 
@@ -274,7 +274,7 @@ void UCMeleeEnemyFSM::SetWanderMoveLocation()
 	
 }
 
-void UCMeleeEnemyFSM::GetOnwerEnemy()
+void UCMeleeEnemyFSM::GetOwnerEnemy()
 {
 	MyEnemy = Cast<ACMeleeEnemy>(GetOwner());
 
