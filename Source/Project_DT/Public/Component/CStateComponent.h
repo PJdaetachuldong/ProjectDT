@@ -54,6 +54,9 @@ public:
 	void OnSubActionMode ( );
 	void OffSubActionMode ( );
 
+	FORCEINLINE EStateType GetStateType ( ) { return Type; }
+
+
 private:
 	void ChangeType ( EStateType InType );
 

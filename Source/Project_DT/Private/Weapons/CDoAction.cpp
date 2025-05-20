@@ -65,11 +65,16 @@ void UCDoAction::DoGuardStarted ( )
 {
 	State->SetGuardMode ( );
 	CLog::Log ( "asdjasibdihasbdsad" );
+	DoGuardActionData[0].DoGuardAction ( OwnerCharacter );
+
 
 }
 
 void UCDoAction::DoGuardComplete ( )
 {
 	State->SetIdleMode ( );
+
+	DoGuardActionData[1].DoGuardAction ( OwnerCharacter );
+
 
 }
