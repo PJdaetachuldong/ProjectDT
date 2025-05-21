@@ -25,8 +25,6 @@ public:
 		class ACharacter* InOwner ,
 		class TArray<FDoActionData>& InDoActionData,
 		class TArray<FDoHeavyActionData>& InDoHeavyActionData,
-		class TArray<FDoSpecialActionData>& InDoSpecialActionData ,
-		class TArray<FDoGuardActionData>& InDoGuardActionData ,
 		class TArray<FHitData>& InHitData
 	);
 
@@ -38,11 +36,6 @@ public:
 	virtual void DoHeavyAction ();
 	virtual void Begin_DoHeavyAction ( );
 
-	virtual void DoSpecialAction ( );
-
-	virtual void DoGuardStarted ( );
-	virtual void DoGuardTrriger ( ) {};
-	virtual void DoGuardComplete ( );
 
 
 public:
@@ -76,8 +69,6 @@ protected:
 
 	TArray<FDoActionData> DoActionDatas;
 	TArray<FDoHeavyActionData> DoHeavyActionDatas;
-	TArray<FDoSpecialActionData> DoSpecialActionData;
-	TArray<FDoGuardActionData> DoGuardActionData;
 	TArray<FHitData> HitDatas;
 
 };

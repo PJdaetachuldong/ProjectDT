@@ -9,10 +9,14 @@
 #include "Weapons/CEquipment.h"
 #include "Global.h"
 #include "Weapons/CDoAction.h"
+#include "Weapons/CSubAction.h"
+#include "Weapons/SubActions/CSubAction_Skill.h"
 
 // Sets default values for this component's properties
 UCWeaponComponent::UCWeaponComponent()
 {
+	PrimaryComponentTick.bCanEverTick = true;
+
 }
 
 
@@ -25,6 +29,19 @@ void UCWeaponComponent::BeginPlay()
 		if ( !!DataAssets[i] )
 			DataAssets[i]->BeginPlay ( OwnerCharacter );
 	}
+}
+
+void UCWeaponComponent::TickComponent ( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction )
+{
+	Super::TickComponent ( DeltaTime , TickType , ThisTickFunction );
+
+	//if ( !!GetDoAction ( ) )
+	//	GetDoAction ( )->Tick ( DeltaTime );
+
+	if ( !!GetSubAction ( ) )
+		GetSubAction ( )->Tick ( DeltaTime );
+	if ( !!GetSubAction_Skill ( ) )
+		GetSubAction_Skill( )->Tick ( DeltaTime );
 }
 
 bool UCWeaponComponent::IsIdleMode ( )
@@ -54,6 +71,21 @@ class UCDoAction* UCWeaponComponent::GetDoAction ( )
 	CheckFalseResult ( !!DataAssets[(int32)Type] , nullptr );
 
 	return DataAssets[(int32)Type]->GetDoAction ();
+}
+
+class UCSubAction* UCWeaponComponent::GetSubAction ( )
+{
+	CheckTrueResult ( IsUnarmedMode ( ) , nullptr );
+	CheckFalseResult ( !!DataAssets[(int32)Type] , nullptr );
+	return DataAssets[(int32)Type]->GetSubAction ( );
+
+}
+
+class UCSubAction_Skill* UCWeaponComponent::GetSubAction_Skill ( )
+{
+	CheckTrueResult ( IsUnarmedMode ( ) , nullptr );
+	CheckFalseResult ( !!DataAssets[(int32)Type] , nullptr );
+	return DataAssets[(int32)Type]->GetSubAction_Skill ( );
 }
 
 void UCWeaponComponent::SetUnarmedMode ( )
@@ -99,28 +131,37 @@ void UCWeaponComponent::DoHeavyAction ( )
 	}
 }
 
-void UCWeaponComponent::DoSpeciaAction ( )
+void UCWeaponComponent::SubAction_Pressed ( )
 {
-	if ( !!GetDoAction ( ) ) {
-		GetDoAction ( )->DoSpecialAction ( );
-		GetDoAction ( )->SpecialAttack ( );
-	}
+	if ( !!GetSubAction ( ) )
+		GetSubAction ( )->Pressed ( );
 }
 
-void UCWeaponComponent::DoGuardActionStart ( )
+void UCWeaponComponent::SubAction_Released ( )
 {
-	if ( !!GetDoAction ( ) ) {
-		GetDoAction ( )->DoGuardStarted ( );
-
-	}
+	if ( !!GetSubAction ( ) )
+		GetSubAction ( )->Released ( );
 }
 
-void UCWeaponComponent::DoGuardActionEnd ( )
+void UCWeaponComponent::SubAction_Skill_Pressed ( )
 {
-	if ( !!GetDoAction ( ) ) {
-		GetDoAction ( )->DoGuardComplete ( );
+	if ( !!GetSubAction_Skill ( ) ){
+		GetSubAction_Skill ( )->Pressed ( );
 	}
 
+}
+
+void UCWeaponComponent::SubAction_Skill_Released ( )
+{
+	if ( !!GetSubAction_Skill ( ) )
+		GetSubAction_Skill ( )->Released ( );
+
+}
+
+void UCWeaponComponent::OnParry ( EParryState ParryState )
+{
+	if ( !!GetSubAction ( ) )
+		GetSubAction ( )->Parry ( ParryState );
 }
 
 void UCWeaponComponent::SetMode ( EWeaponType InType )

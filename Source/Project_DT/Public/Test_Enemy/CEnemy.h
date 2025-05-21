@@ -36,6 +36,8 @@ protected:
 
 protected:
 	virtual void BeginPlay() override;
+public:
+	virtual void Tick ( float DeltaTime ) override;
 
 private:
 	UFUNCTION()
@@ -46,6 +48,8 @@ public:
 
 protected:
 	virtual void Hitted ( );
+protected:
+	void OverlapBegin ( );
 
 private:
 	UFUNCTION()
@@ -63,4 +67,7 @@ private:
 	} Damage;
 private:
 	FTimerHandle RestoreColor_TimerHandle;
+
+	// 무시할 액터 집합
+	TSet<AActor*> TemporarilyIgnoredActors;
 };

@@ -38,16 +38,8 @@ void UCDoAction_Combo::Begin_DoAction ( )
 	}
 		break;
 	case EActionState::Heavy:{
-		AddComboArray(DoHeavyActionDatas[++Index].DoHeavyAction ( OwnerCharacter ));
-		DamageIndex = Index + 3;
-		}
-		break;
-	case EActionState::Special:{
-		if ( !IsLeftMajority ( ) )
-			DoSpecialActionData[0].DoSpecialAction ( OwnerCharacter );
-		else
-			DoSpecialActionData[1].DoSpecialAction ( OwnerCharacter );
-		DamageIndex = 5;
+		AddComboArray(DoHeavyActionDatas[++HeavyIndex].DoHeavyAction ( OwnerCharacter ));
+		DamageIndex = HeavyIndex + 3;
 		}
 		break;
 	default:
@@ -61,6 +53,7 @@ void UCDoAction_Combo::End_DoAction ( )
 
 	Index = 0;
 	HeavyIndex = 0;
+	DamageIndex = 0;
 }
 
 void UCDoAction_Combo::DoHeavyAction ( )
@@ -80,29 +73,6 @@ void UCDoAction_Combo::DoHeavyAction ( )
 	Super::DoHeavyAction ( );
 	AddComboArray(DoHeavyActionDatas[0].DoHeavyAction ( OwnerCharacter ));
 	DamageIndex = 3;
-
-}
-
-void UCDoAction_Combo::DoSpecialAction ( )
-{
-	CheckTrue ( DoHeavyActionDatas.Num ( ) < 1 );
-
-	if ( bEnable )
-	{
-		bEnable = false;
-		bExist = true;
-
-		return;
-	}
-
-	CheckFalse ( State->IsIdleMode ( ) );
-
-	Super::DoSpecialAction ( );
-	if(!IsLeftMajority ( ))
-		DoSpecialActionData[0].DoSpecialAction ( OwnerCharacter );
-	else
-		DoSpecialActionData[1].DoSpecialAction ( OwnerCharacter );
-	DamageIndex = 5;
 }
 
 void UCDoAction_Combo::OnAttachmentBeginOverlap ( class ACharacter* InAttacker , AActor* InAttackCuaser , class ACharacter* InOther )

@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Component/CStateComponent.h"
 #include "ICharacter.h"
+#include "Component/CParryComponent.h"
 #include "CPlayer.generated.h"
 
 UCLASS()
@@ -25,9 +26,11 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UCMointageComponent* Montages;
 
-
 	UPROPERTY(VisibleAnywhere)
 	class UCStateComponent* State;
+
+	UPROPERTY(VisibleAnywhere)
+	class UCParryComponent* Parry;
 public:
 	UPROPERTY(VisibleAnywhere)
 	class UCMovementComponent* Movement;
@@ -89,9 +92,13 @@ private:
 	void OnSprint ( );
 private:
 	void DoGuardActionStart ( );
+private:
+	UFUNCTION()
+	void OnParryDetected(EParryState ParryDirection);
 
 public:
 	void End_BackStep() override;
+
 
 
 

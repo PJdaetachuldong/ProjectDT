@@ -18,6 +18,7 @@
 #include "Component/CTrajectoryComponent.h"
 #include "Character/CPlayerAnim.h"
 #include "Weapons/CWeaponComponent.h"
+#include "Component/CParryComponent.h"
 // Sets default values
 ACPlayer::ACPlayer()
 {
@@ -66,6 +67,7 @@ ACPlayer::ACPlayer()
 	CHelpers::CreateActorComponent<UCMovementComponent> ( this , &Movement , "Movement" );
 	CHelpers::CreateActorComponent<UCStateComponent> ( this , &State , "State" );
 	CHelpers::CreateActorComponent<UCTrajectoryComponent> ( this , &Trajectory , "Trajectory" );
+	CHelpers::CreateActorComponent<UCParryComponent> ( this , &Parry , "Parry" );
 
 	//인풋 받기
 	CHelpers::GetAsset ( &IMC , AssetPaths::IMC );
@@ -114,16 +116,17 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction ( IA_MoveRight , ETriggerEvent::Triggered , Movement , &UCMovementComponent::OnMoveRight );
 		playerInput->BindAction ( IA_VerticalLook , ETriggerEvent::Triggered , Movement , &UCMovementComponent::OnVerticalLook );
 		playerInput->BindAction ( IA_HorizontalLook , ETriggerEvent::Triggered , Movement , &UCMovementComponent::OnHorizontalLook );
-		playerInput->BindAction ( IA_Dash , ETriggerEvent::Started , this , &ACPlayer::OnSprint);
+		playerInput->BindAction ( IA_Dash , ETriggerEvent::Started , Movement , &UCMovementComponent::OnSprint);
 		playerInput->BindAction ( IA_Dash , ETriggerEvent::Completed , Movement , &UCMovementComponent::OnRun);
 		playerInput->BindAction ( IA_Avoid , ETriggerEvent::Completed , this , &ACPlayer::OnAvoid );
 		playerInput->BindAction ( IA_TestBtn , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SetKatanaMode );
 		playerInput->BindAction ( IA_Jump , ETriggerEvent::Completed , this , &ACPlayer::Jump );
 		playerInput->BindAction ( IA_LeftAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoAction );
 		playerInput->BindAction ( IA_RightAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoHeavyAction );
-		playerInput->BindAction ( IA_SpecialAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoSpeciaAction);
-		playerInput->BindAction ( IA_Guard , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoGuardActionStart);
-		playerInput->BindAction ( IA_Guard , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::DoGuardActionEnd);
+		playerInput->BindAction ( IA_SpecialAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::SubAction_Skill_Pressed );
+		playerInput->BindAction ( IA_SpecialAttack , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SubAction_Skill_Released );
+		playerInput->BindAction ( IA_Guard , ETriggerEvent::Started , Weapon , &UCWeaponComponent::SubAction_Pressed);
+		playerInput->BindAction ( IA_Guard , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SubAction_Released);
 	}
 }
 
@@ -153,18 +156,9 @@ void ACPlayer::Jump ( ){
 	ACharacter::Jump();
 }
 
-void ACPlayer::OnSprint ( )
+void ACPlayer::OnParryDetected ( EParryState ParryDirection )
 {
-	if ( State->GetStateType ( ) == EStateType::Guard )
-		return;
-	Movement->OnSprint ( );
-
-}
-
-void ACPlayer::DoGuardActionStart ( )
-{
-	Movement->OnWalk ( );
-	Weapon->DoGuardActionStart();
+	Weapon->OnParry ( ParryDirection );
 }
 
 void ACPlayer::End_BackStep() {

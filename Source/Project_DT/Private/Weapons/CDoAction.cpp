@@ -11,7 +11,7 @@ UCDoAction::UCDoAction ( )
 
 }
 
-void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipment* InEquipment , class ACharacter* InOwner , class TArray<FDoActionData>& InDoActionData , class TArray<FDoHeavyActionData>& InDoHeavyActionData , class TArray<FDoSpecialActionData>& InDoSpecialActionData , class TArray<FDoGuardActionData>& InDoGuardActionData , TArray<FHitData>& InHitData )
+void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipment* InEquipment , class ACharacter* InOwner , class TArray<FDoActionData>& InDoActionData , class TArray<FDoHeavyActionData>& InDoHeavyActionData ,TArray<FHitData>& InHitData )
 {
 	OwnerCharacter = InOwner;
 	World = OwnerCharacter->GetWorld ( );
@@ -21,8 +21,6 @@ void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipmen
 
 	DoActionDatas = InDoActionData;
 	DoHeavyActionDatas = InDoHeavyActionData;
-	DoSpecialActionData = InDoSpecialActionData;
-	DoGuardActionData = InDoGuardActionData;
 	HitDatas = InHitData;
 }
 
@@ -53,28 +51,4 @@ void UCDoAction::DoHeavyAction ( )
 void UCDoAction::Begin_DoHeavyAction ( )
 {
 	bBeginAction = true;
-}
-
-void UCDoAction::DoSpecialAction ( )
-{
-	State->SetActionMode ( );
-
-}
-
-void UCDoAction::DoGuardStarted ( )
-{
-	State->SetGuardMode ( );
-	CLog::Log ( "asdjasibdihasbdsad" );
-	DoGuardActionData[0].DoGuardAction ( OwnerCharacter );
-
-
-}
-
-void UCDoAction::DoGuardComplete ( )
-{
-	State->SetIdleMode ( );
-
-	DoGuardActionData[1].DoGuardAction ( OwnerCharacter );
-
-
 }

@@ -63,6 +63,8 @@ void UCMovementComponent::DisableControlRotation ( )
 
 void UCMovementComponent::OnMoveForward ( const FInputActionValue& Value )
 {
+	if ( !bCanMove )return;
+
 	float Scale = Value.Get<float> ( );
 
 	FRotator rotator = FRotator ( 0 , OwnerCharacter->GetControlRotation ( ).Yaw , 0 );
@@ -76,6 +78,7 @@ void UCMovementComponent::OnMoveForward ( const FInputActionValue& Value )
 
 void UCMovementComponent::OnMoveRight ( const FInputActionValue& Value )
 {
+	if ( !bCanMove )return;
 	float Scale = Value.Get<float> ( );
 
 

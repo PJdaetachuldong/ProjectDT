@@ -26,16 +26,12 @@ public:
 	void End_DoAction ( ) override;
 
 	void DoHeavyAction ( ) override;
-
-	void DoSpecialAction ( ) override;
-
-
 public:
 	void OnAttachmentBeginOverlap ( class ACharacter* InAttacker , AActor* InAttackCuaser , class ACharacter* InOther ) override;
 
 private:
 	int32 Index=0;
-	int32 HeavyIndex=0;
+	int32 HeavyIndex = 0;
 	int32 DamageIndex;
 
 	bool bEnable;

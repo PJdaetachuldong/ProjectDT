@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Component/CParryComponent.h"
 #include "CWeaponComponent.generated.h"
 UENUM(BlueprintType)
 enum class EWeaponType : uint8 {
@@ -33,6 +34,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+public:
+	virtual void TickComponent ( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction ) override;
 
 public:
 	bool IsIdleMode ( );
@@ -41,6 +44,8 @@ public:
 	class ACAttachment* GetAttachment ( );
 	class UCEquipment* GetEquipment ( );
 	class UCDoAction* GetDoAction ( );
+	class UCSubAction* GetSubAction ( );
+	class UCSubAction_Skill* GetSubAction_Skill ( );
 public:
 	void SetUnarmedMode ( );
 	void SetFistMode ( );
@@ -49,10 +54,20 @@ public:
 
 	void DoAction();
 	void DoHeavyAction();
-	void DoSpeciaAction();
+public:
+	UFUNCTION(BlueprintCallable)
+	void SubAction_Pressed();
 
-	void DoGuardActionStart();
-	void DoGuardActionEnd();
+	UFUNCTION(BlueprintCallable)
+	void SubAction_Released();
+
+	UFUNCTION ( BlueprintCallable )
+	void SubAction_Skill_Pressed ( );
+
+	UFUNCTION ( BlueprintCallable )
+	void SubAction_Skill_Released ( );
+	UFUNCTION ( BlueprintCallable )
+	void OnParry ( EParryState ParryState );
 
 
 private:
