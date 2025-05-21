@@ -75,6 +75,17 @@ void UCDoAction_Combo::DoHeavyAction ( )
 	DamageIndex = 3;
 }
 
+void UCDoAction_Combo::ResetDoAction ( )
+{
+	Index = 0;
+	HeavyIndex = 0;
+	DamageIndex = 0;
+
+	//bBeginAction = false;
+
+	//State->SetIdleMode ( );
+}
+
 void UCDoAction_Combo::OnAttachmentBeginOverlap ( class ACharacter* InAttacker , AActor* InAttackCuaser , class ACharacter* InOther )
 {
 	Super::OnAttachmentBeginOverlap ( InAttacker , InAttackCuaser , InOther );

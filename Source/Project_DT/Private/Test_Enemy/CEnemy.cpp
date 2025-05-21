@@ -11,12 +11,14 @@
 #include "Weapons/CWeaponStuctures.h"
 #include "GameFramework/Character.h"
 #include "Weapons/CAttachment.h"
+#include "Component/CParryComponent.h"
 // Sets default values
 ACEnemy::ACEnemy ( )
 {
 	CHelpers::CreateActorComponent<UCMointageComponent> ( this , &Montages , "Montages" );
 	CHelpers::CreateActorComponent<UCMovementComponent> ( this , &Movement , "Movement" );
 	CHelpers::CreateActorComponent<UCStateComponent> ( this , &State , "State" );
+	CHelpers::CreateActorComponent<UCWeaponComponent> ( this , &Weapon , "Weapon" );
 	//CHelpers::CreateActorComponent<UCStatusComponent> ( this , &Status , "Status" );
 
 
@@ -46,12 +48,15 @@ void ACEnemy::BeginPlay ( )
 	Change_Color ( this , OriginColor );
 
 	State->OnStateTypeChanged.AddDynamic ( this , &ACEnemy::OnStateTypeChanged );
+	Weapon->SetKatanaMode();
+
 }
 
 void ACEnemy::Tick ( float DeltaTime )
 {
 	Super::Tick ( DeltaTime );
 	OverlapBegin();
+
 }
 
 void ACEnemy::OnStateTypeChanged ( EStateType InPrevType , EStateType InNewType )
@@ -62,6 +67,7 @@ void ACEnemy::OnStateTypeChanged ( EStateType InPrevType , EStateType InNewType 
 	}
 }
 
+
 float ACEnemy::TakeDamage ( float DamageAmount , struct FDamageEvent const& DamageEvent , class AController* EventInstigator , AActor* DamageCauser )
 {
 	float damage = Super::TakeDamage ( DamageAmount , DamageEvent , EventInstigator , DamageCauser );
@@ -71,7 +77,8 @@ float ACEnemy::TakeDamage ( float DamageAmount , struct FDamageEvent const& Dama
 	Damage.Event = (FActionDamageEvent*)&DamageEvent;
 	CLog::Log ( Damage.Power );
 
-	State->SetHittedMode ( );
+	//State->SetHittedMode ( );
+	Weapon->SetKatanaMode ( );
 
 	return damage;
 }
@@ -152,14 +159,17 @@ void ACEnemy::OverlapBegin ( )
 			DrawDebugLine ( GetWorld ( ) , GetActorLocation ( ) , Hit.GetActor ( )->GetActorLocation ( ) , FColor::Blue , false , 1.0f , 0 , 2.0f );
 
 			FVector LocalHit = UKismetMathLibrary::InverseTransformLocation ( GetActorTransform ( ) , Hit.ImpactPoint );
-			FString Quadrant;
+
+			EParryState Quadrant = EParryState::Max;
 
 			if ( LocalHit.X >= 0 )
-				Quadrant = ( LocalHit.Y >= 0 ) ? TEXT ( "우상단" ) : TEXT ( "좌상단" );
+				Quadrant = ( LocalHit.Y >= 0 ) ? EParryState::TR : EParryState::TL;
 			else
-				Quadrant = ( LocalHit.Y >= 0 ) ? TEXT ( "우하단" ) : TEXT ( "좌하단" );
+				Quadrant = ( LocalHit.Y >= 0 ) ? EParryState::BR : EParryState::BL;
 
-			CLog::Log ( FString::Printf ( TEXT ( "사분면: %s" ) , *Quadrant ) );
+			Weapon->OnParry ( Quadrant );
+
+
 
 			// 잠깐 무시 처리
 			AActor* HitActor = Hit.GetActor ( );
@@ -171,7 +181,7 @@ void ACEnemy::OverlapBegin ( )
 			GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandle , [&]( ){
 			{
 				TemporarilyIgnoredActors.Reset();
-			}} , 2.0f , false );
+			}} , 0.5f , false );
 		}
 	}
 }

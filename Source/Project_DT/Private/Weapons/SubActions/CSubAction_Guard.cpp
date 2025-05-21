@@ -33,9 +33,13 @@ void UCSubAction_Guard::Released ( )
 
 void UCSubAction_Guard::Parry ( EParryState ParryState )
 {
+	//CheckTrue ( State->IsSubActionMode ( ) );
 	Super::Parry (ParryState );
+
 	State->SetActionMode ( );
 	State->OnSubActionMode ( );
+	UE_LOG ( LogTemp , Warning , TEXT ( "Parry State: %s" ) , *UEnum::GetValueAsString ( ParryState ) );
+
 	switch ( ParryState )
 	{
 	case EParryState::TL:ActionData[1].DoAction ( Owner );

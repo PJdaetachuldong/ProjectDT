@@ -5,6 +5,7 @@
 #include "Global.h"
 #include "Weapons/CWeaponComponent.h"
 #include "Weapons/CSubAction.h"
+#include "Weapons/CDoAction.h"
 
 
 FString UCAnimNotifyState_SubAction::GetNotifyName_Implementation ( ) const
@@ -23,6 +24,7 @@ void UCAnimNotifyState_SubAction::NotifyBegin ( USkeletalMeshComponent* MeshComp
 	CheckNull ( weapon->GetSubAction ( ) );
 
 	weapon->GetSubAction ( )->Begin_SubAction ( );
+	weapon->GetDoAction ( )->ResetDoAction ( );
 }
 
 void UCAnimNotifyState_SubAction::NotifyEnd ( USkeletalMeshComponent* MeshComp , UAnimSequenceBase* Animation )

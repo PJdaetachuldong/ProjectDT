@@ -33,6 +33,7 @@ public:
 	UFUNCTION ( BlueprintNativeEvent )
 	void End_SubAction ( );
 	virtual void End_SubAction_Implementation ( ) {};
+
 	UFUNCTION ( BlueprintNativeEvent )
 	void Tick ( float InDeltaTime );
 	virtual void Tick_Implementation ( float InDeltaTime ) {};

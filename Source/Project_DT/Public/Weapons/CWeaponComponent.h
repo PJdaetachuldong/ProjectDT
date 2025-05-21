@@ -81,5 +81,7 @@ private:
 
 	EWeaponType Type = EWeaponType::Max;
 
+	bool bCanParry = true;
+
 
 };

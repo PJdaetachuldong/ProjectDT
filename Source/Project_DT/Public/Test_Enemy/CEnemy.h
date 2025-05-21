@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Character/ICharacter.h"
 #include "Component/CStateComponent.h"
+#include "Component/CParryComponent.h"
 #include "CEnemy.generated.h"
 
 UCLASS()
@@ -30,6 +31,11 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 		class UCStateComponent* State;
 
+	UPROPERTY(VisibleAnywhere )
+	class UCWeaponComponent* Weapon;
+
+
+
 	//UPROPERTY(VisibleAnywhere)
 		//class UCStatusComponent* Status;
 
@@ -42,6 +48,7 @@ public:
 private:
 	UFUNCTION()
 		void OnStateTypeChanged(EStateType InPrevType, EStateType InNewType);
+
 
 public:
 	float TakeDamage ( float DamageAmount , struct FDamageEvent const& DamageEvent , class AController* EventInstigator , AActor* DamageCauser ) override;

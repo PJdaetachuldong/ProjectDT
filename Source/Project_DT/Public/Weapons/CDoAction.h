@@ -36,6 +36,8 @@ public:
 	virtual void DoHeavyAction ();
 	virtual void Begin_DoHeavyAction ( );
 
+	virtual void ResetDoAction ( ) {};
+
 
 
 public:

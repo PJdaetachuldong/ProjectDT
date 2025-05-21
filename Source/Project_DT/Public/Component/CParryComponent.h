@@ -21,6 +21,10 @@ class PROJECT_DT_API UCParryComponent : public UActorComponent
 public:
 	UCParryComponent();
 
+	FORCEINLINE void OnParryCollision ( ) { bIsParrying = true; }
+	FORCEINLINE void OffParryCollision ( ) { bIsParrying = false; }
+
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -44,4 +48,8 @@ private:
 
 private:
 	class ACharacter* OwnerCharacter;
+	UPROPERTY(VisibleAnywhere)
+	class UCWeaponComponent* Weapon;
+
+	bool bIsParrying;
 };

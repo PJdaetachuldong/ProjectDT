@@ -4,6 +4,7 @@
 #include "Component/CParryComponent.h"
 #include "Global.h"
 #include "Weapons/CAttachment.h"
+#include "Weapons/CWeaponComponent.h"
 // Sets default values for this component's properties
 UCParryComponent::UCParryComponent()
 {
@@ -16,14 +17,15 @@ void UCParryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	OwnerCharacter = Cast<ACharacter> ( GetOwner ( ) );
-
+	Weapon = CHelpers::GetComponent<UCWeaponComponent> ( GetOwner ( ) );
 }
 
 
 void UCParryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	DetectActor ( );
+	if ( bIsParrying )
+		DetectActor ( );
 	// ...
 }
 
@@ -71,8 +73,9 @@ void UCParryComponent::DetectActor ( )
 		EParryState Quadrant = GetHitQuadrant ( Hit.ImpactPoint );
 
 		HandleTemporaryIgnore ( HitActor );
-
-		OnParryDetected.Broadcast ( Quadrant );
+		//UE_LOG ( LogTemp , Warning , TEXT ( "Parry State: %s" ) , *UEnum::GetValueAsString ( Quadrant ) );
+		Weapon->OnParry ( Quadrant );
+		//OnParryDetected.Broadcast ( Quadrant );
 	}
 }
 
@@ -88,9 +91,10 @@ EParryState UCParryComponent::GetHitQuadrant ( const FVector& ImpactPoint ) cons
 	FVector LocalHit = UKismetMathLibrary::InverseTransformLocation ( GetOwner ( )->GetActorTransform ( ) , ImpactPoint );
 
 	if ( LocalHit.X >= 0 )
-		return ( LocalHit.Y >= 0 ) ? EParryState::TR : EParryState::TR;
+		return ( LocalHit.Y >= 0 ) ? EParryState::TL : EParryState::TR;
 	else
-		return ( LocalHit.Y >= 0 ) ? EParryState::TL : EParryState::BR;
+		return ( LocalHit.Y >= 0 ) ? EParryState::BL : EParryState::BR;
+
 }
 
 void UCParryComponent::HandleTemporaryIgnore ( AActor* ActorToIgnore )
@@ -100,6 +104,6 @@ void UCParryComponent::HandleTemporaryIgnore ( AActor* ActorToIgnore )
 	FTimerHandle TimerHandle;
 	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandle , [this , ActorToIgnore]( )
 	{
-		TemporarilyIgnoredActors.Remove ( ActorToIgnore );
-	} , 2.0f , false );
+		TemporarilyIgnoredActors.Empty();
+	} , 0.2f , false );
 }
