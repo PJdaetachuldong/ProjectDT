@@ -96,6 +96,7 @@ void ACPlayer::BeginPlay()
 	subSys->AddMappingContext ( IMC , 0 );
 
 	State->OnStateTypeChanged.AddDynamic ( this , &ACPlayer::OnStateTypeChanged );
+	Parry->OnParryDetected.AddDynamic ( this , &ACPlayer::OnParryDetected );
 }
 
 // Called every frame
