@@ -86,7 +86,7 @@ void ACMeleeEnemy::CheckPlayerInRange()
 	FHitResult Hit;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
-	bool bHit = GetWorld()->SweepSingleByChannel(Hit,GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel3 , FCollisionShape::MakeSphere(500.0f), Params);
+	bool bHit = GetWorld()->SweepSingleByChannel(Hit,GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel4 , FCollisionShape::MakeSphere(500.0f), Params);
 
 	DrawDebugSphere(GetWorld(), GetActorLocation(), 500.0f, 21, FColor::Green, false, 0.1f);
 

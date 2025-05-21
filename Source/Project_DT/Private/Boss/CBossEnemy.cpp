@@ -6,6 +6,7 @@
 #include "Boss/FSM/CBossFSM.h"
 #include "Weapons/CAttachment.h"
 #include "Kismet/GameplayStatics.h"
+#include "Boss/RangedAttackObject/CRangeAttack.h"
 
 ACBossEnemy::ACBossEnemy()
 {
@@ -16,7 +17,10 @@ ACBossEnemy::ACBossEnemy()
 
 	FSMComponent = CreateDefaultSubobject<UCBossFSM>(TEXT("FSMComponent"));
 
-
+	//일단 임시로 하는 발사 위치 설정
+	ThrowPosition = CreateDefaultSubobject<USceneComponent>(L"ThrowPosition");
+	ThrowPosition->SetupAttachment(RootComponent);
+	//일단 임시로 하는 발사 위치 설정
 }
 
 void ACBossEnemy::BeginPlay()
@@ -24,80 +28,37 @@ void ACBossEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	Target = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+
+	//원거리 공격을 최대 설정 값만큼 미리 생성함
+	for ( int32 i = 0; i < MaxRangedAttackCount; ++i )
+	{
+		//스폰할 객체에 대한 스폰 옵션을 설정하는 구조체
+		FActorSpawnParameters Params;
+		//스폰 과정에 충돌이 생겨도 제자리에서 스폰할 수 있게 만듦
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		//원거리 공격 오브젝트를 월드에 소환
+		ACRangeAttack* RangedAttackObject = GetWorld()->SpawnActor<ACRangeAttack>(RangedAttackFactory, Params);
+		//해당 원거리 공격 오브젝트 비활성화 처리
+		RangedAttackObject->SetActive(false, FVector(0));
+		//생성한 것을 오브젝트 풀에 넣음
+		RangedAttackList.Add(RangedAttackObject);
+	}
 }
 
 void ACBossEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	CurTestSPTime += DeltaTime;
 
-// 	//추적 상태에서 거리를 체크
-// 	TargetDist = FVector::Dist(Target->GetActorLocation(), GetActorLocation());
-// 	
-// 	if (FSMComponent->State == EBossState:: CHASE)
+	//임의로 하는 필살기 패턴 테스트
+// 	if ( CurTestSPTime >= TestSPTime )
 // 	{
-// 		//거리를 체크해서 거리가 멀 경우
-// 		if ( TargetDist >= LongDist )
-// 		{		
-// 			//거리가 먼 상태가 얼마나 지속되었는지 체크한다
-// 			CurChaseTime += DeltaTime;
-// 		}
-// 
-// 		//만약 거리가 먼 상태가 일정 시간 유지되었다면
-// 		if ( CurChaseTime >= DashAttackCooltime )
-// 		{
-// 			//공격 상태로 변환
-// 			FSMComponent->State=EBossState::ATTACK;
-// 			//그리고 대쉬 공격이 이루어지도록 공격상태도 변환
-// 			FSMComponent->AttackState = EBossATTACKState::DASHATTACK;
-// 
-// 			//뒤에 코드 실행 안되게 리턴
-// 			return;
-// 		}
-// 
-// 		//그냥 추적 상태인데 플레이어가 물약 마시는 모션을 할 경우
-// // 		if ()
-// // 		{
-// // 			//공격 상태로 변환하고
-// // 			FSMComponent->State == EBossState::ATTACK;
-// // 			//바로 원거리 공격하게 변환
-// // 			FSMComponent->AttackState == EBossATTACKState::RANGEDATTACK;
-// // 		}
-// 		//그냥 추적 상태인데 플레이어가 물약 마시는 모션을 할 경우
+// 		FSMComponent->AttackState = EBossATTACKState::SPATTACK;
+// 		CurTestSPTime =0.0f;
 // 	}
-// 	//추적 상태에서 거리를 체크해서 거리가 멀 경우
-
-	//만약 공격 상태이면서 아직 어떤 공격을 할지 정하지 않았을 경우
-// 	if(FSMComponent->State == EBossState::ATTACK && FSMComponent->AttackState == EBossATTACKState::NONE)
-// 	{
-// 		//가드 게이지를 채워줌
-// 		GuardGage += DeltaTime;
-// 		//가드 게이지를 채워줌
-// 
-// 		//만약 가드 조건이 충족되었을 경우
-// 		if ( GuardGage <= GuardPlaying )
-// 		{
-// 			//가드 상태로 변화
-// 			FSMComponent->AttackState = EBossATTACKState::COUNTERATTACK;
-// 			//초기화
-// 			GuardGage = 0.0f;
-// 
-// 			//밑에 코드 안 일어나게 리턴
-// 			return;
-// 		}
-// 
-// 		//플레이어가 공격범위 이내일경우
-// 		if ( TargetDist <= AttackRange )
-// 		{
-// 			FSMComponent->SetRANGEDATTACKState(FMath::RandRange(0,2));
-// 		}
-// 	}
-	//만약 공격 상태이면서 아직 어떤 공격을 할지 정하지 않았을 경우
-
-	//스페셜 공격에 들어갔을 경우
-	if ( FSMComponent->AttackState == EBossATTACKState::SPATTACK )
-	{
-		
-	}
+	//임의로 하는 필살기 패턴 테스트
 }
 
 void ACBossEnemy::SPBreak()
@@ -118,19 +79,8 @@ void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActo
 		//현재 필살기를 공격하려고 준비중이라면
 		if ( FSMComponent->AttackState == EBossATTACKState::SPATTACK )
 		{
-			//받은 데미지 량을 전부 저장
-			OnSPDamage += 10;
-
-			//만약 데미지 량이 패턴 파훼조건을 만족했다면
-			if ( OnSPDamage >= SPBreakDamageAmount )
-			{
-				GEngine->AddOnScreenDebugMessage ( 85 , 1.0f , FColor::Red , TEXT ( "SPAttack Break!!" ) );
-				
-				//공격 상태를 NONE으로 불발되게 전환
-				FSMComponent->AttackState = EBossATTACKState::NONE;
-				//Break 상태로 변환
-				FSMComponent->State = EBossState::BREAK;
-			}
+			//데미지를 저장
+			FSMComponent->SetSPDamage(10.0f);
 		}
 
 		//공격을 맞았을 때 쉴드 게이지가 있다면

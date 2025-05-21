@@ -25,6 +25,23 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	//원거리 공격 오브젝트 할당
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ACRangeAttack> RangedAttackFactory;
+
+	//원거리 공격 오브젝트를 Object Pool로 관리
+	//오브젝트의 최초 생성 수 (혹시몰라 여유분까지)
+	int32 MaxRangedAttackCount = 4;
+
+	//원거리 공격 오브젝트 목록
+	UPROPERTY(EditAnywhere, Category = ObjectPool)
+	TArray<class ACRangeAttack*> RangedAttackList;
+
+	//임의로 하는 필살기 패턴 테스트
+	float CurTestSPTime = 0.0f;
+	float TestSPTime = 15.0f;
+	//임의로 하는 필살기 패턴 테스트
+
 // 	//플레이어와의 거리를 저장하는 변수
 // 	float TargetDist = 0.0f;
 // 
@@ -44,7 +61,7 @@ public:
 	float GuardGage = 0.0f;
 
 	//가드가 실행되는 조건 설정 변수
-	float GuardPlaying = 60.0f;
+	float GuardPlaying = 10.0f;
 
 	//가드가 성공하였는지 체크하는 변수
 	bool IsSucssessGuard = false;
@@ -56,6 +73,10 @@ public:
 	float SPBreakDamageAmount = 150.0f;
 
 	void SPBreak();
+
+	//일단 임시로 하는 발사 위치 설정
+	UPROPERTY(EditAnywhere)
+	class USceneComponent* ThrowPosition;
 
 	// FSM 컴포넌트
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")

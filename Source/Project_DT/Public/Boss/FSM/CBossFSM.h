@@ -8,7 +8,6 @@ UENUM()
 enum class EBossState : uint8
 {
 	IDLE UMETA(DisplayName = "IDLE"),
-	CHASE UMETA(DisplayName = "CHASE"),
 	ATTACK UMETA(DisplayName = "ATTACK"),
 	DAMAGE UMETA(DisplayName = "DAMAGE"),
 	BREAK UMETA ( DisplayName = "BREAK" ),
@@ -52,6 +51,12 @@ public:
 	//거리가 먼 상태에서 시간이 얼마나 지났는지 저장하는 변수
 	float CurChaseTime = 0.0f;
 
+	//원거리 공격 오브젝트를 소환하는 함수
+	void SpawnRangedActor(FVector Direction);
+
+	//임의로 던지는 공격이 두번 일어나게 만드는 타이머
+	float CurRandgedTime = 0.0f;
+
 	//대쉬 공격이 실행되는 쿨타임 변수
 	float DashAttackCooltime = 5.0f;
 
@@ -77,6 +82,26 @@ public:
 	//EaseInSine 계산을 하는 함수
 	float EaseInSine(float x);
 
+	//가드 상태 지속시간을 체크함
+	float CurGuardTime = 0.0f;
+
+	//가드 상태 제한시간 변수
+	float LimiteGuardTime = 3.5f;
+
+	//필살기 준비자세일 때 받는 데미지의 총량을 저장하는 변수
+	float OnSpDamageAmount = 0.0f;
+
+	//필살기 준비 자세때 패턴이 파훼될때까지 필요한 데미지를 설정하는 변수
+	float SPBreakDamageAmount = 50.0f;
+
+	//임의로 적은 필살기 준비 시간
+	float CurSPReadyTime = 0.0f;
+	float SPReadyTime = 15.0f;
+	//임의로 적은 필살기 준비 시간
+
+	//필살기 준비자세일 때 받은 데미지를 받게하는 변수
+	void SetSPDamage(float Damage);
+
 	//필살기가 파훼되어서 Break 상태의 시간을 저장하는 변수
 	float CurBreakTime = 0.0f;
 
@@ -87,7 +112,7 @@ public:
 	int32 ComboAttackIndex;
 
 	//콤보공격이 될때 어떤 콤보 공격을 하지 같이 받는 함수
-	void SetRANGEDATTACKState(int32 RandomComboAttack);
+	void SetCOMBOATTACKState(int32 RandomComboAttack);
 	
 	//시작될때 자신의 주인과 AI를 받게하는 함수
 	void GetOwnerEnemy();
@@ -101,7 +126,6 @@ public:
 	EBossState State = EBossState::IDLE;
 
 	void IDLEState();
-	void CHASEState();
 	void ATTACKState();
 	void DAMAGEState();
 	void BREAKState();
