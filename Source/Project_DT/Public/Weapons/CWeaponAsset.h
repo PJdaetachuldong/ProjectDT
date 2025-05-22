@@ -32,15 +32,18 @@ private:
 	TArray<FDoHeavyActionData> DoHeavyActionDatas;
 
 	UPROPERTY(EditAnywhere)
-	TArray<FDoSpecialActionData> DoSpecialActionData;
-
-	UPROPERTY(EditAnywhere)
 	TArray<FHitData> HitDatas;
+	UPROPERTY ( EditAnywhere )
+	TSubclassOf<class UCSubAction> SubActionClass;
+	UPROPERTY ( EditAnywhere )
+	TSubclassOf<class UCSubAction_Skill> SubAction_SkillClass;
 
 public:
 	FORCEINLINE class ACAttachment* GetAttachment ( ) { return Attachment; }
 	FORCEINLINE class UCEquipment* GetEquipment ( ) { return Equipment; }
 	FORCEINLINE class UCDoAction* GetDoAction ( ) { return DoAction; }
+	FORCEINLINE class UCSubAction* GetSubAction ( ) { return SubAction; }
+	FORCEINLINE class UCSubAction_Skill* GetSubAction_Skill ( ) { return SubAction_Skill; }
 
 public:
 	UCWeaponAsset();
@@ -55,6 +58,12 @@ public:
 
 	UPROPERTY()
 	class UCDoAction* DoAction;
+
+	UPROPERTY ( )
+	class UCSubAction* SubAction;
+
+	UPROPERTY ( )
+	class UCSubAction_Skill* SubAction_Skill;
 
 
 };

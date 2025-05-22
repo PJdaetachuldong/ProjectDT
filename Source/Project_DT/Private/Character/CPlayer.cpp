@@ -18,6 +18,7 @@
 #include "Component/CTrajectoryComponent.h"
 #include "Character/CPlayerAnim.h"
 #include "Weapons/CWeaponComponent.h"
+#include "Component/CParryComponent.h"
 // Sets default values
 ACPlayer::ACPlayer()
 {
@@ -38,17 +39,35 @@ ACPlayer::ACPlayer()
 	SpringArm->SetRelativeLocation ( FVector ( 0 , 0 , 140 ) );
 	SpringArm->SetRelativeRotation ( FRotator ( 0 , 90,0 ) );
 	SpringArm->TargetArmLength = 200;
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+
 	SpringArm->bDoCollisionTest = false;
-	SpringArm->bUsePawnControlRotation = true;
 	SpringArm->bEnableCameraLag = true;
 
-	GetCharacterMovement ( )->RotationRate = FRotator ( ( 0 , 720 , 0 ) );
+	GetCharacterMovement ( )->bOrientRotationToMovement = true; // 이동 방향을 바라보게
+	GetCharacterMovement ( )->bUseControllerDesiredRotation = false;
+
+	// 카메라 설정
+	SpringArm->bUsePawnControlRotation = true; // SpringArm이 컨트롤러 회전을 따르지 않음
+	Camera->bUsePawnControlRotation = false;
+
+	SpringArm->bInheritPitch = true;
+	SpringArm->bInheritYaw = true;
+	SpringArm->bInheritRoll = false;
+
+
+	GetCharacterMovement ( )->bUseControllerDesiredRotation = false;
+	//GetCharacterMovement ( )->RotationRate = FRotator ( ( 0 , 720 , 0 ) );
 
 	CHelpers::CreateActorComponent<UCWeaponComponent> ( this , &Weapon , "Weapon" );
 	CHelpers::CreateActorComponent<UCMointageComponent> ( this , &Montages , "Montages" );
 	CHelpers::CreateActorComponent<UCMovementComponent> ( this , &Movement , "Movement" );
 	CHelpers::CreateActorComponent<UCStateComponent> ( this , &State , "State" );
 	CHelpers::CreateActorComponent<UCTrajectoryComponent> ( this , &Trajectory , "Trajectory" );
+	CHelpers::CreateActorComponent<UCParryComponent> ( this , &Parry , "Parry" );
 
 	//인풋 받기
 	CHelpers::GetAsset ( &IMC , AssetPaths::IMC );
@@ -63,6 +82,7 @@ ACPlayer::ACPlayer()
 	CHelpers::GetAsset ( &IA_LeftAttack , AssetPaths::IA_LeftClick );
 	CHelpers::GetAsset ( &IA_RightAttack , AssetPaths::IA_RightClick );
 	CHelpers::GetAsset ( &IA_SpecialAttack , AssetPaths::IA_SpecialClick );
+	CHelpers::GetAsset ( &IA_Guard , AssetPaths::IA_GuardBtn );
 }
 
 void ACPlayer::BeginPlay()
@@ -76,6 +96,7 @@ void ACPlayer::BeginPlay()
 	subSys->AddMappingContext ( IMC , 0 );
 
 	State->OnStateTypeChanged.AddDynamic ( this , &ACPlayer::OnStateTypeChanged );
+	Parry->OnParryDetected.AddDynamic ( this , &ACPlayer::OnParryDetected );
 }
 
 // Called every frame
@@ -103,7 +124,10 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction ( IA_Jump , ETriggerEvent::Completed , this , &ACPlayer::Jump );
 		playerInput->BindAction ( IA_LeftAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoAction );
 		playerInput->BindAction ( IA_RightAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoHeavyAction );
-		playerInput->BindAction ( IA_SpecialAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoSpeciaAction);
+		playerInput->BindAction ( IA_SpecialAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::SubAction_Skill_Pressed );
+		playerInput->BindAction ( IA_SpecialAttack , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SubAction_Skill_Released );
+		playerInput->BindAction ( IA_Guard , ETriggerEvent::Started , Weapon , &UCWeaponComponent::SubAction_Pressed);
+		playerInput->BindAction ( IA_Guard , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SubAction_Released);
 	}
 }
 
@@ -124,7 +148,6 @@ void ACPlayer::OnAvoid ( )
 
 void ACPlayer::BackStep ()
 {
-	Movement->EnableControlRotation ();
 
 	Montages->PlayBackStepMode ();
 }
@@ -132,6 +155,11 @@ void ACPlayer::BackStep ()
 void ACPlayer::Jump ( ){
 	CLog::Log ( "Test" );
 	ACharacter::Jump();
+}
+
+void ACPlayer::OnParryDetected ( EParryState ParryDirection )
+{
+	Weapon->OnParry ( ParryDirection );
 }
 
 void ACPlayer::End_BackStep() {

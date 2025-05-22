@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
 #include "Weapons/CWeaponComponent.h"
+#include "Component/CStateComponent.h"
 #include "CPlayerAnim.generated.h"
 
 UCLASS()
@@ -27,6 +28,8 @@ public:
 protected:
 	UPROPERTY ( BlueprintReadOnly , EditAnywhere , Category = "Animation" )
 	EWeaponType WeaponType = EWeaponType::Max;
+	UPROPERTY ( BlueprintReadOnly , EditAnywhere , Category = "Animation" )
+	EStateType StateType = EStateType::Max;
 
 
 public:
@@ -39,5 +42,6 @@ private:
 private:
 	class ACharacter* OwnerCharacter;
 	class UCWeaponComponent* Weapon;
+	class UCStateComponent* State;
 
 };

@@ -14,6 +14,7 @@ void UCPlayerAnim::NativeBeginPlay ( )
 	CheckNull ( OwnerCharacter );
 
 	Weapon = CHelpers::GetComponent<UCWeaponComponent> ( OwnerCharacter );
+	State = CHelpers::GetComponent<UCStateComponent> ( OwnerCharacter );
 	if ( !!Weapon )
 		Weapon->OnWeaponTypeChange.AddDynamic ( this , &UCPlayerAnim::OnWeaponTypeChanged );
 }
@@ -28,6 +29,8 @@ void UCPlayerAnim::NativeUpdateAnimation ( float DeltaSeconds )
 	auto Owner = Cast<ACPlayer> ( TryGetPawnOwner ( ) );
 	Movement = Owner->GetCharacterMovement();
 	Trajectory = Owner->Trajectory;
+	WeaponType = Weapon->GetWeaponType ( );
+	StateType = State->GetStateType ( );
 }
 
 void UCPlayerAnim::OnWeaponTypeChanged ( EWeaponType InPrevType , EWeaponType InNewType )

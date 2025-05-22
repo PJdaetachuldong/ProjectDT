@@ -6,12 +6,15 @@
 #include "GameFramework/Character.h"
 #include "Weapons/CEquipment.h"
 #include "Weapons/CDoAction.h"
+#include "Weapons/CSubAction.h"
+#include "Weapons/SubActions/CSubAction_Skill.h"
 
 UCWeaponAsset::UCWeaponAsset ( )
 {
 	AttachmentClass = ACAttachment::StaticClass();
 	EquipmentClass = UCEquipment::StaticClass();
-	DoActionClass = UCDoAction::StaticClass();
+	//DoActionClass = UCDoAction::StaticClass();
+	//SubActionClass = UCSubAction::StaticClass ( );
 }
 
 void UCWeaponAsset::BeginPlay ( class ACharacter* InOwner )
@@ -33,7 +36,7 @@ void UCWeaponAsset::BeginPlay ( class ACharacter* InOwner )
 	}
 	if ( !!DoActionClass ) {
 		DoAction = NewObject<UCDoAction> ( this , DoActionClass );
-		DoAction->BeginPlay ( Attachment , Equipment , InOwner , DoActionDatas, DoHeavyActionDatas, DoSpecialActionData ,HitDatas );
+		DoAction->BeginPlay ( Attachment , Equipment , InOwner , DoActionDatas, DoHeavyActionDatas,HitDatas );
 
 		if ( !!Attachment ) {
 			Attachment->OnAttachmentBeginCollision.AddDynamic ( DoAction , &UCDoAction::OnAttachmentBeginCollision );
@@ -41,6 +44,13 @@ void UCWeaponAsset::BeginPlay ( class ACharacter* InOwner )
 			Attachment->OnAttachmentBeginOverlap.AddDynamic ( DoAction , &UCDoAction::OnAttachmentBeginOverlap );
 			Attachment->OnAttachmentEndOverlap.AddDynamic ( DoAction , &UCDoAction::OnAttachmentEndOverlap );
 		}
-
+	}
+	if ( !!SubActionClass ) {
+		SubAction = NewObject<UCSubAction> ( this , SubActionClass );
+		SubAction->BeginPlay ( InOwner , Attachment , DoAction );
+	}
+	if ( !!SubAction_SkillClass ) {
+		SubAction_Skill = NewObject<UCSubAction_Skill> ( this , SubAction_SkillClass );
+		SubAction_Skill->BeginPlay ( InOwner , Attachment , DoAction );
 	}
 }

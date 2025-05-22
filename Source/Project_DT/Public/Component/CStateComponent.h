@@ -9,7 +9,7 @@
 UENUM()
 enum class EStateType : uint8
 {
-	Idle = 0, BackStep, Equip, Hitted, Dead, Action, Max,
+	Idle = 0, BackStep, Equip, Hitted, Dead, Action,Guard, Max,
 };
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FStateTypeChanged, EStateType, InPrevType, EStateType, InNewType);
 
@@ -26,6 +26,7 @@ public:
 	FORCEINLINE bool IsHittedMode ( ) { return Type == EStateType::Hitted; }
 	FORCEINLINE bool IsDeadMode ( ) { return Type == EStateType::Dead; }
 	FORCEINLINE bool IsActionMode ( ) { return Type == EStateType::Action; }
+	FORCEINLINE bool IsGuardMode ( ) { return Type == EStateType::Guard; }
 
 	FORCEINLINE bool IsSubActionMode ( ) { return bInSubActionMode; }
 
@@ -48,9 +49,13 @@ public:
 	void SetHittedMode ( );
 	void SetDeadMode ( );
 	void SetActionMode ( );
+	void SetGuardMode ( );
 
 	void OnSubActionMode ( );
 	void OffSubActionMode ( );
+
+	FORCEINLINE EStateType GetStateType ( ) { return Type; }
+
 
 private:
 	void ChangeType ( EStateType InType );

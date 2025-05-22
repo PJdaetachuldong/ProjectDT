@@ -9,10 +9,14 @@
 #include "Weapons/CEquipment.h"
 #include "Global.h"
 #include "Weapons/CDoAction.h"
+#include "Weapons/CSubAction.h"
+#include "Weapons/SubActions/CSubAction_Skill.h"
 
 // Sets default values for this component's properties
 UCWeaponComponent::UCWeaponComponent()
 {
+	PrimaryComponentTick.bCanEverTick = true;
+
 }
 
 
@@ -25,6 +29,19 @@ void UCWeaponComponent::BeginPlay()
 		if ( !!DataAssets[i] )
 			DataAssets[i]->BeginPlay ( OwnerCharacter );
 	}
+}
+
+void UCWeaponComponent::TickComponent ( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction )
+{
+	Super::TickComponent ( DeltaTime , TickType , ThisTickFunction );
+
+	//if ( !!GetDoAction ( ) )
+	//	GetDoAction ( )->Tick ( DeltaTime );
+
+	if ( !!GetSubAction ( ) )
+		GetSubAction ( )->Tick ( DeltaTime );
+	if ( !!GetSubAction_Skill ( ) )
+		GetSubAction_Skill( )->Tick ( DeltaTime );
 }
 
 bool UCWeaponComponent::IsIdleMode ( )
@@ -56,6 +73,21 @@ class UCDoAction* UCWeaponComponent::GetDoAction ( )
 	return DataAssets[(int32)Type]->GetDoAction ();
 }
 
+class UCSubAction* UCWeaponComponent::GetSubAction ( )
+{
+	CheckTrueResult ( IsUnarmedMode ( ) , nullptr );
+	CheckFalseResult ( !!DataAssets[(int32)Type] , nullptr );
+	return DataAssets[(int32)Type]->GetSubAction ( );
+
+}
+
+class UCSubAction_Skill* UCWeaponComponent::GetSubAction_Skill ( )
+{
+	CheckTrueResult ( IsUnarmedMode ( ) , nullptr );
+	CheckFalseResult ( !!DataAssets[(int32)Type] , nullptr );
+	return DataAssets[(int32)Type]->GetSubAction_Skill ( );
+}
+
 void UCWeaponComponent::SetUnarmedMode ( )
 {
 	CheckFalse ( IsIdleMode ( ) );
@@ -83,6 +115,12 @@ void UCWeaponComponent::SetSwordMode ( )
 	SetMode ( EWeaponType::Sword );
 }
 
+void UCWeaponComponent::SetRapierMode ( )
+{
+	CheckFalse ( IsIdleMode ( ) );
+	SetMode ( EWeaponType::Rapier );
+}
+
 void UCWeaponComponent::DoAction ( )
 {
 	if ( !!GetDoAction ( ) ){
@@ -99,13 +137,80 @@ void UCWeaponComponent::DoHeavyAction ( )
 	}
 }
 
-void UCWeaponComponent::DoSpeciaAction ( )
+void UCWeaponComponent::SubAction_Pressed()
 {
-	if ( !!GetDoAction ( ) ) {
-		GetDoAction ( )->DoSpecialAction ( );
-		GetDoAction ( )->SpecialAttack ( );
+	if ( !bCanParry ) return; // 연타 방지
+	UCStateComponent* State = CHelpers::GetComponent<UCStateComponent> ( OwnerCharacter );
 
+	//CheckFalse ( State->IsIdleMode ( ) );
+
+	if (!!GetSubAction())
+		GetSubAction()->Pressed();
+
+	UCParryComponent* parry = CHelpers::GetComponent<UCParryComponent>(OwnerCharacter);
+	CheckNull(parry);
+
+	parry->OnParryCollision();
+
+	// 5프레임 뒤에 콜리전 끄기 (60FPS 기준 약 0.083초)
+	FTimerHandle TimerHandle;
+	FTimerDelegate TimerDelegate;
+
+	// 람다 캡처 방식 또는 바인딩 방식 사용 가능
+	TimerDelegate.BindLambda([parry]()
+	{
+		parry->OffParryCollision();
+	});
+
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle,
+		TimerDelegate,
+		5.0f / 60.0f, // 약 0.083초
+		false // 반복 안 함
+	);
+	FTimerHandle PH;
+
+	bCanParry = false;
+	GetWorld ( )->GetTimerManager ( ).SetTimer (
+		PH,
+		[this]( ){bCanParry = true; } ,
+		0.2f , // 쿨타임 0.3초 (원하는 시간으로)
+		false
+	);
+}
+
+void UCWeaponComponent::SubAction_Released ( )
+{
+
+	if ( !!GetSubAction ( ) )
+		GetSubAction ( )->Released ( );
+
+	UCParryComponent* parry = CHelpers::GetComponent<UCParryComponent> ( OwnerCharacter );
+	CheckNull ( parry );
+	//parry->OffParryCollision ( );
+
+}
+
+void UCWeaponComponent::SubAction_Skill_Pressed ( )
+{
+	if ( !!GetSubAction_Skill ( ) ){
+		GetSubAction_Skill ( )->Pressed ( );
 	}
+
+}
+
+void UCWeaponComponent::SubAction_Skill_Released ( )
+{
+	if ( !!GetSubAction_Skill ( ) )
+		GetSubAction_Skill ( )->Released ( );
+
+}
+
+void UCWeaponComponent::OnParry ( EParryState ParryState )
+{
+	if ( !!GetSubAction ( ) )
+		GetSubAction ( )->Parry ( ParryState );
+
 }
 
 void UCWeaponComponent::SetMode ( EWeaponType InType )

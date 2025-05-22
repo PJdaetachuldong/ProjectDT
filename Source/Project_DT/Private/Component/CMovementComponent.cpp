@@ -48,17 +48,23 @@ void UCMovementComponent::OnWalk ( )
 void UCMovementComponent::EnableControlRotation ( )
 {
 	OwnerCharacter->bUseControllerRotationYaw = true;
+
 	OwnerCharacter->GetCharacterMovement ( )->bOrientRotationToMovement = false;
+	OwnerCharacter->GetCharacterMovement ( )->bUseControllerDesiredRotation = true;
 }
 
 void UCMovementComponent::DisableControlRotation ( )
 {
 	OwnerCharacter->bUseControllerRotationYaw = false;
+
 	OwnerCharacter->GetCharacterMovement ( )->bOrientRotationToMovement = true;
+	OwnerCharacter->GetCharacterMovement ( )->bUseControllerDesiredRotation = false;
 }
 
 void UCMovementComponent::OnMoveForward ( const FInputActionValue& Value )
 {
+	if ( !bCanMove )return;
+
 	float Scale = Value.Get<float> ( );
 
 	FRotator rotator = FRotator ( 0 , OwnerCharacter->GetControlRotation ( ).Yaw , 0 );
@@ -72,6 +78,7 @@ void UCMovementComponent::OnMoveForward ( const FInputActionValue& Value )
 
 void UCMovementComponent::OnMoveRight ( const FInputActionValue& Value )
 {
+	if ( !bCanMove )return;
 	float Scale = Value.Get<float> ( );
 
 
