@@ -7,6 +7,7 @@
 #include "Weapons/CAttachment.h"
 #include "Kismet/GameplayStatics.h"
 #include "Boss/RangedAttackObject/CRangeAttack.h"
+#include "Boss/CBossAnim.h"
 
 ACBossEnemy::ACBossEnemy()
 {
@@ -16,6 +17,22 @@ ACBossEnemy::ACBossEnemy()
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ACBossEnemy::EnemyHitDamage);
 
 	FSMComponent = CreateDefaultSubobject<UCBossFSM>(TEXT("FSMComponent"));
+
+	SwordMesh = CreateDefaultSubobject<USkeletalMeshComponent>(L"SwordMesh");
+	SwordMesh->SetupAttachment(GetMesh());
+
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(L"/Script/Engine.SkeletalMesh'/Game/ODH/Asset/Boss/ElfArden/BaseMesh/Sword/SK_sword.SK_sword'");
+	if ( TempMesh.Succeeded() )
+	{
+		SwordMesh->SetSkeletalMesh(TempMesh.Object);
+		SwordMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale , TEXT("Weapon_Socket"));
+	}
+
+	ConstructorHelpers::FClassFinder<UAnimInstance> TempAnim (L"/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Boss/ABP_BossAnim.ABP_BossAnim_C'");
+	if ( TempAnim.Succeeded() )
+	{
+		GetMesh()->SetAnimInstanceClass(TempAnim.Class);
+	}
 
 	//일단 임시로 하는 발사 위치 설정
 	ThrowPosition = CreateDefaultSubobject<USceneComponent>(L"ThrowPosition");
@@ -68,7 +85,9 @@ void ACBossEnemy::SPBreak()
 
 void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//스페셜 공격때 데미지량 저장하는 코드를 적어야함
+	//가드가 성공한 경우에는 데미지 처리 및 피격 애니메이션이 안 나오도록 만듦
+	if(IsGuardSucssess )
+	return;
 
 	ACAttachment* Weapon = Cast<ACAttachment> ( OtherActor );
 

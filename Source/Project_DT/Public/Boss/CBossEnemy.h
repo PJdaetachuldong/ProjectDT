@@ -64,7 +64,7 @@ public:
 	float GuardPlaying = 10.0f;
 
 	//가드가 성공하였는지 체크하는 변수
-	bool IsSucssessGuard = false;
+	bool IsGuardSucssess = false;
 
 	//준비 자세일때 받은 데미지의 총량을 저장하는 변수
 	float OnSPDamage = 0.0f;
@@ -77,6 +77,10 @@ public:
 	//일단 임시로 하는 발사 위치 설정
 	UPROPERTY(EditAnywhere)
 	class USceneComponent* ThrowPosition;
+	//일단 임시로 하는 발사 위치 설정
+
+	UPROPERTY(EditAnywhere)
+	USkeletalMeshComponent* SwordMesh;
 
 	// FSM 컴포넌트
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")

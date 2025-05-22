@@ -343,6 +343,8 @@ void UCBossFSM::COUNTERATTACKState()
 		{
 			//바로 카운터 공격이 동작하게 만듦
 			GEngine->AddOnScreenDebugMessage ( 111 , 1.0f , FColor::White , TEXT ( "Counter Attack!!!" ) );
+			//혹시 모르니 데미지 처리 못하게 bool을 true로 변경해줌
+			MyBoss->IsGuardSucssess = true;
 			//공격 상태 NONE으로 변경
 			AttackState = EBossATTACKState::NONE;
 			//시간 초기화
