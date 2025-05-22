@@ -62,7 +62,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category =FSM)
 	EMeleeEnemyState State = EMeleeEnemyState::IDLE;
 
-	void GetOnwerEnemy();
+	void GetOwnerEnemy();
 
 	void LookAtTarget();
 
@@ -72,7 +72,7 @@ public:
 	float CurTime = 0.0f;
 	//임의로 그냥 시간을 재서 다시 MOVE상태가 되게 작성
 	UPROPERTY()
-	class AAIController* AI;
+	class ACMeleeAIController* AI;
 
 	void IDLEState();
 	void CHASEState();
