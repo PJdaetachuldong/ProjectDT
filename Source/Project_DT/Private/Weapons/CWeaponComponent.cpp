@@ -115,6 +115,12 @@ void UCWeaponComponent::SetSwordMode ( )
 	SetMode ( EWeaponType::Sword );
 }
 
+void UCWeaponComponent::SetRapierMode ( )
+{
+	CheckFalse ( IsIdleMode ( ) );
+	SetMode ( EWeaponType::Rapier );
+}
+
 void UCWeaponComponent::DoAction ( )
 {
 	if ( !!GetDoAction ( ) ){

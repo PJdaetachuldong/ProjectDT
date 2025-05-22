@@ -8,7 +8,7 @@
 #include "CWeaponComponent.generated.h"
 UENUM(BlueprintType)
 enum class EWeaponType : uint8 {
-	Fist,Katana,Sword,Max
+	Fist,Katana,Sword,Rapier,Max
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams ( FWeaponTypeChanged , EWeaponType , InPrevType , EWeaponType , InNewType );
@@ -28,6 +28,7 @@ public:
 	FORCEINLINE bool IsFistMode ( ) { return Type == EWeaponType::Fist; }
 	FORCEINLINE bool IsKatanaMode ( ) { return Type == EWeaponType::Katana; }
 	FORCEINLINE bool IsSwordMode ( ) { return Type == EWeaponType::Sword; }
+	FORCEINLINE bool IsRapierMode ( ) { return Type == EWeaponType::Rapier; }
 	FORCEINLINE EWeaponType GetWeaponType ( ) { return Type; }
 public:
 	UCWeaponComponent();
@@ -51,6 +52,7 @@ public:
 	void SetFistMode ( );
 	void SetKatanaMode ( );
 	void SetSwordMode ( );
+	void SetRapierMode ( );
 
 	void DoAction();
 	void DoHeavyAction();
