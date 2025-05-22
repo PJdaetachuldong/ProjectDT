@@ -154,6 +154,11 @@ void UCWolfFSM::UpdateEnemyList ( )
 	}
 }
 
+void UCWolfFSM::Dissolved ( )
+{
+
+}
+
 void UCWolfFSM::SearchEnemy ( )
 {
 	// 플레이어가 공격한 에너미로 타게팅 (플레이어쪽 리스트 필요)
@@ -169,32 +174,30 @@ void UCWolfFSM::SearchEnemy ( )
 		IsInBattle = true;
 		SetOnTarget();
 	}
-
-
 }
 
 // 전투 상태인 경우에만 실행
 void UCWolfFSM::SetOnTarget ( )
 {
-	SetOnRandTarget();	// 임시 랜덤 타겟 (하단 우선순위 만들시 변경예정)
+	TargetEnemy = nullptr;
 
-	// Enemy에 가장 가까운 대상 값 넣어주기
+	UpdateEnemyList ( );
+	if ( EnemyList.IsEmpty ( ) ) { return; }	// 에너미 리스트가 비어있다면 실행할 필요가 없음
+	HitActors.Empty ( );	// (본인이) 공격했던 타겟 목록 비우기
 
-	// 1순위 - 플레이어가 공격중인 대상.
+// Enemy에 가장 가까운 대상 값 넣어주기
+	SetOnRandTarget ( );	// 임시 랜덤 타겟 (하단 우선순위 만들시 변경예정)
+
+// 1순위 - 플레이어가 공격중인 대상.
 	// ㄴ 플레이어 리스트 받아와야함.
 
-	// 2순위 - 플레이어를 공격중인 대상.
+// 2순위 - 플레이어를 공격중인 대상.
 	// ㄴ 에너미 상태(공격중인지 불값 등) 받아와야함.
 
 }
 
 void UCWolfFSM::SetOnRandTarget ( )
 {
-	UpdateEnemyList();
-	if ( EnemyList.IsEmpty ( ) ) { return; }	// 에너미 리스트가 비어있다면 실행할 필요가 없음
-	
-	HitActors.Empty ( );	// (본인이) 공격했던 타겟 목록 비우기
-
 	int32 randTarget = FMath::RandRange ( 0 , EnemyList.Num ( ) - 1 );
 	TargetEnemy = EnemyList[randTarget];
 }

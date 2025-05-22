@@ -64,3 +64,25 @@ void UCWolfAnimInstance::AnimNotify_Roar_END ( )
 	if ( !Me ) { return; }
 	NewState(EUpperState::Idle);
 }
+
+void UCWolfAnimInstance::AnimNotify_Search_Target ( )
+{
+	if ( !Me ) { return; }
+	FSM->SearchEnemy ( );
+	Me->IsCanAttack = true;
+}
+
+void UCWolfAnimInstance::AnimNotify_Dissolve_Start ( )
+{
+	if ( !Me ) { return; }
+
+	FSM->Dissolved();
+}
+
+void UCWolfAnimInstance::AnimNotify_DesPawn_End ( )
+{
+	if ( !Me ) { return; }
+
+	Me->SetOnDesPawn();
+
+}

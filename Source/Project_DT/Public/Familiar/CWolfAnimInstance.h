@@ -60,4 +60,13 @@ public:	// AnimNotify 관련 -------- UFUNCTION() 잊지말것!!!
 	UFUNCTION() 
 	void AnimNotify_Roar_END();
 
+	UFUNCTION() 
+	void AnimNotify_Search_Target();
+
+	UFUNCTION() 
+	void AnimNotify_Dissolve_Start();
+
+	UFUNCTION() 
+	void AnimNotify_DesPawn_End();
+
 };

@@ -132,6 +132,7 @@ public:	// State 관련 함수
 public:	// 실행쪽 함수
 	void SpawnFamiliar();
 	void UpdateEnemyList();
+	void Dissolved();
 
 	// Start, 공격 직전, 피격
 	void SearchEnemy();			// 적 리스트 갱신

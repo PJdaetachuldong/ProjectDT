@@ -55,6 +55,12 @@ void ACFamiliarWolf::Tick ( float DeltaTime )
 
 }
 
+void ACFamiliarWolf::SetOnDesPawn ( )
+{
+	IsCanAttack = false;
+
+}
+
 /*
 void ACFamiliarWolf::Landed ( const FHitResult& Hit )
 {
