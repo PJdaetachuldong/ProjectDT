@@ -23,20 +23,27 @@ public:
 
 public:	// 기본 세팅 파트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
-	class UCWolfFSM* WolfFSM;
+	class UCWolfFSM* FSM;
 
 	UPROPERTY(EditDefaultsOnly)
 	class USkeletalMeshComponent* WolfComponent;
 
 	UPROPERTY()
-	class UCWolfAnimInstance* WolfAnim;
+	class UCWolfAnimInstance* Anim;
 
 public:	// 스탯 관련
 	float AttackDelayTime = 2.f;	// 공격 쿨타임
 	float SearchRange = 1000.f;
+	float MoveMentSpeed = 300.f;
+	float MaxDistance = 400.f;
+	float MinDistance = 200.f;
 
 public:
 	bool IsCanAttack = false;
+
+	bool IsSpawned = false;		// 스폰 상태인지 확인하는 변수
+	bool IsInBattle = false;	// 전투 상태인지 확인하는 변수
+	bool IsFar = false;			// Idle 상태에서 거리가 먼지 판단하는 변수
 
 public://오버라이드 할 것 같은 항목
 	// virtual void OnWeaponChanged ( );	// 무기에 따른 소환수 변화
@@ -47,5 +54,5 @@ public:
 	void SetOnDesPawn( );
 
 public:	// 기타 함수
-	// void Landed ( const FHitResult& Hit );	// 착지 확인 델리게이트
+	void Landed ( const FHitResult& Hit );	// 착지 확인 델리게이트
 };

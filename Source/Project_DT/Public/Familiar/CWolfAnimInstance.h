@@ -23,7 +23,7 @@ public:
 
 public:	// 수치값
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM_Move")
-	float Speed = 0.f;
+	float Speed = 200.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM_Move")
 	float Direction = 0.f;
 
@@ -37,9 +37,6 @@ public://FSM State 관련
 	EUpperState AUpState = EUpperState::Start;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
-	EIdleState AIdleState = EIdleState::None;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
 	EJumpState AJumpState = EJumpState::None;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
@@ -48,13 +45,6 @@ public://FSM State 관련
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
 	EOverridenState AOverState = EOverridenState::None;
 #pragma endregion State 
-	
-public:
-	void NewState( EUpperState _UpState);
-	void NewState( EIdleState _IdleState );
-	void NewState( EJumpState _JumpState );
-	void NewState( EAttackState _AttState );
-	void NewState( EOverridenState _OverState );
 
 public:	// AnimNotify 관련 -------- UFUNCTION() 잊지말것!!!
 	UFUNCTION() 
@@ -68,5 +58,8 @@ public:	// AnimNotify 관련 -------- UFUNCTION() 잊지말것!!!
 
 	UFUNCTION() 
 	void AnimNotify_DesPawn_End();
+
+	UFUNCTION() 
+	void AnimNotify_Att_End();
 
 };

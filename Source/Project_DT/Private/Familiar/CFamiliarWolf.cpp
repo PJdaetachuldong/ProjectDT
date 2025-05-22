@@ -26,8 +26,8 @@ ACFamiliarWolf::ACFamiliarWolf ( )
 	}
 	
 
-	WolfFSM = CreateDefaultSubobject<UCWolfFSM> ( TEXT ( "WolfFSM" ) );
-	WolfAnim = Cast<UCWolfAnimInstance> ( GetMesh ( )->GetAnimInstance ( ) );
+	FSM = CreateDefaultSubobject<UCWolfFSM> ( TEXT ( "WolfFSM" ) );
+	Anim = Cast<UCWolfAnimInstance> ( GetMesh ( )->GetAnimInstance ( ) );
 
 	/*
 	USkeletalMeshComponent* SkeletalMeshComp = GetMesh ( );
@@ -61,9 +61,7 @@ void ACFamiliarWolf::SetOnDesPawn ( )
 
 }
 
-/*
 void ACFamiliarWolf::Landed ( const FHitResult& Hit )
 {
-	WolfFSM->mUpState = EUpperState::Idle;
+	FSM->UpdateState(EUpperState::Idle);
 }
-*/

@@ -16,7 +16,7 @@ enum class EUpperState : uint8
 	None			UMETA(DisplayName = "None"),		// 소환 해제 대기상태
 	Start			UMETA(DisplayName = "Start"),		// 
 	Idle			UMETA(DisplayName = "Idle"),
-	Move			UMETA(DisplayName = "Move"),
+	Jump			UMETA(DisplayName = "Jump"),
 	Attack			UMETA(DisplayName = "Attack"),
 	CC				UMETA(DisplayName = "CC"),
 	Uncontrolled	UMETA(DisplayName = "Uncontrolled")
@@ -24,20 +24,11 @@ enum class EUpperState : uint8
 
 //========================= 하위 스테이트 머신 ==================================
 
-UENUM() // HFSM - 대기 상태
-enum class EIdleState : uint8
-{
-	None		UMETA(DisplayName = "None"),
-	Idle		UMETA(DisplayName = "Idle"),
-	BattleIdle	UMETA(DisplayName = "BattleIdle") ,
-	Jump		UMETA(DisplayName = "Jump")
-};
-
 UENUM() // HFSM - 공격 상태
 enum class EAttackState : uint8
 {
 	None		UMETA(DisplayName = "None"),
-	Attack		UMETA(DisplayName = "Attack")
+	Attack1		UMETA(DisplayName = "Attack1")
 };
 
 UENUM() // HFSM - 이동 상태 (점프로 각도 조정등 수행)
@@ -90,9 +81,6 @@ public:
 	EUpperState MUpState = EUpperState::Start;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
-	EIdleState MIdleState = EIdleState::None;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
 	EJumpState MJumpState = EJumpState::None;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
@@ -102,6 +90,14 @@ public:
 	EOverridenState MOverState = EOverridenState::None;
 #pragma endregion State 
 
+// 스테이트 업데이트
+#pragma region Update_States
+public:	// State 변환
+	void UpdateState ( EUpperState _UpState );
+	void UpdateState ( EJumpState _JumpState );
+	void UpdateState ( EAttackState _AttState );
+	void UpdateState ( EOverridenState _OverState );
+#pragma endregion Update_States
 
 // 본인, 플레이어, 에너미리스트
 #pragma region Target
@@ -109,9 +105,13 @@ private:
 	UPROPERTY()
 	class ACFamiliarWolf* Me;
 	UPROPERTY()
+	class UCWolfAnimInstance* Anim;
+
+	UPROPERTY()
 	class ACPlayer* Player;	// 쫓아갈 플레이어
+
 	UPROPERTY()	
-	class ACEnemyBase* TargetEnemy;		// 타게팅 된 에너미
+	class ACEnemyBase* TargetEnemy = nullptr;		// 타게팅 된 에너미
 
 	UPROPERTY()	
 	TArray<ACEnemyBase*>EnemyList;
@@ -121,25 +121,28 @@ private:
 public:
 	float CurrentTime = 0.f;
 
-public:
-	bool IsSpawned = false;		// 스폰 상태인지 확인하는 변수
-	bool IsInBattle = false;	// 전투 상태인지 확인하는 변수
-
 public:	// State 관련 함수
 	void IdleState();
 	void JumpState();
+	void AttackState();
 
 public:	// 실행쪽 함수
 	void SpawnFamiliar();
 	void UpdateEnemyList();
 	void Dissolved();
 
-	// Start, 공격 직전, 피격
-	void SearchEnemy();			// 적 리스트 갱신
+public:	// 에너미 색적 
+	void SearchEnemy();			// 적 리스트 갱신, IsInBattle 갱신
 	void SetOnTarget();			// 타겟 지정하기
 	void SetOnRandTarget ( );	// 임시타겟. 리스트 랜덤돌림.
-	FVector TargetDir ();		// 타겟 Dir 구하기
-	void TurnToTarget();		// 타겟 방향으로 몸 돌리기
 
 
+public:	// 공격 실행 함수
+	void OnAttackProcess();		// 공격 실행하는 함수
+	void DecideAttack();		// 어떤 공격할지 결정하는 함수
+
+public:	// 이동 관련 함수
+	FVector TargetDir ( AActor* target );		// 타겟 Dir 구하기
+	void MoveToTarget( AActor* target );		// 타겟 방향으로 이동하기
+	void TurnToTarget( AActor* target );		// 타겟 방향으로 몸 돌리기
 };
