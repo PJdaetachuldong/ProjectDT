@@ -33,10 +33,13 @@ public:	// 기본 세팅 파트
 
 public:	// 스탯 관련
 	float AttackDelayTime = 2.f;	// 공격 쿨타임
-	float SearchRange = 1000.f;
+	float SearchRange = 2000.f;
+
 	float MoveMentSpeed = 300.f;
 	float MaxDistance = 400.f;
 	float MinDistance = 200.f;
+
+	float AttackRange = MinDistance;
 
 public:
 	bool IsCanAttack = false;

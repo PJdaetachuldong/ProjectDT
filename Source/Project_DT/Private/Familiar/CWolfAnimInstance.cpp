@@ -57,5 +57,5 @@ void UCWolfAnimInstance::AnimNotify_DesPawn_End ( )
 void UCWolfAnimInstance::AnimNotify_Att_End ( )
 {
 	if ( !Me ) { return; }
-	FSM->UpdateState(EUpperState::Jump);
+	FSM->EndAttackProcess();
 }
