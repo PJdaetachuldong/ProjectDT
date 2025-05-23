@@ -23,6 +23,7 @@ namespace AssetPaths
 
     constexpr const TCHAR* IMC = TEXT ( "/Script/EnhancedInput.InputMappingContext'/Game/LHW/Input/IMC_Player.IMC_Player'" );
     constexpr const TCHAR* IA_Test = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Test.IA_Test'" );
+    constexpr const TCHAR* IA_Test2 = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Test2.IA_Test2'" );
 
 
 }

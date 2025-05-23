@@ -19,6 +19,7 @@
 #include "Character/CPlayerAnim.h"
 #include "Weapons/CWeaponComponent.h"
 #include "Component/CParryComponent.h"
+#include "Component/CTargetingComponent.h"
 // Sets default values
 ACPlayer::ACPlayer()
 {
@@ -68,6 +69,7 @@ ACPlayer::ACPlayer()
 	CHelpers::CreateActorComponent<UCStateComponent> ( this , &State , "State" );
 	CHelpers::CreateActorComponent<UCTrajectoryComponent> ( this , &Trajectory , "Trajectory" );
 	CHelpers::CreateActorComponent<UCParryComponent> ( this , &Parry , "Parry" );
+	CHelpers::CreateActorComponent<UCTargetingComponent> ( this , &TargetComp , "TargetComp" );
 
 	//인풋 받기
 	CHelpers::GetAsset ( &IMC , AssetPaths::IMC );
@@ -77,12 +79,14 @@ ACPlayer::ACPlayer()
 	CHelpers::GetAsset ( &IA_HorizontalLook , AssetPaths::IA_HorizontalLook );
 	CHelpers::GetAsset ( &IA_Dash , AssetPaths::IA_Dash );
 	CHelpers::GetAsset ( &IA_Avoid , AssetPaths::IA_Avoid );
-	CHelpers::GetAsset ( &IA_TestBtn , AssetPaths::IA_Test );
 	CHelpers::GetAsset ( &IA_Jump , AssetPaths::IA_Jump );
 	CHelpers::GetAsset ( &IA_LeftAttack , AssetPaths::IA_LeftClick );
 	CHelpers::GetAsset ( &IA_RightAttack , AssetPaths::IA_RightClick );
 	CHelpers::GetAsset ( &IA_SpecialAttack , AssetPaths::IA_SpecialClick );
 	CHelpers::GetAsset ( &IA_Guard , AssetPaths::IA_GuardBtn );
+
+	CHelpers::GetAsset ( &IA_TestBtn , AssetPaths::IA_Test );
+	CHelpers::GetAsset ( &IA_TestBtn2 , AssetPaths::IA_Test2 );
 }
 
 void ACPlayer::BeginPlay()
@@ -103,7 +107,6 @@ void ACPlayer::BeginPlay()
 void ACPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -120,7 +123,7 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction ( IA_Dash , ETriggerEvent::Started , Movement , &UCMovementComponent::OnSprint);
 		playerInput->BindAction ( IA_Dash , ETriggerEvent::Completed , Movement , &UCMovementComponent::OnRun);
 		playerInput->BindAction ( IA_Avoid , ETriggerEvent::Completed , this , &ACPlayer::OnAvoid );
-		playerInput->BindAction ( IA_TestBtn , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SetKatanaMode );
+		//playerInput->BindAction ( IA_Avoid , ETriggerEvent::Completed , TargetComp , &UCTargetingComponent::OnLookOn );
 		playerInput->BindAction ( IA_Jump , ETriggerEvent::Completed , this , &ACPlayer::Jump );
 		playerInput->BindAction ( IA_LeftAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoAction );
 		playerInput->BindAction ( IA_RightAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoHeavyAction );
@@ -128,6 +131,9 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction ( IA_SpecialAttack , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SubAction_Skill_Released );
 		playerInput->BindAction ( IA_Guard , ETriggerEvent::Started , Weapon , &UCWeaponComponent::SubAction_Pressed);
 		playerInput->BindAction ( IA_Guard , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SubAction_Released);
+
+		playerInput->BindAction ( IA_TestBtn , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SetKatanaMode );
+		playerInput->BindAction ( IA_TestBtn2 , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SetGreatSwordMode );
 	}
 }
 

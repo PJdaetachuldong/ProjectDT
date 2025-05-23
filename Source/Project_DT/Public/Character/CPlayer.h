@@ -31,6 +31,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	class UCParryComponent* Parry;
+
+	UPROPERTY(VisibleAnywhere)
+	class UCTargetingComponent* TargetComp;
 public:
 	UPROPERTY(VisibleAnywhere)
 	class UCMovementComponent* Movement;
@@ -51,6 +54,8 @@ public:
 	class UInputAction* IA_Avoid;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UInputAction* IA_TestBtn;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInputAction* IA_TestBtn2;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UInputAction* IA_Jump;
 	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
