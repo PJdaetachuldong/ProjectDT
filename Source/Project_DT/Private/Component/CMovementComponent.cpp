@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Weapons/CWeaponComponent.h"
 #include "Global.h"
+#include "Component/CTargetingComponent.h"
 
 // Sets default values for this component's properties
 UCMovementComponent::UCMovementComponent()
@@ -20,6 +21,8 @@ void UCMovementComponent::BeginPlay()
 	Super::BeginPlay();
 	OwnerCharacter = Cast<ACharacter> ( GetOwner ( ) );
 	Weapon = CHelpers::GetComponent<UCWeaponComponent> ( OwnerCharacter );
+	TargetComp = CHelpers::GetComponent<UCTargetingComponent> ( OwnerCharacter );
+
 
 	// ...
 
@@ -32,13 +35,15 @@ void UCMovementComponent::SetSpeed ( ESpeedType InType )
 
 void UCMovementComponent::OnSprint ( )
 {
-	CheckFalse ( Weapon->GetWeaponType ( ) == EWeaponType::Max );
+	//bCancelLockOn = true;
+	if ( !OwnerCharacter->GetMesh ( )->GetAnimInstance ( )->IsAnyMontagePlaying () )
+		TargetComp->ResetLockOn ( );
 	SetSpeed ( ESpeedType::Sprint );
-
 }
 
 void UCMovementComponent::OnRun ( )
 {
+	bCancelLockOn = false;
 	SetSpeed ( ESpeedType::Run );
 
 }
@@ -67,32 +72,48 @@ void UCMovementComponent::DisableControlRotation ( )
 
 void UCMovementComponent::OnMoveForward ( const FInputActionValue& Value )
 {
-	if ( !bCanMove )return;
+	if ( !bCanMove ) return;
 
-	float Scale = Value.Get<float> ( );
+	ForwardScale = Value.Get<float> ( );
 
 	FRotator rotator = FRotator ( 0 , OwnerCharacter->GetControlRotation ( ).Yaw , 0 );
-	FVector direction = FQuat ( rotator ).GetForwardVector ( );
+	FVector ForwardVector = FQuat ( rotator ).GetForwardVector ( );
+	FVector RightVector = FQuat ( rotator ).GetRightVector ( );
 
 	if ( bTopViewCamera )
-		direction = FVector::XAxisVector;
+	{
+		ForwardVector = FVector::XAxisVector;
+		RightVector = FVector::YAxisVector;
+	}
 
-	OwnerCharacter->AddMovementInput ( direction , Scale);
+	// 최종 입력 방향 계산
+	LastInputDirection = ( ForwardVector * ForwardScale + RightVector * RightScale ).GetSafeNormal ( );
+
+	// 이동 적용
+	OwnerCharacter->AddMovementInput ( ForwardVector , ForwardScale );
 }
 
 void UCMovementComponent::OnMoveRight ( const FInputActionValue& Value )
 {
-	if ( !bCanMove )return;
-	float Scale = Value.Get<float> ( );
+	if ( !bCanMove ) return;
 
+	RightScale = Value.Get<float> ( );
 
 	FRotator rotator = FRotator ( 0 , OwnerCharacter->GetControlRotation ( ).Yaw , 0 );
-	FVector direction = FQuat ( rotator ).GetRightVector ( );
+	FVector ForwardVector = FQuat ( rotator ).GetForwardVector ( );
+	FVector RightVector = FQuat ( rotator ).GetRightVector ( );
 
 	if ( bTopViewCamera )
-		direction = FVector::YAxisVector;
+	{
+		ForwardVector = FVector::XAxisVector;
+		RightVector = FVector::YAxisVector;
+	}
 
-	OwnerCharacter->AddMovementInput ( direction , Scale);
+	// 최종 입력 방향 계산
+	LastInputDirection = ( ForwardVector * ForwardScale + RightVector * RightScale ).GetSafeNormal ( );
+
+	// 이동 적용
+	OwnerCharacter->AddMovementInput ( RightVector , RightScale );
 }
 
 void UCMovementComponent::OnHorizontalLook ( const FInputActionValue& Value )

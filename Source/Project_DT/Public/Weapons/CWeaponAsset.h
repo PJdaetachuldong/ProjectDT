@@ -17,7 +17,7 @@ private:
 	TSubclassOf<class ACAttachment> AttachmentClass;
 
 	UPROPERTY(EditAnywhere)
-	FEquipmentData EquipmentData;
+	TArray< FEquipmentData> EquipmentData;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UCEquipment> EquipmentClass;

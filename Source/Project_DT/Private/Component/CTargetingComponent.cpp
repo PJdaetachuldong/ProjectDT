@@ -8,6 +8,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Weapons/CWeaponComponent.h"
 #include "Engine/OverlapResult.h"
+#include "Component/CMovementComponent.h"
 // Sets default values for this component's properties
 UCTargetingComponent::UCTargetingComponent()
 {
@@ -25,33 +26,50 @@ void UCTargetingComponent::BeginPlay()
 	Camera = CHelpers::GetComponent<UCameraComponent> ( OwnerCharacter );
 	SpringArm = CHelpers::GetComponent<USpringArmComponent> ( OwnerCharacter );
 	Weapon = CHelpers::GetComponent<UCWeaponComponent> ( OwnerCharacter );
+	Movement = CHelpers::GetComponent<UCMovementComponent> ( OwnerCharacter );
 }
 
 void UCTargetingComponent::TickComponent ( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent ( DeltaTime , TickType , ThisTickFunction );
-	currentTime += DeltaTime;
-        OnLookOn ( );
-    if ( currentTime > 1.0f ) {
-		currentTime = 0.0f;
-	}
-    //if ( Weapon->GetWeaponType ( ) != EWeaponType::Max )
-        UpdateLockOn ( DeltaTime );
+
+    if ( Weapon->GetWeaponType ( ) != EWeaponType::Max )
+        if ( !Movement->GetCancelLockOn())
+            UpdateLockOn ( DeltaTime );
 
 }
 
-AActor* UCTargetingComponent::FindClosestEnemyByDistance ( float MaxDistance )
+AActor* UCTargetingComponent::FindClosestEnemyByDirection ( float MaxDistance , const FVector& InputDirection )
 {
     if ( !OwnerCharacter ) return nullptr;
 
     FVector CharacterLocation = OwnerCharacter->GetActorLocation ( );
 
+    TArray<AActor*> PotentialTargets;
+    float ClosestDot = -1.f;
     AActor* ClosestTarget = nullptr;
-    float ClosestDistance = MaxDistance;
 
     TArray<FOverlapResult> Overlaps;
     FCollisionQueryParams Params;
     Params.AddIgnoredActor ( OwnerCharacter );
+
+    // 디버그: 오버랩 쿼리 정보 로그
+    UE_LOG ( LogTemp , Log ,
+        TEXT ( "[Overlap Debug] Starting OverlapMultiByObjectType | Center: %s | Radius: %.2f | Channel: ECC_EngineTraceChannel3" ) ,
+        *CharacterLocation.ToString ( ) , MaxDistance );
+
+    // 디버그: 오버랩 범위 시각화 (파란색 구체, 1초 지속)
+    DrawDebugSphere (
+        GetWorld ( ) ,
+        CharacterLocation ,
+        MaxDistance ,
+        32 ,
+        FColor::Blue ,
+        false ,
+        0.001f ,
+        0 ,
+        2.0f
+    );
 
     // 캐릭터 중심의 원형 탐색
     GetWorld ( )->OverlapMultiByObjectType (
@@ -63,21 +81,35 @@ AActor* UCTargetingComponent::FindClosestEnemyByDistance ( float MaxDistance )
         Params
     );
 
+    // 디버그: 오버랩 결과 로그
+    UE_LOG ( LogTemp , Log ,
+        TEXT ( "[Overlap Debug] Found %d objects in overlap query" ) , Overlaps.Num ( ) );
+
     for ( const FOverlapResult& Result : Overlaps )
     {
         AActor* Enemy = Result.GetActor ( );
         if ( !IsValid ( Enemy ) ) continue;
 
-        float Distance = FVector::Dist ( CharacterLocation , Enemy->GetActorLocation ( ) );
+        // 디버그: 감지된 오브젝트 정보 로그
+        UE_LOG ( LogTemp , Log ,
+            TEXT ( "[Overlap Debug] Detected Actor: %s | Location: %s" ) ,
+            *Enemy->GetName ( ) , *Enemy->GetActorLocation ( ).ToString ( ) );
+
+        // 유효한 적을 배열에 추가
+        PotentialTargets.Add ( Enemy );
+
+        // 적 방향과 입력 방향 간 내적 계산
+        FVector EnemyDirection = ( Enemy->GetActorLocation ( ) - CharacterLocation ).GetSafeNormal ( );
+        float DotProduct = FVector::DotProduct ( InputDirection , EnemyDirection );
 
         UE_LOG ( LogTemp , Log ,
-            TEXT ( "[LockOn Check] Enemy: %s | Distance: %.1f" ) ,
-            *Enemy->GetName ( ) , Distance
+            TEXT ( "[LockOn Check] Enemy: %s | DotProduct: %.2f" ) ,
+            *Enemy->GetName ( ) , DotProduct
         );
 
-        if ( Distance < ClosestDistance )
+        if ( DotProduct > ClosestDot )
         {
-            ClosestDistance = Distance;
+            ClosestDot = DotProduct;
             ClosestTarget = Enemy;
         }
     }
@@ -94,8 +126,8 @@ AActor* UCTargetingComponent::FindClosestEnemyByDistance ( float MaxDistance )
         );
 
         UE_LOG ( LogTemp , Warning ,
-            TEXT ( "[LockOn] Selected Target: %s (Distance: %.1f)" ) ,
-            *ClosestTarget->GetName ( ) , ClosestDistance
+            TEXT ( "[LockOn] Selected Target: %s (DotProduct: %.2f)" ) ,
+            *ClosestTarget->GetName ( ) , ClosestDot
         );
     }
     else
@@ -105,26 +137,41 @@ AActor* UCTargetingComponent::FindClosestEnemyByDistance ( float MaxDistance )
 
     return ClosestTarget;
 }
+
 void UCTargetingComponent::OnLookOn ( )
 {
-    AActor* Target = FindClosestEnemyByDistance ( 250.f );
-    TimeSinceLostTarget += GetWorld()->DeltaTimeSeconds;
+    // TODO: 5초 동안 공격 입력이 없으면 LockedOnTarget을 nullptr로 설정하고 bIsLockedOn을 false로 변경
+
+    if ( !OwnerCharacter ) return;
+
+    // UCMovementComponent에서 마지막 입력 방향 가져오기
+    if ( !Movement )
+    {
+        UE_LOG ( LogTemp , Warning , TEXT ( "[LockOn] No UCMovementComponent found." ) );
+        return;
+    }
+
+    FVector InputDirection = Movement->LastInputDirection.GetSafeNormal ( );
+    if ( InputDirection.IsNearlyZero ( ) )
+    {
+        UE_LOG ( LogTemp , Warning , TEXT ( "[LockOn] No valid input direction. %f"),InputDirection.Size() );
+        return;
+    }
+
+    AActor* Target = FindClosestEnemyByDirection ( 300.f , InputDirection );
     if ( Target )
     {
         LockedOnTarget = Target;
         bIsLockedOn = true;
         UE_LOG ( LogTemp , Warning , TEXT ( "[LockOn] Locked on to: %s" ) , *Target->GetName ( ) );
     }
-    else
-    {
-        if ( TimeSinceLostTarget >= TargetLossTimeout ){
-        LockedOnTarget = nullptr;
-        bIsLockedOn = false;
-        UE_LOG ( LogTemp , Warning , TEXT ( "[LockOn] Lock-Off (No target found)" ) );
-        }
-    }
+    //else
+    //{
+    //    LockedOnTarget = nullptr;
+    //    bIsLockedOn = false;
+    //    UE_LOG ( LogTemp , Warning , TEXT ( "[LockOn] Lock-Off (No target found)" ) );
+    //}
 }
-
 void UCTargetingComponent::UpdateLockOn ( float DeltaTime )
 {
     if ( !bIsLockedOn || !IsValid ( LockedOnTarget ) )
@@ -141,7 +188,7 @@ void UCTargetingComponent::UpdateLockOn ( float DeltaTime )
     FRotator TargetRotation = ToTarget.Rotation ( );
 
     // 캐릭터 회전 보간
-    FRotator NewCharRotation = FMath::RInterpTo ( OwnerCharacter->GetActorRotation ( ) , TargetRotation , DeltaTime , 10.f );
+    FRotator NewCharRotation = FMath::RInterpTo ( OwnerCharacter->GetActorRotation ( ) , TargetRotation , DeltaTime , 100.f );
     OwnerCharacter->SetActorRotation ( NewCharRotation );
 
     // 카메라도 타겟 바라보게 (컨트롤러 회전 보간)
@@ -161,4 +208,11 @@ void UCTargetingComponent::UpdateLockOn ( float DeltaTime )
 
     // 디버그
     DrawDebugSphere ( GetWorld ( ) , LockedOnTarget->GetActorLocation ( ) , 70.f , 16 , FColor::Blue , false , -1.f , 0 , 3.f );
+}
+
+void UCTargetingComponent::ResetLockOn ( )
+{
+    bIsLockedOn = false;
+    LockedOnTarget = nullptr;
+    TimeSinceLostTarget = 0.f;
 }

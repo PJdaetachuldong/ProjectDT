@@ -6,7 +6,7 @@
 #include "Component/CMovementComponent.h"
 #include "Component/CStateComponent.h"
 
-void UCEquipment::BeginPlay ( class ACharacter* InOwner , const FEquipmentData& InData )
+void UCEquipment::BeginPlay ( class ACharacter* InOwner , TArray<FEquipmentData>& InData )
 {
 	OwnerCharacter = InOwner;
 	Data = InData;
@@ -19,16 +19,16 @@ void UCEquipment::Equip_Implementation ( )
 {
 	State->SetEquipMode ( );
 
-	if ( Data.bCanMove == false )
+	if ( Data[0].bCanMove == false )
 		Movement->Stop ( );
 
-	if ( !!Data.Montage )
-		OwnerCharacter->PlayAnimMontage ( Data.Montage , Data.PlayRate );
+	if ( !!Data[0].Montage )
+		OwnerCharacter->PlayAnimMontage ( Data[0].Montage , Data[0].PlayRate );
 	else {
 		Begin_Equip ( );
 		End_Equip ( );
 	}
-	if ( Data.bUseControlRotation )
+	if ( Data[0].bUseControlRotation )
 		Movement->EnableControlRotation ( );
 }
 
@@ -55,6 +55,9 @@ void UCEquipment::Unequip_Implementation ( )
 {
 	bEquipped = false;
 	Movement->DisableControlRotation ( );
+
+	if ( !!Data[1].Montage )
+		OwnerCharacter->PlayAnimMontage ( Data[1].Montage , Data[1].PlayRate );
 
 	if ( OnEquipmentUnequip.IsBound() )
 	{

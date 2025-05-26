@@ -16,7 +16,7 @@ class PROJECT_DT_API UCEquipment : public UObject
 {
 	GENERATED_BODY()
 public:
-	void BeginPlay ( class ACharacter* InOwner , const FEquipmentData& InData );
+	void BeginPlay ( class ACharacter* InOwner , TArray<FEquipmentData>& );
 
 public:
 	UFUNCTION ( BlueprintNativeEvent )
@@ -36,7 +36,7 @@ public:
 
 private:
 	class ACharacter* OwnerCharacter;
-	FEquipmentData Data;
+	TArray<FEquipmentData> Data;
 
 private:
 	class UCMovementComponent* Movement;

@@ -55,7 +55,7 @@ void ACEnemy::BeginPlay ( )
 void ACEnemy::Tick ( float DeltaTime )
 {
 	Super::Tick ( DeltaTime );
-	OverlapBegin();
+	//OverlapBegin();
 
 }
 

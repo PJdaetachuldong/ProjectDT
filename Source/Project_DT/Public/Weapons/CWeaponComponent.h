@@ -78,12 +78,15 @@ private:
 public:
 	FWeaponTypeChanged OnWeaponTypeChange;
 
+	bool bIsCombatState = false;
+	float CombatStateTime = 0.0f;
 private:
 	class ACharacter* OwnerCharacter;
 
 	EWeaponType Type = EWeaponType::Max;
 
 	bool bCanParry = true;
+
 
 
 };

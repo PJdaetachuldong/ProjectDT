@@ -43,6 +43,8 @@ public:
 	FORCEINLINE void EnableTopViewCamera() { bTopViewCamera = true; }
 	FORCEINLINE void DisableTopViewCamera() { bTopViewCamera = false; }
 
+	FORCEINLINE bool GetCancelLockOn ( ) { return bCancelLockOn; }
+
 public:
 	// Sets default values for this component's properties
 	UCMovementComponent();
@@ -74,11 +76,21 @@ public:
 private:
 	class ACharacter* OwnerCharacter;
 	class UCWeaponComponent* Weapon;
+	class UCTargetingComponent* TargetComp;
 
 private:
 	bool bCanMove = true;
 	bool bFixedCamera;
 	bool bTopViewCamera;
+	bool bCancelLockOn = false;
+	// 전방 입력 스케일
+	float ForwardScale;
+
+	// 우측 입력 스케일
+	float RightScale;
+public:
+    UPROPERTY(BlueprintReadOnly, Category = "Movement")
+    FVector LastInputDirection=FVector::ZeroVector;
 
 
 };

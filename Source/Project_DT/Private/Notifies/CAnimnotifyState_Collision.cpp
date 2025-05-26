@@ -24,6 +24,10 @@ void UCAnimnotifyState_Collision::NotifyBegin ( USkeletalMeshComponent* MeshComp
 	CheckNull ( weapon->GetAttachment ( ) );
 
 	weapon->GetAttachment ( )->OnCollisions ( );
+	weapon->bIsCombatState = true;
+	weapon->CombatStateTime = 0.0f;
+
+
 }
 
 void UCAnimnotifyState_Collision::NotifyEnd ( USkeletalMeshComponent* MeshComp , UAnimSequenceBase* Animation )

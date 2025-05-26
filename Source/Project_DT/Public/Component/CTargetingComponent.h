@@ -21,6 +21,9 @@ protected:
 	virtual void BeginPlay() override;
 private:
 	virtual void TickComponent ( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction ) override;
+public:
+	//FORCEINLINE AActor* GetLockedOnTarget ( ) const { return LockedOnTarget; }
+	FORCEINLINE bool IsLockedOn ( ) const { return bIsLockedOn; }
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -31,14 +34,21 @@ private:
 	class USpringArmComponent* SpringArm;
 	UPROPERTY ( VisibleAnywhere )
 	class UCWeaponComponent* Weapon;
+	UPROPERTY ( VisibleAnywhere )
+	class UCMovementComponent* Movement;
+
 
 private:
-	AActor* FindClosestEnemyByDistance ( float MaxDistance );
+    UFUNCTION(BlueprintCallable)
+    AActor* FindClosestEnemyByDirection(float MaxDistance, const FVector& InputDirection);
 
 public:
 	void OnLookOn ( );
 	void UpdateLockOn ( float DeltaSeconds );
+	void ResetLockOn ( );
 
+
+	bool bSearchTarget=false;
 private:
 	UPROPERTY()
     AActor* LockedOnTarget = nullptr;
