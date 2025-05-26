@@ -175,7 +175,7 @@ void UCBossFSM::NONEState()
 		else
 		{	
 			//랜덤 공격이 실행
-			SetCOMBOATTACKState(FMath::RandRange(0, 2));
+			SetCOMBOATTACKState(FMath::RandRange(0, 1));
 		}
 	}
 }
@@ -289,7 +289,7 @@ void UCBossFSM::DASHATTACKState()
 
 void UCBossFSM::COMBOATTACKState()
 {
-
+	
 }
 
 void UCBossFSM::COUNTERATTACKState()
@@ -317,14 +317,12 @@ void UCBossFSM::COUNTERATTACKState()
 	// Pawn 회전 설정
 	MyBoss->SetActorRotation (NewRotation);
 
-	//병합하고 난 다음에 GameTrace를 3으로 바꿔주기
-
 	//공격이 현재 에너미가 바라보는 방향에서 어느 각도로 맞았는지 체크하게 만듦
 	//SphereTrace와 내적을 사용해서 플레이어의 공격 각도를 체크하는 방식
 	FHitResult Hit;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(MyBoss);
-	bool bHit = GetWorld()->SweepSingleByChannel(Hit, MyBoss->GetActorLocation(), MyBoss->GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel4 , FCollisionShape::MakeSphere(130.0f), Params);
+	bool bHit = GetWorld()->SweepSingleByChannel(Hit, MyBoss->GetActorLocation(), MyBoss->GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel3 , FCollisionShape::MakeSphere(130.0f), Params);
 
 	DrawDebugSphere ( GetWorld ( ) , MyBoss->GetActorLocation ( ) , 130.0f , 21 , FColor::Green , false , 0.1f );
 
@@ -437,7 +435,7 @@ void UCBossFSM::SetCOMBOATTACKState(int32 RandomComboAttack)
 {
 	ComboAttackIndex = RandomComboAttack;
 
-	AttackState = EBossATTACKState::RANGEDATTACK;
+	AttackState = EBossATTACKState::COMBOATTACK;
 }
 
 void UCBossFSM::GetOwnerEnemy()

@@ -82,9 +82,37 @@ public:
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* SwordMesh;
 
+	UPROPERTY(EditAnywhere )
+	class UBoxComponent* SwordCollComp;
+
+	UPROPERTY(EditAnywhere)
+	class UBoxComponent* GuardCollComp;
+
+	UAnimInstance* AnimInstance;
+
+	void OnSwordCollision();
+
+	void OffSwordCollision();
+
+	void OnGuardCollision();
+
+	void OffGuardCollision();
+
+	bool CheckPlayer();
+
+	void PlayNextSectionAttack( UAnimMontage* CurrentMontage , FName CurrentSection );
+
+	FName GetNextSection(FName SectionName);
+
 	// FSM 컴포넌트
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     class UCBossFSM* FSMComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* ComboAttack_01;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* ComboAttack_02;
 	
 	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 };

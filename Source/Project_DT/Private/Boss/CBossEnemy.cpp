@@ -8,6 +8,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Boss/RangedAttackObject/CRangeAttack.h"
 #include "Boss/CBossAnim.h"
+#include "Components/BoxComponent.h"
+#include "Character/CPlayer.h"
 
 ACBossEnemy::ACBossEnemy()
 {
@@ -26,18 +28,29 @@ ACBossEnemy::ACBossEnemy()
 	{
 		SwordMesh->SetSkeletalMesh(TempMesh.Object);
 		SwordMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale , TEXT("Weapon_Socket"));
+
+		SwordCollComp = CreateDefaultSubobject<UBoxComponent>(L"SwordCollision");
+		SwordCollComp->AttachToComponent(SwordMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Collision_Socket"));
+		SwordCollComp->SetBoxExtent(FVector(10, 48, 3));
+		//공격 판정 콜리전 비활성화
+		SwordCollComp->SetCollisionEnabled ( ECollisionEnabled::NoCollision );
 	}
 
-	ConstructorHelpers::FClassFinder<UAnimInstance> TempAnim (L"/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Boss/ABP_BossAnim.ABP_BossAnim_C'");
+	ConstructorHelpers::FObjectFinder<UAnimBlueprint> TempAnim (L"/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Boss/ABP_BossAnim.ABP_BossAnim'");
 	if ( TempAnim.Succeeded() )
 	{
-		GetMesh()->SetAnimInstanceClass(TempAnim.Class);
+		GetMesh()->SetAnimInstanceClass(TempAnim.Object->GeneratedClass);
+		AnimInstance = GetMesh()->GetAnimInstance();
 	}
 
 	//일단 임시로 하는 발사 위치 설정
 	ThrowPosition = CreateDefaultSubobject<USceneComponent>(L"ThrowPosition");
 	ThrowPosition->SetupAttachment(RootComponent);
 	//일단 임시로 하는 발사 위치 설정
+
+	GuardCollComp = CreateDefaultSubobject<UBoxComponent>(L"GuardCollision");
+	GuardCollComp->SetupAttachment(GetMesh());
+	GuardCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ACBossEnemy::BeginPlay()
@@ -83,6 +96,135 @@ void ACBossEnemy::SPBreak()
 	
 }
 
+void ACBossEnemy::OnSwordCollision()
+{
+	
+	//블프에서 안 터지게 막아주기
+	if(SwordCollComp)
+	{ 
+		//공격 콜리전 활성화
+		SwordCollComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}
+}
+
+void ACBossEnemy::OffSwordCollision()
+{
+	//블프에서 안 터지게 막아주기
+	if(SwordCollComp)
+	{ 
+		//공격 콜리전 비활성화
+		SwordCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void ACBossEnemy::OnGuardCollision ( )
+{
+	if ( GuardCollComp )
+	{
+		//공격 판정 콜리전 활성화
+		GuardCollComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}
+}
+
+void ACBossEnemy::OffGuardCollision ( )
+{
+	if ( GuardCollComp )
+	{
+		//공격 판정 콜리전 비활성화
+		SwordCollComp->SetCollisionEnabled ( ECollisionEnabled::NoCollision );
+	}
+}
+
+bool ACBossEnemy::CheckPlayer()
+{
+	//애님 노티파이에서 해당 함수가 불림
+
+	//플레이어와의 거리와 각도를 체크, 일단은 기존 에너미가 플레이어를 탐지하는 방식으로 진행
+	//SphereTrace와 내적을 사용해서 플레이어를 감지하는 방식
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	bool bHit = GetWorld()->SweepSingleByChannel(Hit,GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel4 , FCollisionShape::MakeSphere(300.0f), Params);
+
+	DrawDebugSphere(GetWorld(), GetActorLocation(), 300.0f, 21, FColor::Green, false, 3.0f);
+
+	if (bHit && Hit.GetActor()->IsA(ACPlayer::StaticClass()))
+	{
+		FVector ToPlayer = (Hit.GetActor()->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
+		
+		float DotProduct = FVector::DotProduct(GetActorForwardVector(), ToPlayer);
+		float AngleRad = FMath::Acos(DotProduct);
+		float AngleDeg = FMath::RadiansToDegrees(AngleRad);
+
+		if (AngleDeg <= 40.0f)
+		{
+			//플레이어 탐지하는데 장애물이 있는지 확인함
+			FHitResult LOSHit;
+			bool bLOS = GetWorld()->LineTraceSingleByChannel(LOSHit, GetActorLocation(), Hit.GetActor()->GetActorLocation(), ECC_WorldDynamic , Params);
+
+			if (bLOS && LOSHit.GetActor()->IsA( ACPlayer::StaticClass()))
+			{
+				//true로 값을 전달
+				return true;
+			}
+		}
+	}
+	//아닐 경우 false로 값을 전달
+	return false;
+}
+
+void ACBossEnemy::PlayNextSectionAttack ( UAnimMontage* CurrentMontage , FName CurrentSection )
+{
+	//없다면 실행하지 않음
+	if ( !AnimInstance || !CurrentMontage)
+	{
+		return;
+	}
+
+	//다음 섹션의 이름을 현재 섹션이름을 갖고 가져옴
+	FName NextSection = GetNextSection(CurrentSection);
+
+	//다음 섹션 이름이 있음
+	if ( NextSection != NAME_None )
+	{
+		//해당 몽타주 섹션으로 이동
+		AnimInstance->Montage_JumpToSection(NextSection, CurrentMontage);
+	}
+}
+
+FName ACBossEnemy::GetNextSection ( FName SectionName )
+{
+	//현재 섹션의 이름이 무엇인지 if문으로 체크
+	//해당되는 if문으로 들어가 다음 섹션의 이름을 호출함
+
+	if ( SectionName == FName ( "ComboAttack_01_01" ) )
+	{
+		return FName( "ComboAttack_01_02" );
+	}
+	else if ( SectionName == FName ( "ComboAttack_01_02" ) )
+	{
+		return FName("ComboAttack_01_03" );
+	}
+	else if ( SectionName == FName ( "ComboAttack_01_03" ) )
+	{
+		return FName ( "ComboAttack_01_04" );
+	}
+	else if ( SectionName == FName ( "ComboAttack_02_01" ) )
+	{
+		return FName ( "ComboAttack_02_02" );
+	}
+	else if ( SectionName == FName ( "ComboAttack_02_02" ) )
+	{
+		return FName ( "ComboAttack_02_03" );
+	}
+	else if ( SectionName == FName ( "ComboAttack_02_03" ) )
+	{
+		return FName ( "ComboAttack_02_04" );
+	}
+
+	return NAME_None;
+}
+
 void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//가드가 성공한 경우에는 데미지 처리 및 피격 애니메이션이 안 나오도록 만듦
@@ -90,6 +232,14 @@ void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActo
 	return;
 
 	ACAttachment* Weapon = Cast<ACAttachment> ( OtherActor );
+
+	//맞은 위치를 기준으로 어떤 피격 애니메이션이 재생될지 방향값을 구하는 코드, 가드, 피격 상태일때 해당 코드를 써서 봐야함
+	FVector HitLocation = SweepResult.Location;
+    FVector EnemyLocation = GetActorLocation();
+    FVector EnemyRightVector = GetActorRightVector();
+    FVector ToHitLocation = (HitLocation -EnemyLocation).GetSafeNormal();
+    float DotProduct = FVector::DotProduct(ToHitLocation, EnemyRightVector);
+	//맞은 위치를 기준으로 어떤 피격 애니메이션이 재생될지 방향값을 구하는 코드, 가드, 피격 상태일때 해당 코드를 써서 봐야함
 
 	if ( Weapon )
 	{
