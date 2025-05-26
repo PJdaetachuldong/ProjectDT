@@ -16,7 +16,7 @@
 ACEnemy::ACEnemy ( )
 {
 	CHelpers::CreateActorComponent<UCMointageComponent> ( this , &Montages , "Montages" );
-	CHelpers::CreateActorComponent<UCMovementComponent> ( this , &Movement , "Movement" );
+	//CHelpers::CreateActorComponent<UCMovementComponent> ( this , &Movement , "Movement" );
 	CHelpers::CreateActorComponent<UCStateComponent> ( this , &State , "State" );
 	CHelpers::CreateActorComponent<UCWeaponComponent> ( this , &Weapon , "Weapon" );
 	//CHelpers::CreateActorComponent<UCStatusComponent> ( this , &Status , "Status" );
@@ -42,7 +42,7 @@ void ACEnemy::BeginPlay ( )
 {
 	Super::BeginPlay ( );
 
-	Movement->OnWalk ( );
+	//Movement->OnWalk ( );
 
 	Create_DynamicMeterical ( this );
 	Change_Color ( this , OriginColor );

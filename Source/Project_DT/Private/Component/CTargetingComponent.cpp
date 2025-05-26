@@ -35,29 +35,25 @@ void UCTargetingComponent::TickComponent ( float DeltaTime , ELevelTick TickType
     if ( currentTime > 1.0f ) {
 		currentTime = 0.0f;
 	}
-    if ( Weapon->GetWeaponType ( ) != EWeaponType::Max )
+    //if ( Weapon->GetWeaponType ( ) != EWeaponType::Max )
         UpdateLockOn ( DeltaTime );
 
 }
 
-AActor* UCTargetingComponent::FindClosestEnemyInCameraFront ( float MaxDistance , float MinDotProduct )
+AActor* UCTargetingComponent::FindClosestEnemyByDistance ( float MaxDistance )
 {
-    if ( !OwnerCharacter || !Camera ) return nullptr;
+    if ( !OwnerCharacter ) return nullptr;
 
-    FVector CameraForward = Camera->GetForwardVector ( );
-
-    // ✅ 카메라 위치를 약간 뒤로 보정
-    FVector CameraLocation = Camera->GetComponentLocation ( ) - CameraForward * 100.f;
+    FVector CharacterLocation = OwnerCharacter->GetActorLocation ( );
 
     AActor* ClosestTarget = nullptr;
     float ClosestDistance = MaxDistance;
 
-    // 1. 캐릭터 기준 반경 내 탐색
-    FVector CharacterLocation = OwnerCharacter->GetActorLocation ( );
     TArray<FOverlapResult> Overlaps;
     FCollisionQueryParams Params;
     Params.AddIgnoredActor ( OwnerCharacter );
 
+    // 캐릭터 중심의 원형 탐색
     GetWorld ( )->OverlapMultiByObjectType (
         Overlaps ,
         CharacterLocation ,
@@ -67,33 +63,18 @@ AActor* UCTargetingComponent::FindClosestEnemyInCameraFront ( float MaxDistance 
         Params
     );
 
-    // 디버그: 캐릭터 중심 탐지 범위 그리기
-    DrawDebugSphere (
-        GetWorld ( ) ,
-        CharacterLocation ,
-        MaxDistance ,
-        24 ,
-        FColor::Green ,
-        false , 1.5f , 0 , 2.f
-    );
-
     for ( const FOverlapResult& Result : Overlaps )
     {
         AActor* Enemy = Result.GetActor ( );
         if ( !IsValid ( Enemy ) ) continue;
 
-        FVector ToEnemy = Enemy->GetActorLocation ( ) - CameraLocation;
-        FVector Direction = ToEnemy.GetSafeNormal ( );
-        float Dot = FVector::DotProduct ( CameraForward , Direction );
+        float Distance = FVector::Dist ( CharacterLocation , Enemy->GetActorLocation ( ) );
 
         UE_LOG ( LogTemp , Log ,
-            TEXT ( "[LockOn Check] Enemy: %s | Dot: %.3f | Distance: %.1f" ) ,
-            *Enemy->GetName ( ) , Dot , ToEnemy.Size ( )
+            TEXT ( "[LockOn Check] Enemy: %s | Distance: %.1f" ) ,
+            *Enemy->GetName ( ) , Distance
         );
 
-        if ( Dot < MinDotProduct ) continue;
-
-        float Distance = ToEnemy.Size ( );
         if ( Distance < ClosestDistance )
         {
             ClosestDistance = Distance;
@@ -109,7 +90,7 @@ AActor* UCTargetingComponent::FindClosestEnemyInCameraFront ( float MaxDistance 
             60.f ,
             16 ,
             FColor::Red ,
-            false , 1.5f , 0 , 3.f
+            false , 0.1f , 0 , 3.f
         );
 
         UE_LOG ( LogTemp , Warning ,
@@ -124,11 +105,10 @@ AActor* UCTargetingComponent::FindClosestEnemyInCameraFront ( float MaxDistance 
 
     return ClosestTarget;
 }
-
 void UCTargetingComponent::OnLookOn ( )
 {
-    AActor* Target = FindClosestEnemyInCameraFront ( 1000.f , 0.95f );
-
+    AActor* Target = FindClosestEnemyByDistance ( 250.f );
+    TimeSinceLostTarget += GetWorld()->DeltaTimeSeconds;
     if ( Target )
     {
         LockedOnTarget = Target;
@@ -137,9 +117,11 @@ void UCTargetingComponent::OnLookOn ( )
     }
     else
     {
+        if ( TimeSinceLostTarget >= TargetLossTimeout ){
         LockedOnTarget = nullptr;
         bIsLockedOn = false;
         UE_LOG ( LogTemp , Warning , TEXT ( "[LockOn] Lock-Off (No target found)" ) );
+        }
     }
 }
 
@@ -173,8 +155,8 @@ void UCTargetingComponent::UpdateLockOn ( float DeltaTime )
         FRotator CamToTargetRot = ( LockedOnTarget->GetActorLocation ( ) - CamLoc ).Rotation ( );
 
         // 컨트롤러 회전 보간
-        FRotator NewControlRot = FMath::RInterpTo ( ControlRot , CamToTargetRot , DeltaTime , 10.f );
-        Controller->SetControlRotation ( NewControlRot );
+        FRotator NewControlRot = FMath::RInterpTo ( ControlRot , CamToTargetRot , DeltaTime , 5.f );
+        //Controller->SetControlRotation ( NewControlRot );
     }
 
     // 디버그

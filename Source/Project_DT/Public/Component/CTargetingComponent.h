@@ -33,7 +33,7 @@ private:
 	class UCWeaponComponent* Weapon;
 
 private:
-	AActor* FindClosestEnemyInCameraFront ( float MaxDistance , float MinDotProduct );
+	AActor* FindClosestEnemyByDistance ( float MaxDistance );
 
 public:
 	void OnLookOn ( );
@@ -46,5 +46,10 @@ private:
     bool bIsLockedOn = false;
 
 	float currentTime = 0.0f;
+
+float TimeSinceLostTarget = 0.f;
+
+UPROPERTY(EditAnywhere, Category = "LockOn")
+float TargetLossTimeout = 5.f;
 
 };

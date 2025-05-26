@@ -4,6 +4,8 @@
 #include "Component/CMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Weapons/CWeaponComponent.h"
+#include "Global.h"
 
 // Sets default values for this component's properties
 UCMovementComponent::UCMovementComponent()
@@ -17,6 +19,7 @@ void UCMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	OwnerCharacter = Cast<ACharacter> ( GetOwner ( ) );
+	Weapon = CHelpers::GetComponent<UCWeaponComponent> ( OwnerCharacter );
 
 	// ...
 
@@ -29,6 +32,7 @@ void UCMovementComponent::SetSpeed ( ESpeedType InType )
 
 void UCMovementComponent::OnSprint ( )
 {
+	CheckFalse ( Weapon->GetWeaponType ( ) == EWeaponType::Max );
 	SetSpeed ( ESpeedType::Sprint );
 
 }

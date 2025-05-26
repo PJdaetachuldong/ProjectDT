@@ -73,6 +73,7 @@ public:
 
 private:
 	class ACharacter* OwnerCharacter;
+	class UCWeaponComponent* Weapon;
 
 private:
 	bool bCanMove = true;
