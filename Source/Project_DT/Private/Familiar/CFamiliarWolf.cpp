@@ -29,7 +29,6 @@ ACFamiliarWolf::ACFamiliarWolf ( )
 	
 
 	FSM = CreateDefaultSubobject<UCWolfFSM> ( TEXT ( "WolfFSM" ) );
-	Anim = Cast<UCWolfAnimInstance> ( GetMesh ( )->GetAnimInstance ( ) );
 
 	/*
 	USkeletalMeshComponent* SkeletalMeshComp = GetMesh ( );
@@ -52,6 +51,7 @@ void ACFamiliarWolf::BeginPlay ( )
 {
 	Super::BeginPlay ( );
 
+	Anim = Cast<UCWolfAnimInstance> ( GetMesh ( )->GetAnimInstance ( ) );
 }
 
 void ACFamiliarWolf::Tick ( float DeltaTime )
@@ -97,17 +97,10 @@ void ACFamiliarWolf::Landed ( const FHitResult& Hit )
 {
 	// FSM->UpdateState(EUpperState::Idle);
 
-	if ( Anim )
-	{
-		Anim->IsJumping = true;
-	}
-	else
-	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "nullptr" ) );
-	}
+	Anim->IsJumping = false;
 
-	FSM->EndAttackProcess();
-	
+	FSM->UpdateState(EJumpState::EndJump);
+
 }
 
 void ACFamiliarWolf::OnAttackOverlapBegin ( class UPrimitiveComponent* OverlappedComp , class AActor* OtherActor , class UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult )

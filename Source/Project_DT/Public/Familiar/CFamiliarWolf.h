@@ -46,6 +46,10 @@ public:	// 스탯 관련
 
 	float AttackRange = MinDistance;
 
+	int32 SpecialMax = 2;
+	int32 SpecialStack = 0;		// 맥스 스텟만큼 쌓이면 스페셜 발동
+								// 나중에는 플레이어가 발동하는 스킬로 바꿀 예정
+
 public:	// 스탯 관련
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status)
 	float MAXHP = 1000.f;

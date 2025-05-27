@@ -51,6 +51,10 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 	FString OverStateStr = UEnum::GetValueAsString ( MOverState );
 	GEngine->AddOnScreenDebugMessage ( 3 , 1 , FColor::Green , OverStateStr );
 
+	FColor IsJumpingColor = Anim->IsJumping ? FColor::Red : FColor::White;
+	FString logMsgIsJumping = FString::Printf ( TEXT ( "IsJumping: %s" ) , Anim->IsJumping ? TEXT ( "True" ) : TEXT ( "False" ) );
+	GEngine->AddOnScreenDebugMessage ( 5 , 1 , IsJumpingColor , logMsgIsJumping );
+
 #pragma endregion LogMessageState
 
 // 최상위 State
@@ -173,12 +177,13 @@ void UCWolfFSM::IdleState ( )
 
 void UCWolfFSM::JumpState ( )
 {
-
+	if ( Anim->IsJumping == false ) { return; }
+	
 	//점프 두 번 갈길 경우엔 Bool형 체크도 해주기
 	if ( Me->CanJump() )
 	{
-		Me->Jump();
-		// Anim->IsJumping = true;
+		Me->Jump ( );
+		Anim->IsJumping = true;
 	}
 
 
@@ -357,18 +362,28 @@ void UCWolfFSM::EndAttackProcess ( )
 {
 	UpdateState ( EUpperState::Idle );	// 공격 루틴 뒷점프 없앨거면 Idle로
 	UpdateState ( EAttackState::None );
-	// UpdateState ( EUpperState::Jump );
+	UpdateState ( EJumpState::None );
+
 	Me->OnAttOffProcess();
 }
 
+// 세부 공격 타입 결정
 void UCWolfFSM::DecideAttack ( )
 {
 
-// 세부 공격 타입 결정
-	MAttState = EAttackState::Attack1;	// 어떤 공격할지 바꾸기. 일단 물기 하나 넣고 테스트
-	
-// 실행은 OnAttackProcess 에서
+// 공격 횟수가 쌓일 경우 SpecialAttack으로 변경.
+	if (Me->SpecialStack >= Me->SpecialMax)
+	{
+		MAttState = EAttackState::Special;
+		Me->SpecialStack = 0;
+		return;
+	}
 
+// 일반공격(물기)
+	MAttState = EAttackState::Attack1;	
+	Me->SpecialStack += 1;
+
+// 실행은 OnAttackProcess 에서
 }
 
 bool UCWolfFSM::CheckPath ( )

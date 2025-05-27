@@ -69,5 +69,13 @@ void UCWolfAnimInstance::AnimNotify_Att_End ( )
 	// FSM->EndAttackProcess();
  	FSM->UpdateState( EAttackState::None );
  	FSM->UpdateState( EUpperState::Jump);
+	FSM->UpdateState(EJumpState::BackJump);
 
+	IsJumping = true;
+
+}
+
+void UCWolfAnimInstance::AnimNotify_Land_End ( )
+{
+	FSM->EndAttackProcess ( );
 }

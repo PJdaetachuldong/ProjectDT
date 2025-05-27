@@ -28,13 +28,15 @@ UENUM() // HFSM - 공격 상태
 enum class EAttackState : uint8
 {
 	None		UMETA(DisplayName = "None"),
-	Attack1		UMETA(DisplayName = "Attack1")
+	Attack1		UMETA(DisplayName = "Attack1"),
+	Special		UMETA(DisplayName = "Special")
 };
 
 UENUM() // HFSM - 이동 상태 (점프로 각도 조정등 수행)
 enum class EJumpState : uint8
 {
 	None		UMETA(DisplayName = "None"),
+	EndJump		UMETA(DisplayName = "EndJump"),
 	StopJump	UMETA(DisplayName = "StopJump"),
 
 	FrontJump	UMETA(DisplayName = "FrontJump"),
