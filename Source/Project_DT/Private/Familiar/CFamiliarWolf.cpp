@@ -5,6 +5,8 @@
 #include "Familiar/CWolfFSM.h"
 #include "Familiar/CWolfAnimInstance.h"
 #include "Engine/SkeletalMesh.h"
+#include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ACFamiliarWolf::ACFamiliarWolf ( )
 {
@@ -41,6 +43,9 @@ ACFamiliarWolf::ACFamiliarWolf ( )
 	*/
 
 #pragma endregion Components
+
+	InitBoxes();
+	AttCollisionBite->OnComponentBeginOverlap.AddDynamic ( this , &ACFamiliarWolf::OnAttackOverlapBegin );
 }
 
 void ACFamiliarWolf::BeginPlay ( )
@@ -53,6 +58,28 @@ void ACFamiliarWolf::Tick ( float DeltaTime )
 {
 	Super::Tick ( DeltaTime );
 
+	if ( IsOnBiteAtt == true)
+	{ AttCollisionBite->SetCollisionEnabled ( ECollisionEnabled::QueryAndPhysics ); }
+
+	else 
+	{ 
+		HitPawn.Empty ( );	// 공격 사이클이 끝났으니 HitPawn 지워주기
+		AttCollisionBite->SetCollisionEnabled ( ECollisionEnabled::NoCollision ); 
+	}
+}
+
+void ACFamiliarWolf::InitBoxes ( )
+{
+
+	AttCollisionBite = CreateDefaultSubobject<UBoxComponent>(TEXT("AttCollisionBite"));	// 머리
+	AttCollisionBite->SetupAttachment( WolfComponent , TEXT("Socket_BiteDMGBox"));
+	AttCollisionBite->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AttCollisionBite->SetCollisionResponseToAllChannels(ECR_Overlap);
+	AttCollisionBite->SetCollisionProfileName(TEXT("Socket_BiteDMGBox"));
+	AttCollisionBite->SetCollisionObjectType(ECC_Pawn);
+	AttCollisionBite->SetRelativeLocation(FVector(90.f, 0.f, 0.f));
+	AttCollisionBite->SetBoxExtent(FVector(30.f, 30.f, 30.f));
+
 }
 
 void ACFamiliarWolf::SetOnDesPawn ( )
@@ -61,7 +88,39 @@ void ACFamiliarWolf::SetOnDesPawn ( )
 
 }
 
+void ACFamiliarWolf::OnAttOffProcess ( )
+{
+	IsOnBiteAtt = false;
+}
+
 void ACFamiliarWolf::Landed ( const FHitResult& Hit )
 {
-	FSM->UpdateState(EUpperState::Idle);
+	// FSM->UpdateState(EUpperState::Idle);
+
+	if ( Anim )
+	{
+		Anim->IsJumping = true;
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "nullptr" ) );
+	}
+
+	FSM->EndAttackProcess();
+	
+}
+
+void ACFamiliarWolf::OnAttackOverlapBegin ( class UPrimitiveComponent* OverlappedComp , class AActor* OtherActor , class UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult )
+{
+	ACEnemyBase* target = Cast<ACEnemyBase> ( OtherActor );
+	// if ( !target || HitPawn.Contains ( target ) ) { return; }
+	if ( !target ) { return; }
+
+	if (IsOnBiteAtt == true)
+	{
+		//if ( HitPawn.Num ( ) > 0 ){ return; }
+		UE_LOG ( LogTemp , Warning , TEXT ( "DMG_Test" ) );
+		UGameplayStatics::ApplyDamage ( OtherActor , MeleeBiteDMG , nullptr , this , nullptr );
+		HitPawn.AddUnique ( target );
+	}
 }

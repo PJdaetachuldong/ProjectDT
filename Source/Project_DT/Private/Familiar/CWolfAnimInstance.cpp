@@ -21,6 +21,7 @@ void UCWolfAnimInstance::NativeUpdateAnimation ( float DeltaSeconds )
 	FVector rightVector = Me->GetActorRightVector ( );
 	Direction = FVector::DotProduct ( velocity , rightVector );
 
+	//IsLand = Me->IsLand;
 }
 
 
@@ -28,20 +29,21 @@ void UCWolfAnimInstance::NativeUpdateAnimation ( float DeltaSeconds )
 
 void UCWolfAnimInstance::AnimNotify_Roar_END ( )
 {
-	if ( !Me ) { return; }
+	if ( !FSM ) { return; }
 	FSM->UpdateState(EUpperState::Idle);
 }
 
 void UCWolfAnimInstance::AnimNotify_Search_Target ( )
 {
-	if ( !Me ) { return; }
+	if ( !FSM || !Me ) { return; }
+
 	FSM->SearchEnemy ( );
 	Me->IsCanAttack = true;
 }
 
 void UCWolfAnimInstance::AnimNotify_Dissolve_Start ( )
 {
-	if ( !Me ) { return; }
+	if ( !FSM ) { return; }
 
 	FSM->Dissolved();
 }
@@ -54,8 +56,18 @@ void UCWolfAnimInstance::AnimNotify_DesPawn_End ( )
 
 }
 
-void UCWolfAnimInstance::AnimNotify_Att_End ( )
+void UCWolfAnimInstance::AnimNotify_Att_Bite_Start ( )
 {
 	if ( !Me ) { return; }
-	FSM->EndAttackProcess();
+
+	Me->IsOnBiteAtt = true;
+}
+
+void UCWolfAnimInstance::AnimNotify_Att_End ( )
+{
+	if ( !FSM ) { return; }
+	// FSM->EndAttackProcess();
+ 	FSM->UpdateState( EAttackState::None );
+ 	FSM->UpdateState( EUpperState::Jump);
+
 }

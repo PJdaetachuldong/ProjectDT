@@ -14,7 +14,6 @@ UCWolfFSM::UCWolfFSM ( )
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-
 }
 // -------------------------------------------------
 void UCWolfFSM::BeginPlay ( )
@@ -89,12 +88,16 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 #pragma region Update_States
 void UCWolfFSM::UpdateState ( EUpperState _UpState )
 {
+	if ( !Me ) { return; }
+
 	MUpState = _UpState;
 	Anim->AUpState = _UpState;
 }
 
 void UCWolfFSM::UpdateState ( EJumpState _JumpState )
 {
+	if ( !Me ) { return; }
+
 	MJumpState = _JumpState;
 	Anim->AJumpState = _JumpState;
 
@@ -102,12 +105,16 @@ void UCWolfFSM::UpdateState ( EJumpState _JumpState )
 
 void UCWolfFSM::UpdateState ( EAttackState _AttState )
 {
+	if ( !Me ) { return; }
+
 	MAttState = _AttState;
 	Anim->AAttState = _AttState;
 }
 
 void UCWolfFSM::UpdateState ( EOverridenState _OverState )
 {
+	if ( !Me ) { return; }
+
 	MOverState = _OverState;
 	Anim->AOverState = _OverState;
 }
@@ -166,11 +173,26 @@ void UCWolfFSM::IdleState ( )
 
 void UCWolfFSM::JumpState ( )
 {
+
 	//점프 두 번 갈길 경우엔 Bool형 체크도 해주기
 	if ( Me->CanJump() )
 	{
 		Me->Jump();
+		// Anim->IsJumping = true;
 	}
+
+
+	// 타겟과의 사거리 체크
+	//FVector dirToTarget = TargetEnemy->GetActorLocation ( ) - Me->GetActorLocation ( );
+	
+	FVector dirToTarget = Me->GetActorLocation ( ) - TargetEnemy->GetActorLocation ( );
+	float distToTarget = dirToTarget.Size ( );
+
+	dirToTarget.Normalize ( );
+	FVector targetLocation = Me->GetActorLocation ( ) + dirToTarget * 3;
+
+	// 이동 실행
+	Me->SetActorLocation ( targetLocation, true );
 }
 
 void UCWolfFSM::AttackState ( )
@@ -225,17 +247,21 @@ void UCWolfFSM::SearchEnemy ( )
 		// 현재는 랜덤.
 	UpdateEnemyList ( );
 	
+
 	// 있을 경우 공격 상태로 전환
 	if (!EnemyList.IsEmpty())
 	{
+		if ( !Me ) { return; }
 		Me->IsInBattle = true;
 		SetOnTarget();
 	}
 
 	else
 	{
+		if ( !Me ) { return; }
 		Me->IsInBattle = false;
 	}
+
 }
 
 // 전투 상태인 경우에만 실행
@@ -329,8 +355,10 @@ void UCWolfFSM::OnAttackProcess ( )
 
 void UCWolfFSM::EndAttackProcess ( )
 {
+	UpdateState ( EUpperState::Idle );	// 공격 루틴 뒷점프 없앨거면 Idle로
 	UpdateState ( EAttackState::None );
-	UpdateState ( EUpperState::Idle );
+	// UpdateState ( EUpperState::Jump );
+	Me->OnAttOffProcess();
 }
 
 void UCWolfFSM::DecideAttack ( )
@@ -354,6 +382,7 @@ bool UCWolfFSM::CheckPath ( )
 	TraceParams.bReturnPhysicalMaterial = false;
 	TraceParams.AddIgnoredActor ( Me ); // 자기 자신은 무시
 
+
 	bool bHit = GetWorld ( )->LineTraceSingleByChannel (
 		HitResult ,
 		Start ,
@@ -361,6 +390,7 @@ bool UCWolfFSM::CheckPath ( )
 		ECC_Visibility ,
 		TraceParams
 	);
+
 
 	if ( bHit == false) { return false; }
 
@@ -380,7 +410,6 @@ bool UCWolfFSM::CheckPath ( )
 
 void UCWolfFSM::MoveToTarget ( AActor* target )
 {
-
 
 // 타겟과의 사거리 체크
 	FVector dirToTarget = target->GetActorLocation ( ) - Me->GetActorLocation ( );
@@ -404,7 +433,7 @@ void UCWolfFSM::MoveToTarget ( AActor* target )
 			TraceParams.bReturnPhysicalMaterial = false;
 			TraceParams.AddIgnoredActor ( Me ); // 자기 자신은 무시
 
-			DrawDebugLine ( GetWorld ( ) , Start , End , FColor::Red , false , 1.0f , 0 , 2.0f );
+// DrawDebugLine ( GetWorld ( ) , Start , End , FColor::Red , false , 1.0f , 0 , 2.0f );
 
 			bool bHit = GetWorld ( )->LineTraceSingleByChannel( HitResult, Start, End, ECC_Visibility, TraceParams );
 

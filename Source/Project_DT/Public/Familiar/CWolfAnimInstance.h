@@ -31,6 +31,9 @@ public:	// 불형 체크
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM_Move")
 	bool IsSpawned = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM_Move")
+	bool IsJumping = false;
+
 public://FSM State 관련
 #pragma region State
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FSM")
@@ -58,6 +61,9 @@ public:	// AnimNotify 관련 -------- UFUNCTION() 잊지말것!!!
 
 	UFUNCTION() 
 	void AnimNotify_DesPawn_End();
+
+	UFUNCTION() 
+	void AnimNotify_Att_Bite_Start();
 
 	UFUNCTION() 
 	void AnimNotify_Att_End();
