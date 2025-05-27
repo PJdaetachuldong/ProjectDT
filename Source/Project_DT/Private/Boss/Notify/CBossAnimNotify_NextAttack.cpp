@@ -23,7 +23,7 @@ void UCBossAnimNotify_NextAttack::Notify ( USkeletalMeshComponent* MeshComp , UA
 
 	//현재 재생중인 애니메이션 몽타주 확인
 	UAnimMontage* NowMontage = MeshComp->GetAnimInstance ( )->GetCurrentActiveMontage ( );
-	if ( NowMontage )
+	if ( !NowMontage )
 	{
 		return;
 	}

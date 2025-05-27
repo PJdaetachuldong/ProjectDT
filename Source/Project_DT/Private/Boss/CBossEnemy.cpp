@@ -40,7 +40,6 @@ ACBossEnemy::ACBossEnemy()
 	if ( TempAnim.Succeeded() )
 	{
 		GetMesh()->SetAnimInstanceClass(TempAnim.Object->GeneratedClass);
-		AnimInstance = GetMesh()->GetAnimInstance();
 	}
 
 	//일단 임시로 하는 발사 위치 설정
@@ -51,6 +50,48 @@ ACBossEnemy::ACBossEnemy()
 	GuardCollComp = CreateDefaultSubobject<UBoxComponent>(L"GuardCollision");
 	GuardCollComp->SetupAttachment(GetMesh());
 	GuardCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	ConstructorHelpers::FObjectFinder<UAnimMontage> TempCombo1 (L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/ComboAttack_01/AM_ComboAttack_01_01.AM_ComboAttack_01_01'");
+	if ( TempCombo1.Succeeded ( ) )
+	{
+		ComboAttack_01 = TempCombo1.Object;
+	}
+
+	ConstructorHelpers::FObjectFinder<UAnimMontage> TempCombo2 ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/ComboAttack_02/Combo_Attack_02.Combo_Attack_02'" );
+	if ( TempCombo2.Succeeded ( ) )
+	{
+		ComboAttack_02 = TempCombo2.Object;
+	}
+
+	ConstructorHelpers::FObjectFinder<UAnimMontage> TempDash ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/DashAttack/AM_DashAttack.AM_DashAttack'" );
+	if ( TempDash.Succeeded ( ) )
+	{
+		DashAttack = TempDash.Object;
+	}
+
+// 	ConstructorHelpers::FObjectFinder<UAnimMontage> TempRanged ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/ComboAttack_01/AM_ComboAttack_01_01.AM_ComboAttack_01_01'" );
+// 	if ( TempRanged.Succeeded ( ) )
+// 	{
+// 		RangedAttack = TempRanged.Object;
+// 	}
+
+	ConstructorHelpers::FObjectFinder<UAnimMontage> TempGuard ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/Guard/AM_Guard.AM_Guard'" );
+	if ( TempGuard.Succeeded ( ) )
+	{
+		AM_Guard = TempGuard.Object;
+	}
+
+	ConstructorHelpers::FObjectFinder<UAnimMontage> TempSP ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/SPAttack/AM_SPAttack.AM_SPAttack'" );
+	if ( TempSP.Succeeded ( ) )
+	{
+		SPAttack = TempSP.Object;
+	}
+
+	ConstructorHelpers::FObjectFinder<UAnimMontage> TempBreak ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/Break/AM_Break.AM_Break'" );
+	if ( TempBreak.Succeeded ( ) )
+	{
+		Break = TempBreak.Object;
+	}
 }
 
 void ACBossEnemy::BeginPlay()
@@ -74,27 +115,25 @@ void ACBossEnemy::BeginPlay()
 		//생성한 것을 오브젝트 풀에 넣음
 		RangedAttackList.Add(RangedAttackObject);
 	}
+
+	AnimInstance = GetMesh()->GetAnimInstance();
 }
 
 void ACBossEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	CurTestSPTime += DeltaTime;
-
-	//임의로 하는 필살기 패턴 테스트
-// 	if ( CurTestSPTime >= TestSPTime )
-// 	{
-// 		FSMComponent->AttackState = EBossATTACKState::SPATTACK;
-// 		CurTestSPTime =0.0f;
-// 	}
-	//임의로 하는 필살기 패턴 테스트
 }
 
 void ACBossEnemy::SPBreak()
 {
 	
 }
+
+void ACBossEnemy::ReadyDashAttack ( )
+{
+	FSMComponent->IsSetDashAttackLocation = true;
+	FSMComponent->IsReadyDashAttack = true;
+}	
 
 void ACBossEnemy::OnSwordCollision()
 {
@@ -144,7 +183,7 @@ bool ACBossEnemy::CheckPlayer()
 	FHitResult Hit;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
-	bool bHit = GetWorld()->SweepSingleByChannel(Hit,GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel4 , FCollisionShape::MakeSphere(300.0f), Params);
+	bool bHit = GetWorld()->SweepSingleByChannel(Hit,GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel3 , FCollisionShape::MakeSphere(300.0f), Params);
 
 	DrawDebugSphere(GetWorld(), GetActorLocation(), 300.0f, 21, FColor::Green, false, 3.0f);
 

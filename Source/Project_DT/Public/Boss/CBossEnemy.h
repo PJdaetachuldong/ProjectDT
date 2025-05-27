@@ -37,11 +37,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = ObjectPool)
 	TArray<class ACRangeAttack*> RangedAttackList;
 
-	//임의로 하는 필살기 패턴 테스트
-	float CurTestSPTime = 0.0f;
-	float TestSPTime = 15.0f;
-	//임의로 하는 필살기 패턴 테스트
-
 // 	//플레이어와의 거리를 저장하는 변수
 // 	float TargetDist = 0.0f;
 // 
@@ -89,6 +84,8 @@ public:
 	class UBoxComponent* GuardCollComp;
 
 	UAnimInstance* AnimInstance;
+	
+	void ReadyDashAttack();
 
 	void OnSwordCollision();
 
@@ -113,6 +110,21 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
 	class UAnimMontage* ComboAttack_02;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* DashAttack;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* RangedAttack;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_Guard;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* SPAttack;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* Break;
 	
 	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 };

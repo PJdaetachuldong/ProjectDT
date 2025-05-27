@@ -24,7 +24,7 @@ void UCBossAnimNotify_CheckPlayer::NotifyBegin ( USkeletalMeshComponent* MeshCom
 
 	//현재 재생중인 애니메이션 몽타주 확인
 	UAnimMontage* NowMontage = MeshComp->GetAnimInstance()->GetCurrentActiveMontage();
-	if ( NowMontage )
+	if ( !NowMontage )
 	{
 		return;
 	}
@@ -43,7 +43,7 @@ void UCBossAnimNotify_CheckPlayer::NotifyBegin ( USkeletalMeshComponent* MeshCom
 
 	else
 	{
-		//그대로 끝
+		//그대로 끝 공격
 	}
 }
 

@@ -66,6 +66,9 @@ public:
 	//대쉬 공격을 할때 위치 선정을 했는지 확인하는 변수
 	bool IsSetDashAttackLocation = false;
 
+	//애니메이션 대쉬 공격 준비가 끝났는지 확인하는 bool
+	bool IsReadyDashAttack = false;
+
 	//대쉬 지속 시간
 	float DashDuration = 1.0f;
 
@@ -93,6 +96,11 @@ public:
 
 	//필살기 준비 자세때 패턴이 파훼될때까지 필요한 데미지를 설정하는 변수
 	float SPBreakDamageAmount = 50.0f;
+
+	//임의로 적은 필살기 사용 조건
+	float TestCurSPTime = 0.0f;
+	float TestSPCooltime = 10.0f;
+	//임의로 적은 필살기 사용 조건
 
 	//임의로 적은 필살기 준비 시간
 	float CurSPReadyTime = 0.0f;

@@ -105,10 +105,18 @@ void UCBossFSM::NONEState()
 	//플레이어를 향해서 움직이게 만듦
 	AI->MoveToLocation(MyBoss->Target->GetActorLocation());
 
+	//임의로 되는 필살기 패턴 테스트
+	/*TestCurSPTime += GetWorld()->GetDeltaSeconds();*/
+	//임의로 되는 필살기 패턴 테스트
+
 	//필살기 사용 부분
 	//현재는 체력을 기준으로 필살기를 발동, 체력이 반 이하로 내려갔을 경우
-	if ( MyBoss->CurHP <= MyBoss->MaxHP / 2 )
+	if ( MyBoss->CurHP <= MyBoss->MaxHP / 2 /*TestCurSPTime >= TestSPCooltime*/ )
 	{
+		//임시
+		/*TestCurSPTime = 0.0f;*/
+		//임시
+
 		//필살기 상태로 전환
 		AttackState = EBossATTACKState::SPATTACK;
 		//뒤에 코드 실행 안되게 막음
@@ -123,7 +131,7 @@ void UCBossFSM::NONEState()
 		CurChaseTime += GetWorld()->GetDeltaSeconds();
 
 		//거리가 먼 상태인데 플레이어가 물약 마시는 모션을 할 경우
-		if (/*임시로 다른 조건 넣었음*/ CurChaseTime >= 6.0f)
+		if (/*임시로 다른 조건 넣었음*/ CurChaseTime >= 10.0f)
 		{
 			//임시로 넣은거 나중에 지워야함 제발!
 			CurChaseTime = 0.0f;
@@ -138,7 +146,7 @@ void UCBossFSM::NONEState()
 		//거리가 먼 상태인데 플레이어가 물약 마시는 모션을 할 경우
 
 		//만약 거리가 먼 상태가 일정 시간 유지되었다면
-		if ( CurChaseTime >= /*DashAttackCooltime*/ 15.0f )
+		if ( CurChaseTime >= DashAttackCooltime )
 		{
 			//그리고 대쉬 공격이 이루어지도록 공격상태도 변환
 			AttackState = EBossATTACKState::DASHATTACK;
@@ -160,7 +168,7 @@ void UCBossFSM::NONEState()
 		//가드 게이지를 채워줌
 
 		//만약 가드 조건이 충족되었을 경우
-		if ( MyBoss->GuardGage <= MyBoss->GuardPlaying )
+		if ( MyBoss->GuardGage >= /*MyBoss->GuardPlaying*/ 30.0f )
 		{
 			//가드 상태로 변화
 			AttackState = EBossATTACKState::COUNTERATTACK;
@@ -182,6 +190,9 @@ void UCBossFSM::NONEState()
 
 void UCBossFSM::RANGEDATTACKState()
 {
+	//원거리 공격을 할 것이기에 이동은 멈춤
+	AI->StopMovement();
+
 	//타겟과 자신의 방향을 체크
 	FVector TargetLocation = MyBoss->Target->GetActorLocation();
 	FVector MyLocation = MyBoss->GetActorLocation();
@@ -189,22 +200,18 @@ void UCBossFSM::RANGEDATTACKState()
 
 	//해당 방향으로 원거리 공격 발사
 	//애니메이션을 넣는다면 해당 애니메이션 노티파이로 원거리 공격 발사되게
-	CurRandgedTime += GetWorld()->GetDeltaSeconds();
-	
+	CurRandgedTime += GetWorld ( )->GetDeltaSeconds ( );
+
 	//여기서 코드를 작성하면 Tick으로 여러번 불리기에 여기에 작성하면 안됨
 	/*SpawnRangedActor(DirectionToTarget);*/
 
 	if ( CurRandgedTime >= 2.5f )
 	{
-		SpawnRangedActor(DirectionToTarget);
+		SpawnRangedActor ( DirectionToTarget );
 		AttackState = EBossATTACKState::NONE;
 		CurRandgedTime = 0.0f;
 		return;
 	}
-	//애니메이션을 넣는다면 해당 애니메이션 노티파이로 원거리 공격 발사되게
-
-	//그런 다음 공격 상태를 다시 NONE으로 변경
-	/*AttackState = EBossATTACKState::NONE;*/
 }
 
 void UCBossFSM::SpawnRangedActor(FVector Direction)
@@ -235,42 +242,56 @@ void UCBossFSM::SpawnRangedActor(FVector Direction)
 
 void UCBossFSM::DASHATTACKState()
 {
+	//AI 움직임 멈춤
+	AI->StopMovement();
+
+	//만약 대쉬 공격 애니메이션이 재생중이지 않으면 재생하게 만듦
+	if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->DashAttack ) )
+	{
+		MyBoss->AnimInstance->Montage_Play ( MyBoss->DashAttack );
+	}
+
 	//위치 셋팅이 되어있는 상태이면
 	if ( IsSetDashAttackLocation )
 	{
-		//돌진 시간을 업데이트
-		DashTimer += GetWorld()->GetDeltaSeconds() / DashDuration;
-
-		//만약 시간이 정해진 시간 보다 커진다면
-		if ( DashTimer >= 1.0f)
+		if ( IsReadyDashAttack )
 		{
-			//돌진은 완료했다고 bool값 false로 전환
-			IsSetDashAttackLocation = false;
-			//Navmesh를 이용하여 다시 이동하게 만듦
-			MyBoss->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-			//공격 상태를 다시 NONE으로 되돌림
-			AttackState = EBossATTACKState::NONE;
-			//이동 속도도 다시 원래 추적 속도로 되돌려줌
-			MyBoss->GetCharacterMovement()->MaxWalkSpeed = 200.0f;
-			//추적 시간도 초기화
-			CurChaseTime = 0.0f;
-			//리턴
-			return;
-		}
+			//돌진 시간을 업데이트
+			DashTimer += GetWorld ( )->GetDeltaSeconds ( ) / DashDuration;
 
-		//easeinsine이 적용되도록 계산하게 만듦
-		float t = EaseInSine(DashTimer);
-		//Lerp를 사용하여 사이를 보간
-		FVector NewLocation = FMath::Lerp(StartDashLocation, CalculatedTargetLocation, t);
-		//이동하게 함
-		MyBoss->SetActorLocation( NewLocation );
+			//만약 시간이 정해진 시간 보다 커진다면
+			if ( DashTimer >= 1.0f )
+			{
+				//돌진은 완료했다고 bool값 false로 전환
+				IsSetDashAttackLocation = false;
+				//Navmesh를 이용하여 다시 이동하게 만듦
+				MyBoss->GetCharacterMovement ( )->SetMovementMode ( MOVE_Walking );
+				//공격 상태를 다시 NONE으로 되돌림
+				AttackState = EBossATTACKState::NONE;
+				//이동 속도도 다시 원래 추적 속도로 되돌려줌
+				MyBoss->GetCharacterMovement ( )->MaxWalkSpeed = 200.0f;
+				//추적 시간도 초기화
+				CurChaseTime = 0.0f;
+				//대쉬 공격 준비 초기화
+				IsReadyDashAttack = false;
+				//리턴
+				return;
+			}
+
+			//easeinsine이 적용되도록 계산하게 만듦
+			float t = EaseInSine ( DashTimer );
+			//Lerp를 사용하여 사이를 보간
+			FVector NewLocation = FMath::Lerp ( StartDashLocation , CalculatedTargetLocation , t );
+			//이동하게 함
+			MyBoss->SetActorLocation ( NewLocation );
+		}	
 	}
 
 	//위치 세팅이 안되어있는 상태이면
 	else if ( !IsSetDashAttackLocation )
 	{
 		//위치를 설정 
-		IsSetDashAttackLocation = true;
+		/*IsSetDashAttackLocation = true;*/
 		DashTimer = 0.0f;
 		StartDashLocation = MyBoss->GetActorLocation();
 
@@ -289,12 +310,41 @@ void UCBossFSM::DASHATTACKState()
 
 void UCBossFSM::COMBOATTACKState()
 {
-	
+	//랜덤값에 따라 콤보 공격이 다르게 나옴
+	switch ( ComboAttackIndex )
+	{
+		case 0:
+			//콤보 공격이 실행중이지 않을경우 콤보공격 실행
+			if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->ComboAttack_01 ) )
+			{
+				MyBoss->AnimInstance->Montage_Play ( MyBoss->ComboAttack_01 );
+			}
+
+		break;
+		
+		case 1:
+			//콤보 공격이 실행중이지 않을경우 콤보공격 실행
+			if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->ComboAttack_02 ) )
+			{
+				MyBoss->AnimInstance->Montage_Play ( MyBoss->ComboAttack_02 );
+			}
+
+		break;
+		
+		default: break;
+	}
 }
 
 void UCBossFSM::COUNTERATTACKState()
 {
+	//가드를 할 것이기에 이동은 멈춤
+	AI->StopMovement();
+
 	//먼저 가드 애니메이션이 나오게 만듦
+	if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->AM_Guard ) )
+	{
+		MyBoss->AnimInstance->Montage_Play ( MyBoss->AM_Guard );
+	}
 
 	//가드 상태 지속시간을 체크함
 	CurGuardTime +=GetWorld()->GetDeltaSeconds();
@@ -384,8 +434,15 @@ void UCBossFSM::COUNTERATTACKState()
 
 void UCBossFSM::SPATTACKState()
 {
-	//필살기 상태가 되면
+	//필살기 공격을 할 것이기에 이동은 멈춤
+	AI->StopMovement();
 
+	//필살기 상태가 되면 애니메이션 재생
+	if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->SPAttack ) )
+	{
+		MyBoss->AnimInstance->Montage_Play(MyBoss->SPAttack);
+	}
+	
 	CurSPReadyTime += GetWorld()->GetDeltaSeconds();
 
 	GEngine->AddOnScreenDebugMessage ( 90 , 1.0f , FColor::White , TEXT ( "SP Attack State!!" ) );
