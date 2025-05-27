@@ -168,7 +168,9 @@ void UCWolfFSM::IdleState ( )
 			if ( dir.Size() < Me->AttackRange )
 			{
 				CurrentTime = 0.f;
-				UpdateState ( EUpperState::Attack );
+				DecideAttack ( );
+				OnAttackProcess ( );
+				// UpdateState ( EUpperState::Attack );
 			}
 
 		}
@@ -204,7 +206,9 @@ void UCWolfFSM::AttackState ( )
 {
 	// 회전
 		//TurnToTarget ( TargetEnemy );
-		OnAttackProcess ( );
+
+		// OnAttackProcess ( );
+
 	// 공격 실행은 노티파이로, 점프공격 애니메이션이 있으면 좋을듯. 
 		// (없으면 물기 + Launch)
 }
@@ -351,11 +355,7 @@ void UCWolfFSM::OnAttackProcess ( )
 {
 // 공격중인 상태로 변환
 	UpdateState ( EUpperState::Attack );
-
-	FVector dir = TargetDir ( TargetEnemy );
-	DecideAttack();
-
-	UpdateState ( MAttState );
+	UpdateState (MAttState);
 }
 
 void UCWolfFSM::EndAttackProcess ( )
