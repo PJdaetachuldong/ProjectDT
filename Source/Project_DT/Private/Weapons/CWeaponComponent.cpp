@@ -41,13 +41,12 @@ void UCWeaponComponent::TickComponent ( float DeltaTime , ELevelTick TickType , 
 		GetSubAction_Skill ( )->Tick ( DeltaTime );
 	if ( bIsCombatState ) {
 		CombatStateTime += DeltaTime;
-		if ( CombatStateTime >= 5.0f ) {
+		if ( CombatStateTime >= 10.0f ) {
 			SetUnarmedMode ( );
 			CombatStateTime = 0.0f;
 		}
 	}
 	else CombatStateTime = 0;
-	CLog::Log ( CombatStateTime );
 }
 
 bool UCWeaponComponent::IsIdleMode ( )
@@ -226,8 +225,8 @@ void UCWeaponComponent::SubAction_Skill_Released ( )
 
 void UCWeaponComponent::OnParry ( EParryState ParryState )
 {
-	if ( !!GetSubAction ( ) )
-		GetSubAction ( )->Parry ( ParryState );
+	if ( !!GetDoAction())
+		GetDoAction ( )->DoActionParry ( ParryState );
 
 }
 
@@ -251,6 +250,8 @@ void UCWeaponComponent::ChangeType ( EWeaponType InType )
 {
 	EWeaponType prevType = Type;
 	Type = InType;
+	bIsCombatState = true;
+	CombatStateTime = 0.0f;
 
 	if ( OnWeaponTypeChange.IsBound ( ) )
 		OnWeaponTypeChange.Broadcast ( prevType , InType );

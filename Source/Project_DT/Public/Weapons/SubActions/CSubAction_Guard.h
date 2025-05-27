@@ -25,9 +25,6 @@ public:
 	void Pressed ( ) override;
 	void Released ( ) override;
 
-	void Parry ( EParryState ParryState )override;
-
-
 	void Begin_SubAction_Implementation ( ) override;
 	void End_SubAction_Implementation ( ) override;
 

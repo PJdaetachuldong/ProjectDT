@@ -58,11 +58,6 @@ void UCStateComponent::SetActionMode ( )
 
 }
 
-void UCStateComponent::SetGuardMode ( )
-{
-	ChangeType ( EStateType::Guard );
-}
-
 void UCStateComponent::OnSubActionMode ( )
 {
 	bInSubActionMode = true;

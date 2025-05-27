@@ -48,14 +48,17 @@ void ACEnemy::BeginPlay ( )
 	Change_Color ( this , OriginColor );
 
 	State->OnStateTypeChanged.AddDynamic ( this , &ACEnemy::OnStateTypeChanged );
-	Weapon->SetKatanaMode();
+	//Weapon->SetKatanaMode();
+	Weapon->SetGreatSwordMode ( );
 
 }
 
 void ACEnemy::Tick ( float DeltaTime )
 {
 	Super::Tick ( DeltaTime );
-	//OverlapBegin();
+	Weapon->SetGreatSwordMode ( );
+
+	OverlapBegin();
 
 }
 

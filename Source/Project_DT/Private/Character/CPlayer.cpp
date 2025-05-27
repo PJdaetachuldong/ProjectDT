@@ -39,7 +39,7 @@ ACPlayer::ACPlayer()
 
 	SpringArm->SetRelativeLocation ( FVector ( 0 , 0 , 140 ) );
 	SpringArm->SetRelativeRotation ( FRotator ( 0 , 90,0 ) );
-	SpringArm->TargetArmLength = 200;
+	SpringArm->TargetArmLength = 300;
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;

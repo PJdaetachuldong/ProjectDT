@@ -106,3 +106,33 @@ void FHitData::PlayEffect ( UWorld* InWorld , const FVector& InLocation , const 
 
 	CHelpers::PlayEffect ( InWorld , Effect , transform );
 }
+
+void FCounterActionData::DoCounterAction ( class ACharacter* InOwner )
+{
+	UCMovementComponent* movement = CHelpers::GetComponent<UCMovementComponent> ( InOwner );
+
+	if ( !!movement ) {
+		if ( bFixedCamera )
+			movement->EnableFixedCamera ( );
+
+		if ( bCanMove == false )
+			movement->Stop ( );
+	}
+	if ( !!Montage )
+		InOwner->PlayAnimMontage ( FCounterActionData::Montage , PlayRate );
+}
+
+void FParryActionData::DoParryAction ( class ACharacter* InOwner )
+{
+	UCMovementComponent* movement = CHelpers::GetComponent<UCMovementComponent> ( InOwner );
+
+	if ( !!movement ) {
+		if ( bFixedCamera )
+			movement->EnableFixedCamera ( );
+
+		if ( bCanMove == false )
+			movement->Stop ( );
+	}
+	if ( !!Montage )
+		InOwner->PlayAnimMontage ( FParryActionData::Montage , PlayRate );
+}

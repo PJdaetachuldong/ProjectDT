@@ -31,6 +31,12 @@ private:
 	UPROPERTY(EditAnywhere)
 	TArray<FDoHeavyActionData> DoHeavyActionDatas;
 
+	UPROPERTY ( EditAnywhere )
+	TArray<FCounterActionData> CounterActionDatas;
+
+	UPROPERTY ( EditAnywhere )
+	TArray<FParryActionData> ParryActionDatas;
+
 	UPROPERTY(EditAnywhere)
 	TArray<FHitData> HitDatas;
 	UPROPERTY ( EditAnywhere )

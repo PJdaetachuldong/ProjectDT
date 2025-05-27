@@ -24,7 +24,6 @@ public:
 	virtual void Pressed ( ) {};
 	virtual void Released ( ) {};
 
-	virtual void Parry ( EParryState ParryState ) {};
 
 	UFUNCTION (BlueprintNativeEvent)
 	void Begin_SubAction ( );

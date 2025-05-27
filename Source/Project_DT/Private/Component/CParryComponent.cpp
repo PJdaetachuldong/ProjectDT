@@ -57,7 +57,7 @@ void UCParryComponent::DetectActor ( )
 	DrawDebugBox ( GetWorld ( ) , Location , HalfExtent , FQuat::Identity , FColor::Green , false , 0.1f );
 
 	AActor* HitActor = Hit.GetActor ( );
-	if ( bHit && HitActor && HitActor->IsA ( ACAttachment::StaticClass ( ) ) )
+	if ( bHit && HitActor && HitActor->IsA ( AActor::StaticClass ( ) ) )
 	{
 		if ( TemporarilyIgnoredActors.Contains ( HitActor ) )
 			return;

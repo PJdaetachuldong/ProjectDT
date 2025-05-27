@@ -36,7 +36,7 @@ void UCWeaponAsset::BeginPlay ( class ACharacter* InOwner )
 	}
 	if ( !!DoActionClass ) {
 		DoAction = NewObject<UCDoAction> ( this , DoActionClass );
-		DoAction->BeginPlay ( Attachment , Equipment , InOwner , DoActionDatas, DoHeavyActionDatas,HitDatas );
+		DoAction->BeginPlay ( Attachment , Equipment , InOwner , DoActionDatas, DoHeavyActionDatas, CounterActionDatas, ParryActionDatas ,HitDatas );
 
 		if ( !!Attachment ) {
 			Attachment->OnAttachmentBeginCollision.AddDynamic ( DoAction , &UCDoAction::OnAttachmentBeginCollision );
