@@ -97,6 +97,8 @@ public:
 
 	bool CheckPlayer();
 
+	void AttackTurn();
+
 	void PlayNextSectionAttack( UAnimMontage* CurrentMontage , FName CurrentSection );
 
 	FName GetNextSection(FName SectionName);

@@ -158,10 +158,94 @@ void ACBossEnemy::OffSwordCollision()
 
 void ACBossEnemy::OnGuardCollision ( )
 {
-	if ( GuardCollComp )
+	//공격이 현재 에너미가 바라보는 방향에서 어느 각도로 맞았는지 체크하게 만듦
+	//SphereTrace와 내적을 사용해서 플레이어의 공격 각도를 체크하는 방식
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	bool bHit = GetWorld()->SweepSingleByChannel(Hit, GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel4 , FCollisionShape::MakeSphere(130.0f), Params);
+
+	DrawDebugSphere ( GetWorld ( ) , GetActorLocation ( ) , 130.0f , 21 , FColor::Green , false , 0.1f );
+
+	//일단 닿은게 플레이어라면 
+	if ( bHit && Hit.GetActor()->IsA(ACAttachment::StaticClass()) )
 	{
-		//공격 판정 콜리전 활성화
-		GuardCollComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		//플레이어와의 각도를 계산함
+		FVector ToPlayer = (Hit.GetActor()->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
+		
+		float DotProduct = FVector::DotProduct(GetActorForwardVector(), ToPlayer);
+		float AngleRad = FMath::Acos(DotProduct);
+		float AngleDeg = FMath::RadiansToDegrees(AngleRad);
+
+		//만약 각도가 전방 30도 사이라면, 정면에서 맞았을 경우
+		if ( AngleDeg <= 30.0f )
+		{
+			//바로 카운터 공격이 동작하게 만듦
+		/*	GEngine->AddOnScreenDebugMessage ( 111 , 1.0f , FColor::White , TEXT ( "Counter Attack!!!" ) );*/
+			
+			UAnimMontage* NowMontage = GetMesh()->GetAnimInstance ( )->GetCurrentActiveMontage ( );
+			if ( !NowMontage )
+			{
+				return;
+			}
+
+			//현재 몽타주가 재생중인 섹션 확인
+			FName NowSection = GetMesh()->GetAnimInstance ( )->Montage_GetCurrentSection ( NowMontage );
+
+			//카운터 공격 애니메이션이 나오도록 재생
+			//해당 몽타주 섹션으로 이동
+			AnimInstance->Montage_JumpToSection(FName("Counter") , NowMontage);
+
+			//혹시 모르니 데미지 처리 못하게 bool을 true로 변경해줌
+			IsGuardSucssess = true;
+			//공격 상태 NONE으로 변경
+			FSMComponent->AttackState = EBossATTACKState::NONE;
+			//시간 초기화
+			FSMComponent->CurGuardTime = 0.0f;
+			//가드 조건 초기화
+			GuardGage = 0.0f;
+			//뒤에 코드 작동이 안되게 리턴
+			return;
+		}
+
+		//만약 각도가 100보다 크다면, 즉 후방 80도 사이에서 맞았을 경우
+		else if ( AngleDeg >= 100.0f )
+		{
+			//자세가 흐트러지며 BREAK상태가 됨
+			FSMComponent->AttackState = EBossATTACKState::NONE;
+			FSMComponent->State = EBossState::BREAK;
+			//시간 초기화
+			FSMComponent->CurGuardTime = 0.0f;
+			//가드 조건 초기화
+			GuardGage = 0.0f;
+			//뒤에 코드 작동이 안되게 리턴
+			return;
+		}
+	}
+
+	//만약 그냥 가드 시간이 끝났을 경우
+	if ( FSMComponent->CurGuardTime >= FSMComponent->LimiteGuardTime )
+	{
+		UAnimMontage* NowMontage = GetMesh()->GetAnimInstance ( )->GetCurrentActiveMontage ( );
+			if ( !NowMontage )
+			{
+				return;
+			}
+
+			//현재 몽타주가 재생중인 섹션 확인
+			FName NowSection = GetMesh()->GetAnimInstance ( )->Montage_GetCurrentSection ( NowMontage );
+
+			//카운터 공격 애니메이션이 나오도록 재생
+			//해당 몽타주 섹션으로 이동
+			AnimInstance->Montage_JumpToSection(FName("Guard_End"), NowMontage);
+
+		/*GEngine->AddOnScreenDebugMessage ( 113 , 1.0f , FColor::White , TEXT ( "Guard Time Limite" ) );*/
+		//그냥 공격상태를 NONE상태로 되돌림
+		FSMComponent->AttackState = EBossATTACKState::NONE;
+		//시간 초기화
+		FSMComponent->CurGuardTime = 0.0f;
+		//가드 조건 초기화
+		GuardGage = 0.0f;
 	}
 }
 
@@ -210,6 +294,27 @@ bool ACBossEnemy::CheckPlayer()
 	}
 	//아닐 경우 false로 값을 전달
 	return false;
+}
+
+void ACBossEnemy::AttackTurn()
+{
+	//공격이 제대로 실행되기 전에 플레이어를 바라보도록 만듦
+	// 플레이어 방향 계산
+	FVector TargetLocation = Target->GetActorLocation();
+	FVector MyLocation = GetActorLocation();
+	FVector DirectionToTarget = (TargetLocation - MyLocation).GetSafeNormal();
+
+	// Yaw 회전만 조정 (Pitch는 유지)
+	FRotator TargetRotation = FRotationMatrix::MakeFromX(DirectionToTarget).Rotator();
+	TargetRotation.Pitch = 0.0f; // Pitch를 0으로 설정해 수평 회전만 적용
+	TargetRotation.Roll = 0.0f;
+
+	// 부드러운 회전을 위해 Interp 사용 (선택 사항)
+	FRotator CurrentRotation = GetActorRotation();
+	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 40.0f);
+
+	// Pawn 회전 설정
+	SetActorRotation (NewRotation);
 }
 
 void ACBossEnemy::PlayNextSectionAttack ( UAnimMontage* CurrentMontage , FName CurrentSection )

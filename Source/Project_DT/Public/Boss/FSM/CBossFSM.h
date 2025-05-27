@@ -116,6 +116,12 @@ public:
 	//Break상태의 지속시간을 설정한 변수
 	float BreakLimitTime = 5.0f;
 
+	//콤보 공격 실행 조건 변수
+	float CurComboAttackTime = 0.0f;
+
+	//콤보 공격 쿨타임, 적어야함
+	float ComboCooltime = 6.0f;
+
 	//어느 콤보 공격을 할지 저장하는 변수
 	int32 ComboAttackIndex;
 

@@ -167,8 +167,11 @@ void UCBossFSM::NONEState()
 		MyBoss->GuardGage += GetWorld()->GetDeltaSeconds();
 		//가드 게이지를 채워줌
 
+		//콤보 공격 타임을 더함
+		CurComboAttackTime += GetWorld()->GetDeltaSeconds();
+
 		//만약 가드 조건이 충족되었을 경우
-		if ( MyBoss->GuardGage >= /*MyBoss->GuardPlaying*/ 30.0f )
+		if ( MyBoss->GuardGage >= MyBoss->GuardPlaying/* 30.0f*/ )
 		{
 			//가드 상태로 변화
 			AttackState = EBossATTACKState::COUNTERATTACK;
@@ -179,8 +182,8 @@ void UCBossFSM::NONEState()
 			return;
 		}
 
-		//다른 조건이 다 충족되지 않았을 경우
-		else
+		//콤보 공격 쿨타임이 되었을 경우
+		else if ( CurComboAttackTime >= ComboCooltime )
 		{	
 			//랜덤 공격이 실행
 			SetCOMBOATTACKState(FMath::RandRange(0, 1));
@@ -318,6 +321,9 @@ void UCBossFSM::COMBOATTACKState()
 			if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->ComboAttack_01 ) )
 			{
 				MyBoss->AnimInstance->Montage_Play ( MyBoss->ComboAttack_01 );
+
+				//시간 초기화
+				CurComboAttackTime = 0.0f;
 			}
 
 		break;
@@ -327,6 +333,9 @@ void UCBossFSM::COMBOATTACKState()
 			if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->ComboAttack_02 ) )
 			{
 				MyBoss->AnimInstance->Montage_Play ( MyBoss->ComboAttack_02 );
+
+				//시간 초기화
+				CurComboAttackTime = 0.0f;
 			}
 
 		break;
@@ -367,69 +376,69 @@ void UCBossFSM::COUNTERATTACKState()
 	// Pawn 회전 설정
 	MyBoss->SetActorRotation (NewRotation);
 
-	//공격이 현재 에너미가 바라보는 방향에서 어느 각도로 맞았는지 체크하게 만듦
-	//SphereTrace와 내적을 사용해서 플레이어의 공격 각도를 체크하는 방식
-	FHitResult Hit;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(MyBoss);
-	bool bHit = GetWorld()->SweepSingleByChannel(Hit, MyBoss->GetActorLocation(), MyBoss->GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel3 , FCollisionShape::MakeSphere(130.0f), Params);
-
-	DrawDebugSphere ( GetWorld ( ) , MyBoss->GetActorLocation ( ) , 130.0f , 21 , FColor::Green , false , 0.1f );
-
-	//일단 닿은게 플레이어라면 
-	if ( bHit && Hit.GetActor()->IsA(ACPlayer::StaticClass()) )
-	{
-		//플레이어와의 각도를 계산함
-		FVector ToPlayer = (Hit.GetActor()->GetActorLocation() - MyBoss->GetActorLocation()).GetSafeNormal2D();
-		
-		float DotProduct = FVector::DotProduct( MyBoss->GetActorForwardVector(), ToPlayer);
-		float AngleRad = FMath::Acos(DotProduct);
-		float AngleDeg = FMath::RadiansToDegrees(AngleRad);
-
-		//만약 각도가 전방 30도 사이라면, 정면에서 맞았을 경우
-		if ( AngleDeg <= 30.0f )
-		{
-			//바로 카운터 공격이 동작하게 만듦
-			GEngine->AddOnScreenDebugMessage ( 111 , 1.0f , FColor::White , TEXT ( "Counter Attack!!!" ) );
-			//혹시 모르니 데미지 처리 못하게 bool을 true로 변경해줌
-			MyBoss->IsGuardSucssess = true;
-			//공격 상태 NONE으로 변경
-			AttackState = EBossATTACKState::NONE;
-			//시간 초기화
-			CurGuardTime = 0.0f;
-			//가드 조건 초기화
-			MyBoss->GuardGage = 0.0f;
-			//뒤에 코드 작동이 안되게 리턴
-			return;
-		}
-
-		//만약 각도가 100보다 크다면, 즉 후방 80도 사이에서 맞았을 경우
-		else if ( AngleDeg >= 100.0f )
-		{
-			GEngine->AddOnScreenDebugMessage ( 112 , 1.0f , FColor::White , TEXT ( "Back Attack!!!" ) );
-			//자세가 흐트러지며 BREAK상태가 됨
-			AttackState = EBossATTACKState::NONE;
-			State = EBossState::BREAK;
-			//시간 초기화
-			CurGuardTime = 0.0f;
-			//가드 조건 초기화
-			MyBoss->GuardGage = 0.0f;
-			//뒤에 코드 작동이 안되게 리턴
-			return;
-		}
-	}
-
-	//만약 그냥 가드 시간이 끝났을 경우
-	if ( CurGuardTime >= LimiteGuardTime )
-	{
-		GEngine->AddOnScreenDebugMessage ( 113 , 1.0f , FColor::White , TEXT ( "Guard Time Limite" ) );
-		//그냥 공격상태를 NONE상태로 되돌림
-		AttackState = EBossATTACKState::NONE;
-		//시간 초기화
-		CurGuardTime = 0.0f;
-		//가드 조건 초기화
-		MyBoss->GuardGage = 0.0f;
-	}
+// 	//공격이 현재 에너미가 바라보는 방향에서 어느 각도로 맞았는지 체크하게 만듦
+// 	//SphereTrace와 내적을 사용해서 플레이어의 공격 각도를 체크하는 방식
+// 	FHitResult Hit;
+// 	FCollisionQueryParams Params;
+// 	Params.AddIgnoredActor(MyBoss);
+// 	bool bHit = GetWorld()->SweepSingleByChannel(Hit, MyBoss->GetActorLocation(), MyBoss->GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel3 , FCollisionShape::MakeSphere(130.0f), Params);
+// 
+// 	DrawDebugSphere ( GetWorld ( ) , MyBoss->GetActorLocation ( ) , 130.0f , 21 , FColor::Green , false , 0.1f );
+// 
+// 	//일단 닿은게 플레이어라면 
+// 	if ( bHit && Hit.GetActor()->IsA(ACPlayer::StaticClass()) )
+// 	{
+// 		//플레이어와의 각도를 계산함
+// 		FVector ToPlayer = (Hit.GetActor()->GetActorLocation() - MyBoss->GetActorLocation()).GetSafeNormal2D();
+// 		
+// 		float DotProduct = FVector::DotProduct( MyBoss->GetActorForwardVector(), ToPlayer);
+// 		float AngleRad = FMath::Acos(DotProduct);
+// 		float AngleDeg = FMath::RadiansToDegrees(AngleRad);
+// 
+// 		//만약 각도가 전방 30도 사이라면, 정면에서 맞았을 경우
+// 		if ( AngleDeg <= 30.0f )
+// 		{
+// 			//바로 카운터 공격이 동작하게 만듦
+// 			GEngine->AddOnScreenDebugMessage ( 111 , 1.0f , FColor::White , TEXT ( "Counter Attack!!!" ) );
+// 			//혹시 모르니 데미지 처리 못하게 bool을 true로 변경해줌
+// 			MyBoss->IsGuardSucssess = true;
+// 			//공격 상태 NONE으로 변경
+// 			AttackState = EBossATTACKState::NONE;
+// 			//시간 초기화
+// 			CurGuardTime = 0.0f;
+// 			//가드 조건 초기화
+// 			MyBoss->GuardGage = 0.0f;
+// 			//뒤에 코드 작동이 안되게 리턴
+// 			return;
+// 		}
+// 
+// 		//만약 각도가 100보다 크다면, 즉 후방 80도 사이에서 맞았을 경우
+// 		else if ( AngleDeg >= 100.0f )
+// 		{
+// 			GEngine->AddOnScreenDebugMessage ( 112 , 1.0f , FColor::White , TEXT ( "Back Attack!!!" ) );
+// 			//자세가 흐트러지며 BREAK상태가 됨
+// 			AttackState = EBossATTACKState::NONE;
+// 			State = EBossState::BREAK;
+// 			//시간 초기화
+// 			CurGuardTime = 0.0f;
+// 			//가드 조건 초기화
+// 			MyBoss->GuardGage = 0.0f;
+// 			//뒤에 코드 작동이 안되게 리턴
+// 			return;
+// 		}
+// 	}
+// 
+// 	//만약 그냥 가드 시간이 끝났을 경우
+// 	if ( CurGuardTime >= LimiteGuardTime )
+// 	{
+// 		GEngine->AddOnScreenDebugMessage ( 113 , 1.0f , FColor::White , TEXT ( "Guard Time Limite" ) );
+// 		//그냥 공격상태를 NONE상태로 되돌림
+// 		AttackState = EBossATTACKState::NONE;
+// 		//시간 초기화
+// 		CurGuardTime = 0.0f;
+// 		//가드 조건 초기화
+// 		MyBoss->GuardGage = 0.0f;
+// 	}
 }
 
 void UCBossFSM::SPATTACKState()

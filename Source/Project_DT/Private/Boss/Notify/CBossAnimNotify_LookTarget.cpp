@@ -20,4 +20,6 @@ void UCBossAnimNotify_LookTarget::Notify ( USkeletalMeshComponent* MeshComp , UA
 	ACBossEnemy* My = Cast<ACBossEnemy> ( MeshComp->GetOwner ( ) );
 
 	CheckNull ( My );
+
+	My->AttackTurn();
 }
