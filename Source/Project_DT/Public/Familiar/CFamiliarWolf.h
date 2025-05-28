@@ -68,6 +68,7 @@ public:
 	bool IsFar = false;			// Idle 상태에서 거리가 먼지 판단하는 변수
 	bool IsClose = false;		// Jump 상태에서 거리 판단하는 변수
 	bool IsOnBiteAtt = false;	// 공격 쿨타임 되면 true로 변경.
+	bool IsOnSpecialAtt = false;
 
 public://오버라이드 할 것 같은 항목
 	// virtual void OnWeaponChanged ( );	// 무기에 따른 소환수 변화

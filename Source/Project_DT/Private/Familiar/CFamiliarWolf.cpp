@@ -7,6 +7,7 @@
 #include "Engine/SkeletalMesh.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
 
 ACFamiliarWolf::ACFamiliarWolf ( )
 {
@@ -60,12 +61,18 @@ void ACFamiliarWolf::Tick ( float DeltaTime )
 
 	if ( IsOnBiteAtt == true)
 	{ AttCollisionBite->SetCollisionEnabled ( ECollisionEnabled::QueryAndPhysics ); }
-
 	else 
 	{ 
 		HitPawn.Empty ( );	// 공격 사이클이 끝났으니 HitPawn 지워주기
 		AttCollisionBite->SetCollisionEnabled ( ECollisionEnabled::NoCollision ); 
 	}
+	
+
+	if ( IsOnSpecialAtt == true )
+	{ GetCapsuleComponent ( )->SetCollisionEnabled ( ECollisionEnabled::NoCollision ); }
+	else
+	{ GetCapsuleComponent ( )->SetCollisionEnabled ( ECollisionEnabled::QueryAndPhysics ); }
+
 }
 
 void ACFamiliarWolf::InitBoxes ( )
@@ -91,6 +98,7 @@ void ACFamiliarWolf::SetOnDesPawn ( )
 void ACFamiliarWolf::OnAttOffProcess ( )
 {
 	IsOnBiteAtt = false;
+	// Me->IsOnSpecialAtt = false;
 }
 
 void ACFamiliarWolf::Landed ( const FHitResult& Hit )

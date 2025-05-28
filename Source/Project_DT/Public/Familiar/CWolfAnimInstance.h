@@ -68,6 +68,9 @@ public:	// AnimNotify 관련 -------- UFUNCTION() 잊지말것!!!
 	void AnimNotify_Att_Bite_Start();
 
 	UFUNCTION() 
+	void AnimNotify_Att_Special_Start();
+
+	UFUNCTION() 
 	void AnimNotify_Land_End();
 
 public:	// 스위치문에 전문 때려박으면 보기 힘들어서... 따로 빼는용 함수

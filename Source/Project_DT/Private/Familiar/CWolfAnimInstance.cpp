@@ -5,6 +5,7 @@
 #include "Familiar/CFamiliarWolf.h"
 #include "Familiar/CWolfFSM.h"
 
+
 void UCWolfAnimInstance::NativeUpdateAnimation ( float DeltaSeconds )
 {
 	Me = Cast<ACFamiliarWolf> ( TryGetPawnOwner ( ) );
@@ -65,6 +66,13 @@ void UCWolfAnimInstance::AnimNotify_Att_Bite_Start ( )
 	Me->IsOnBiteAtt = true;
 }
 
+void UCWolfAnimInstance::AnimNotify_Att_Special_Start ( )
+{
+	if ( !Me ) { return; }
+
+	Me->IsOnBiteAtt = true;
+	Me->IsOnSpecialAtt = true;
+}
 
 void UCWolfAnimInstance::AnimNotify_Land_End ( )
 {
@@ -104,8 +112,10 @@ void UCWolfAnimInstance::Attack1 ( )
 
 void UCWolfAnimInstance::AttackSpecial ( )
 {
-	FSM->UpdateState ( EAttackState::None );
-	FSM->UpdateState (EUpperState::Idle);	// 임시값
+	FSM->EndAttackProcess ( );
+
+	// FSM->UpdateState ( EAttackState::None );
+	// FSM->UpdateState (EUpperState::Idle);	// 임시값
 	IsJumping = false;						// 임시2
 	// FSM->TurnToTarget(FSM->TargetEnemy);
 }
