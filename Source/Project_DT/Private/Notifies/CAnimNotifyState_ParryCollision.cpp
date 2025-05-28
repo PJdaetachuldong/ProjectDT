@@ -5,6 +5,7 @@
 #include "Global.h"
 #include "Weapons/DoActions/CDoAction_Combo.h"
 #include "Component/CParryComponent.h"
+#include "Weapons/CWeaponComponent.h"
 FString UCAnimNotifyState_ParryCollision::GetNotifyName_Implementation ( ) const
 {
 	return "Parry";
@@ -16,10 +17,11 @@ void UCAnimNotifyState_ParryCollision::NotifyBegin ( USkeletalMeshComponent* Mes
 	CheckNull ( MeshComp );
 	CheckNull ( MeshComp->GetOwner ( ) );
 
-	UCParryComponent* parry = CHelpers::GetComponent<UCParryComponent> ( MeshComp->GetOwner ( ) );
-	CheckNull ( parry );
+	UCWeaponComponent* weapon = CHelpers::GetComponent<UCWeaponComponent> ( MeshComp->GetOwner ( ) );
+	CheckNull ( weapon );
+	CheckNull ( weapon->GetDoAction ( ) );
 
-	parry->OnParryCollision();
+	weapon->GetDoAction ( )->Begin_Parry ( );
 }
 
 void UCAnimNotifyState_ParryCollision::NotifyEnd ( USkeletalMeshComponent* MeshComp , UAnimSequenceBase* Animation )
@@ -29,9 +31,10 @@ void UCAnimNotifyState_ParryCollision::NotifyEnd ( USkeletalMeshComponent* MeshC
 	CheckNull ( MeshComp );
 	CheckNull ( MeshComp->GetOwner ( ) );
 
-	UCParryComponent* parry = CHelpers::GetComponent<UCParryComponent> ( MeshComp->GetOwner ( ) );
-	CheckNull ( parry );
+	UCWeaponComponent* weapon = CHelpers::GetComponent<UCWeaponComponent> ( MeshComp->GetOwner ( ) );
+	CheckNull ( weapon );
+	CheckNull ( weapon->GetDoAction ( ) );
 
-	parry->OffParryCollision ( );
+	weapon->GetDoAction ( )->End_Parry ( );
 }
 

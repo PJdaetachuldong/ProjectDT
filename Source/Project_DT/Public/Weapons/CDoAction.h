@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "CWeaponStuctures.h"
+#include "Component/CParryComponent.h"
 #include "CDoAction.generated.h"
 UENUM(BlueprintType)
 enum class EActionState : uint8 {
-	Normal,Heavy, Special, Guard ,Max
+	Normal,Heavy, Special, Guard,Parry ,Max
 };
 
 UCLASS(Abstract,NotBlueprintable)
@@ -25,6 +26,8 @@ public:
 		class ACharacter* InOwner ,
 		class TArray<FDoActionData>& InDoActionData,
 		class TArray<FDoHeavyActionData>& InDoHeavyActionData,
+		class TArray<FCounterActionData>& InCounterActionDatas ,
+		class TArray<FParryActionData>& InParryActionDatas ,
 		class TArray<FHitData>& InHitData
 	);
 
@@ -36,6 +39,12 @@ public:
 	virtual void DoHeavyAction ();
 	virtual void Begin_DoHeavyAction ( );
 
+	virtual void DoActionParry ( EParryState parryState );
+	virtual void Begin_Parry ( ) {};
+	virtual void End_Parry ( ) {};
+
+	virtual void CounterAction ( );
+
 	virtual void ResetDoAction ( ) {};
 
 
@@ -45,6 +54,8 @@ public:
 	FORCEINLINE void HeavyAttack ( ) { ActionState = EActionState::Heavy; };
 	FORCEINLINE void SpecialAttack ( ) { ActionState = EActionState::Special; };
 	FORCEINLINE void OnGuard ( ) { ActionState = EActionState::Guard; };
+	FORCEINLINE void OnParry ( ) { ActionState = EActionState::Parry; };
+
 
 public:
 	UFUNCTION()
@@ -71,6 +82,8 @@ protected:
 
 	TArray<FDoActionData> DoActionDatas;
 	TArray<FDoHeavyActionData> DoHeavyActionDatas;
+	TArray<FCounterActionData> CounterActionDatas;
+	TArray<FParryActionData> ParryActionDatas;
 	TArray<FHitData> HitDatas;
 
 };

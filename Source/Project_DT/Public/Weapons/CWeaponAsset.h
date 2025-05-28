@@ -17,7 +17,7 @@ private:
 	TSubclassOf<class ACAttachment> AttachmentClass;
 
 	UPROPERTY(EditAnywhere)
-	FEquipmentData EquipmentData;
+	TArray< FEquipmentData> EquipmentData;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UCEquipment> EquipmentClass;
@@ -30,6 +30,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TArray<FDoHeavyActionData> DoHeavyActionDatas;
+
+	UPROPERTY ( EditAnywhere )
+	TArray<FCounterActionData> CounterActionDatas;
+
+	UPROPERTY ( EditAnywhere )
+	TArray<FParryActionData> ParryActionDatas;
 
 	UPROPERTY(EditAnywhere)
 	TArray<FHitData> HitDatas;

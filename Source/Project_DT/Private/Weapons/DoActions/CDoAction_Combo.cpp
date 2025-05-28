@@ -7,7 +7,10 @@
 #include "Engine/DamageEvents.h"
 void UCDoAction_Combo::DoAction ()
 {
+	CLog::Log ( bParry );
+
 	CheckTrue ( DoActionDatas.Num ( ) < 1 );
+	//CheckTrue ( State->IsSubActionMode ( ) );
 
 	if ( bEnable )
 	{
@@ -16,8 +19,9 @@ void UCDoAction_Combo::DoAction ()
 
 		return;
 	}
+	CheckFalse ( State->IsIdleMode ());
+	if ( bParry )return;
 
-	CheckFalse ( State->IsIdleMode ( ) );
 
 	Super::DoAction ();
 	AddComboArray(DoActionDatas[0].DoAction ( OwnerCharacter ));
@@ -32,16 +36,16 @@ void UCDoAction_Combo::Begin_DoAction ( )
 	bExist = false;
 	switch ( ActionState )
 	{
-	case EActionState::Normal:{
-		AddComboArray(DoActionDatas[++Index].DoAction ( OwnerCharacter ));
+	case EActionState::Normal: {
+		AddComboArray ( DoActionDatas[++Index].DoAction ( OwnerCharacter ) );
 		DamageIndex = Index;
 	}
-		break;
-	case EActionState::Heavy:{
-		AddComboArray(DoHeavyActionDatas[++HeavyIndex].DoHeavyAction ( OwnerCharacter ));
+							 break;
+	case EActionState::Heavy: {
+		AddComboArray ( DoHeavyActionDatas[++HeavyIndex].DoHeavyAction ( OwnerCharacter ) );
 		DamageIndex = HeavyIndex + 3;
-		}
-		break;
+	}
+							break;
 	default:
 		break;
 	}
@@ -54,11 +58,15 @@ void UCDoAction_Combo::End_DoAction ( )
 	Index = 0;
 	HeavyIndex = 0;
 	DamageIndex = 0;
+	bParry = false;
+
 }
 
 void UCDoAction_Combo::DoHeavyAction ( )
 {
 	CheckTrue ( DoHeavyActionDatas.Num ( ) < 1 );
+	//CheckTrue ( State->IsSubActionMode ( ) );
+
 
 	if ( bEnable )
 	{
@@ -69,21 +77,79 @@ void UCDoAction_Combo::DoHeavyAction ( )
 	}
 
 	CheckFalse ( State->IsIdleMode ( ) );
+	if ( bParry )return;
 
 	Super::DoHeavyAction ( );
 	AddComboArray(DoHeavyActionDatas[0].DoHeavyAction ( OwnerCharacter ));
 	DamageIndex = 3;
 }
 
+void UCDoAction_Combo::DoActionParry ( EParryState parryState)
+{
+	CheckTrue ( ParryActionDatas.Num ( ) < 1 );
+
+	if ( bEnable )
+	{
+		bEnable = false;
+		bExist = true;
+
+		return;
+	}
+
+	Super::DoActionParry ( parryState );
+	switch ( parryState )
+	{
+	case EParryState::TL:ParryActionDatas[0].DoParryAction ( OwnerCharacter );
+		break;
+	case EParryState::BL:ParryActionDatas[1].DoParryAction ( OwnerCharacter );
+		break;
+	case EParryState::TR:ParryActionDatas[2].DoParryAction ( OwnerCharacter );
+		break;
+	case EParryState::BR:ParryActionDatas[3].DoParryAction ( OwnerCharacter );
+		break;
+	case EParryState::Max:
+		break;
+	default:
+		break;
+	}
+
+}
+
+void UCDoAction_Combo::Begin_Parry ( )
+{
+	Super::Begin_Parry ( );
+	bParry = true;
+}
+
+void UCDoAction_Combo::End_Parry ( )
+{
+	Super::End_Parry ( );
+	bParry = false;
+
+}
+
+void UCDoAction_Combo::CounterAction ( )
+{
+	CheckTrue ( CounterActionDatas.Num ( ) < 1 );
+
+	CheckFalse ( bExist );
+
+	bExist = false;
+
+
+	Super::CounterAction ( );
+	CounterActionDatas[0].DoCounterAction ( OwnerCharacter );
+}
+
 void UCDoAction_Combo::ResetDoAction ( )
 {
 	Index = 0;
 	HeavyIndex = 0;
+	bParry = false;
 	DamageIndex = 0;
 
 	//bBeginAction = false;
 
-	//State->SetIdleMode ( );
 }
 
 void UCDoAction_Combo::OnAttachmentBeginOverlap ( class ACharacter* InAttacker , AActor* InAttackCuaser , class ACharacter* InOther )

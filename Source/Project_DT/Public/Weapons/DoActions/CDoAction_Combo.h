@@ -6,9 +6,6 @@
 #include "Weapons/CDoAction.h"
 #include "CDoAction_Combo.generated.h"
 
-/**
- *
- */
 UCLASS()
 class PROJECT_DT_API UCDoAction_Combo : public UCDoAction
 {
@@ -27,6 +24,13 @@ public:
 
 	void DoHeavyAction ( ) override;
 
+	void DoActionParry ( EParryState parryState )override;
+	void Begin_Parry ( )override;
+	void End_Parry ( ) override;
+
+
+	void CounterAction ( ) override;
+
 	void ResetDoAction ( ) override;
 
 public:
@@ -39,6 +43,7 @@ private:
 
 	bool bEnable;
 	bool bExist;
+	bool bParry;
 
 	TArray<FString> ComboArray;
 

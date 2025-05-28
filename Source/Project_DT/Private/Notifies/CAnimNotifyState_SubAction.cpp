@@ -25,6 +25,8 @@ void UCAnimNotifyState_SubAction::NotifyBegin ( USkeletalMeshComponent* MeshComp
 
 	weapon->GetSubAction ( )->Begin_SubAction ( );
 	weapon->GetDoAction ( )->ResetDoAction ( );
+	weapon->bIsCombatState = true;
+	weapon->CombatStateTime = 0.0f;
 }
 
 void UCAnimNotifyState_SubAction::NotifyEnd ( USkeletalMeshComponent* MeshComp , UAnimSequenceBase* Animation )

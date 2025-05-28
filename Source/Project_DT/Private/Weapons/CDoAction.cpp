@@ -11,7 +11,15 @@ UCDoAction::UCDoAction ( )
 
 }
 
-void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipment* InEquipment , class ACharacter* InOwner , class TArray<FDoActionData>& InDoActionData , class TArray<FDoHeavyActionData>& InDoHeavyActionData ,TArray<FHitData>& InHitData )
+void UCDoAction::BeginPlay (
+	class ACAttachment* InAttachment ,
+	class UCEquipment* InEquipment ,
+	class ACharacter* InOwner ,
+	class TArray<FDoActionData>& InDoActionData ,
+	class TArray<FDoHeavyActionData>& InDoHeavyActionData,
+	class TArray<FCounterActionData>& InCounterActionDatas,
+	class TArray<FParryActionData>& InParryActionData ,
+	TArray<FHitData>& InHitData )
 {
 	OwnerCharacter = InOwner;
 	World = OwnerCharacter->GetWorld ( );
@@ -21,6 +29,8 @@ void UCDoAction::BeginPlay ( class ACAttachment* InAttachment , class UCEquipmen
 
 	DoActionDatas = InDoActionData;
 	DoHeavyActionDatas = InDoHeavyActionData;
+	CounterActionDatas = InCounterActionDatas;
+	ParryActionDatas = InParryActionData;
 	HitDatas = InHitData;
 }
 
@@ -51,4 +61,15 @@ void UCDoAction::DoHeavyAction ( )
 void UCDoAction::Begin_DoHeavyAction ( )
 {
 	bBeginAction = true;
+}
+
+void UCDoAction::DoActionParry ( EParryState parryState )
+{
+	State->SetActionMode ( );
+}
+
+void UCDoAction::CounterAction ( )
+{
+	bBeginAction = true;
+
 }

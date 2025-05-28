@@ -29,19 +29,25 @@ void UCWeaponComponent::BeginPlay()
 		if ( !!DataAssets[i] )
 			DataAssets[i]->BeginPlay ( OwnerCharacter );
 	}
+	State = CHelpers::GetComponent<UCStateComponent> ( OwnerCharacter );
 }
 
 void UCWeaponComponent::TickComponent ( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent ( DeltaTime , TickType , ThisTickFunction );
 
-	//if ( !!GetDoAction ( ) )
-	//	GetDoAction ( )->Tick ( DeltaTime );
-
 	if ( !!GetSubAction ( ) )
 		GetSubAction ( )->Tick ( DeltaTime );
 	if ( !!GetSubAction_Skill ( ) )
-		GetSubAction_Skill( )->Tick ( DeltaTime );
+		GetSubAction_Skill ( )->Tick ( DeltaTime );
+
+	if (State->GetStateType()==EStateType::Idle){
+		CombatStateTime = +DeltaTime;
+		if ( CombatStateTime>=10 )
+		{
+
+		}
+	}
 }
 
 bool UCWeaponComponent::IsIdleMode ( )
@@ -69,7 +75,6 @@ class UCDoAction* UCWeaponComponent::GetDoAction ( )
 {
 	CheckTrueResult ( IsUnarmedMode ( ) , nullptr );
 	CheckFalseResult ( !!DataAssets[(int32)Type] , nullptr );
-
 	return DataAssets[(int32)Type]->GetDoAction ();
 }
 
@@ -77,6 +82,9 @@ class UCSubAction* UCWeaponComponent::GetSubAction ( )
 {
 	CheckTrueResult ( IsUnarmedMode ( ) , nullptr );
 	CheckFalseResult ( !!DataAssets[(int32)Type] , nullptr );
+
+
+
 	return DataAssets[(int32)Type]->GetSubAction ( );
 
 }
@@ -85,6 +93,8 @@ class UCSubAction_Skill* UCWeaponComponent::GetSubAction_Skill ( )
 {
 	CheckTrueResult ( IsUnarmedMode ( ) , nullptr );
 	CheckFalseResult ( !!DataAssets[(int32)Type] , nullptr );
+
+
 	return DataAssets[(int32)Type]->GetSubAction_Skill ( );
 }
 
@@ -95,12 +105,15 @@ void UCWeaponComponent::SetUnarmedMode ( )
 	GetEquipment ( )->Unequip ( );
 
 	ChangeType ( EWeaponType::Max );
+
+
 }
 
 void UCWeaponComponent::SetFistMode ( )
 {
 	CheckFalse ( IsIdleMode ( ) );
 	SetMode ( EWeaponType::Fist );
+
 }
 
 void UCWeaponComponent::SetKatanaMode ( )
@@ -115,10 +128,10 @@ void UCWeaponComponent::SetSwordMode ( )
 	SetMode ( EWeaponType::Sword );
 }
 
-void UCWeaponComponent::SetRapierMode ( )
+void UCWeaponComponent::SetGreatSwordMode ( )
 {
 	CheckFalse ( IsIdleMode ( ) );
-	SetMode ( EWeaponType::Rapier );
+	SetMode ( EWeaponType::GreatSword );
 }
 
 void UCWeaponComponent::DoAction ( )
@@ -127,6 +140,7 @@ void UCWeaponComponent::DoAction ( )
 		GetDoAction ()->DoAction ( );
 		GetDoAction ()->NormalAttack ( );
 	}
+
 }
 
 void UCWeaponComponent::DoHeavyAction ( )
@@ -135,12 +149,13 @@ void UCWeaponComponent::DoHeavyAction ( )
 		GetDoAction ( )->DoHeavyAction ( );
 		GetDoAction ( )->HeavyAttack ( );
 	}
+
 }
 
 void UCWeaponComponent::SubAction_Pressed()
 {
 	if ( !bCanParry ) return; // 연타 방지
-	UCStateComponent* State = CHelpers::GetComponent<UCStateComponent> ( OwnerCharacter );
+	State = CHelpers::GetComponent<UCStateComponent> ( OwnerCharacter );
 
 	//CheckFalse ( State->IsIdleMode ( ) );
 
@@ -149,6 +164,8 @@ void UCWeaponComponent::SubAction_Pressed()
 
 	UCParryComponent* parry = CHelpers::GetComponent<UCParryComponent>(OwnerCharacter);
 	CheckNull(parry);
+
+
 
 	parry->OnParryCollision();
 
@@ -208,8 +225,8 @@ void UCWeaponComponent::SubAction_Skill_Released ( )
 
 void UCWeaponComponent::OnParry ( EParryState ParryState )
 {
-	if ( !!GetSubAction ( ) )
-		GetSubAction ( )->Parry ( ParryState );
+	if ( !!GetDoAction())
+		GetDoAction ( )->DoActionParry ( ParryState );
 
 }
 
@@ -233,6 +250,7 @@ void UCWeaponComponent::ChangeType ( EWeaponType InType )
 {
 	EWeaponType prevType = Type;
 	Type = InType;
+
 
 	if ( OnWeaponTypeChange.IsBound ( ) )
 		OnWeaponTypeChange.Broadcast ( prevType , InType );
