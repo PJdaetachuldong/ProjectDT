@@ -16,6 +16,21 @@ class PROJECT_DT_API UCBossAnim : public UAnimInstance
 	GENERATED_BODY()
 	
 public:
+	virtual void NativeInitializeAnimation() override;
+
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;;
+
+	ACharacter* Owner;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bool)
+	bool IsPlayingIdle = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State )
+	float Speed = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State )
+	float Direction = 0.0f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State )
 	EBossState State = EBossState::IDLE;
 	

@@ -30,7 +30,8 @@ public:
 	UStaticMeshComponent* MeshComp;
 
 	//던져질때 속도
-	float ThrowSpeed = 1600.0f;
+	UPROPERTY(EditAnywhere )
+	float ThrowSpeed = 2700.0f;
 
 	//현재 자신이 살아 있는 시간을 체크
 	float CurLifeTime = 0.0f;

@@ -37,11 +37,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = ObjectPool)
 	TArray<class ACRangeAttack*> RangedAttackList;
 
-	//임의로 하는 필살기 패턴 테스트
-	float CurTestSPTime = 0.0f;
-	float TestSPTime = 15.0f;
-	//임의로 하는 필살기 패턴 테스트
-
 // 	//플레이어와의 거리를 저장하는 변수
 // 	float TargetDist = 0.0f;
 // 
@@ -82,9 +77,56 @@ public:
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* SwordMesh;
 
+	UPROPERTY(EditAnywhere )
+	class UBoxComponent* SwordCollComp;
+
+	UPROPERTY(EditAnywhere)
+	class UBoxComponent* GuardCollComp;
+
+	UAnimInstance* AnimInstance;
+	
+	void ReadyDashAttack();
+
+	void OnSwordCollision();
+
+	void OffSwordCollision();
+
+	void OnGuardCollision();
+
+	void OffGuardCollision();
+
+	bool CheckPlayer();
+
+	void AttackTurn();
+
+	void PlayNextSectionAttack( UAnimMontage* CurrentMontage , FName CurrentSection );
+
+	FName GetNextSection(FName SectionName);
+
 	// FSM 컴포넌트
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     class UCBossFSM* FSMComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_ComboAttack_01;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_ComboAttack_02;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_DashAttack;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_RangedAttack;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_Guard;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_SPAttack;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_Break;
 	
 	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 };
