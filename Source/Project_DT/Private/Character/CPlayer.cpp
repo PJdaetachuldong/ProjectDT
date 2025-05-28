@@ -84,6 +84,7 @@ ACPlayer::ACPlayer()
 	CHelpers::GetAsset ( &IA_RightAttack , AssetPaths::IA_RightClick );
 	CHelpers::GetAsset ( &IA_SpecialAttack , AssetPaths::IA_SpecialClick );
 	CHelpers::GetAsset ( &IA_Guard , AssetPaths::IA_GuardBtn );
+	CHelpers::GetAsset ( &IA_Heal , AssetPaths::IA_Heal );
 
 	CHelpers::GetAsset ( &IA_TestBtn , AssetPaths::IA_Test );
 	CHelpers::GetAsset ( &IA_TestBtn2 , AssetPaths::IA_Test2 );
@@ -134,6 +135,7 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		playerInput->BindAction ( IA_TestBtn , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SetKatanaMode );
 		playerInput->BindAction ( IA_TestBtn2 , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SetGreatSwordMode );
+		playerInput->BindAction ( IA_Heal , ETriggerEvent::Completed , Montages , &UCMointageComponent::PlayHealingMode );
 	}
 }
 

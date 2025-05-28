@@ -6,6 +6,11 @@
 #include "Components/ActorComponent.h"
 #include "CStateComponent.h"
 #include "CMointageComponent.generated.h"
+UENUM()
+enum class EActState : uint8
+{
+	Dodge , Healing , Equip,Dead,Hit ,Max
+};
 
 USTRUCT()
 struct FMontagesData
@@ -15,7 +20,7 @@ struct FMontagesData
 
 public:
 	UPROPERTY(EditAnywhere)
-		EStateType Type;
+	EActState Type;
 
 	UPROPERTY(EditAnywhere)
 		class UAnimMontage* Montage;
@@ -45,9 +50,11 @@ public:
 public:
 	void PlayBackStepMode();
 	void PlayDeadMode();
+	void PlayEquipMode ( );
+	void PlayHealingMode ( );
 
 private:
-	void PlayAnimMontage(EStateType InType);
+	void PlayAnimMontage( EActState InType);
 
 private:
 	class ACharacter* OwnerCharacter;

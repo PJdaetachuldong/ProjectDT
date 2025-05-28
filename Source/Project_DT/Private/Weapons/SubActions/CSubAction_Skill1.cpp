@@ -9,9 +9,9 @@
 #include "Weapons/CDoAction.h"
 void UCSubAction_Skill1::Pressed ( )
 {
-	//CheckFalse ( State->IsIdleMode ( ) );
+	CheckFalse ( State->IsIdleMode ( ) );
 	CLog::Log ( "Pressed1" );
-	CheckTrue ( State->IsSubActionMode ( ) );
+	//CheckTrue ( State->IsSubActionMode ( ) );
 	CLog::Log ( "Pressed2" );
 	Super::Pressed ( );
 

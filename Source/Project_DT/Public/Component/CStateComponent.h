@@ -9,7 +9,7 @@
 UENUM()
 enum class EStateType : uint8
 {
-	Idle = 0, BackStep, Equip, Hitted, Dead, Action, Max,
+	Idle = 0, BackStep, Equip, Hitted, Dead, Action,Healing, Max,
 };
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FStateTypeChanged, EStateType, InPrevType, EStateType, InNewType);
 

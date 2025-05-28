@@ -72,7 +72,6 @@ void UCMovementComponent::DisableControlRotation ( )
 
 void UCMovementComponent::OnMoveForward ( const FInputActionValue& Value )
 {
-	if ( !bCanMove ) return;
 
 	ForwardScale = Value.Get<float> ( );
 
@@ -89,13 +88,13 @@ void UCMovementComponent::OnMoveForward ( const FInputActionValue& Value )
 	// 최종 입력 방향 계산
 	LastInputDirection = ( ForwardVector * ForwardScale + RightVector * RightScale ).GetSafeNormal ( );
 
+	if ( !bCanMove ) return;
 	// 이동 적용
 	OwnerCharacter->AddMovementInput ( ForwardVector , ForwardScale );
 }
 
 void UCMovementComponent::OnMoveRight ( const FInputActionValue& Value )
 {
-	if ( !bCanMove ) return;
 
 	RightScale = Value.Get<float> ( );
 
@@ -112,6 +111,7 @@ void UCMovementComponent::OnMoveRight ( const FInputActionValue& Value )
 	// 최종 입력 방향 계산
 	LastInputDirection = ( ForwardVector * ForwardScale + RightVector * RightScale ).GetSafeNormal ( );
 
+	if ( !bCanMove ) return;
 	// 이동 적용
 	OwnerCharacter->AddMovementInput ( RightVector , RightScale );
 }

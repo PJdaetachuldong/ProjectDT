@@ -20,6 +20,7 @@ namespace AssetPaths
     constexpr const TCHAR* IA_RightClick = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_RightClick.IA_RightClick'" );
     constexpr const TCHAR* IA_SpecialClick = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Ctrl.IA_Ctrl'" );
     constexpr const TCHAR* IA_GuardBtn = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Guard.IA_Guard'" );
+    constexpr const TCHAR* IA_Heal = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_E.IA_E'" );
 
     constexpr const TCHAR* IMC = TEXT ( "/Script/EnhancedInput.InputMappingContext'/Game/LHW/Input/IMC_Player.IMC_Player'" );
     constexpr const TCHAR* IA_Test = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Test.IA_Test'" );

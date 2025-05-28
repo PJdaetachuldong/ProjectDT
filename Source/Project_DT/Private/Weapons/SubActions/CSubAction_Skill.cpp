@@ -14,3 +14,8 @@ void UCSubAction_Skill::BeginPlay ( class ACharacter* InOwner , class ACAttachme
 	State = CHelpers::GetComponent<UCStateComponent> ( InOwner );
 	Movement = CHelpers::GetComponent<UCMovementComponent> ( InOwner );
 }
+
+void UCSubAction_Skill::Pressed ( )
+{
+	State->OnSubActionMode ( );
+}
