@@ -14,7 +14,6 @@ UCWolfFSM::UCWolfFSM ( )
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-
 }
 // -------------------------------------------------
 void UCWolfFSM::BeginPlay ( )
@@ -38,8 +37,23 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 
 #pragma region LogMessageState
 
+// 최상위 스테이트
 	FString logMsgUpState = UEnum::GetValueAsString( MUpState );
 	GEngine->AddOnScreenDebugMessage(0, 1, FColor::Yellow, logMsgUpState );
+
+// 하위 스테이트
+	FString JumpStateStr = UEnum::GetValueAsString ( MJumpState );
+	GEngine->AddOnScreenDebugMessage ( 1 , 1 , FColor::Green , JumpStateStr );
+
+	FString AttackStateStr = UEnum::GetValueAsString ( MAttState );
+	GEngine->AddOnScreenDebugMessage ( 2 , 1 , FColor::Yellow , AttackStateStr );
+
+	FString OverStateStr = UEnum::GetValueAsString ( MOverState );
+	GEngine->AddOnScreenDebugMessage ( 3 , 1 , FColor::Green , OverStateStr );
+
+	FColor IsJumpingColor = Anim->IsJumping ? FColor::Red : FColor::White;
+	FString logMsgIsJumping = FString::Printf ( TEXT ( "IsJumping: %s" ) , Anim->IsJumping ? TEXT ( "True" ) : TEXT ( "False" ) );
+	GEngine->AddOnScreenDebugMessage ( 5 , 1 , IsJumpingColor , logMsgIsJumping );
 
 #pragma endregion LogMessageState
 
@@ -78,12 +92,16 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 #pragma region Update_States
 void UCWolfFSM::UpdateState ( EUpperState _UpState )
 {
+	if ( !Me ) { return; }
+
 	MUpState = _UpState;
 	Anim->AUpState = _UpState;
 }
 
 void UCWolfFSM::UpdateState ( EJumpState _JumpState )
 {
+	if ( !Me ) { return; }
+
 	MJumpState = _JumpState;
 	Anim->AJumpState = _JumpState;
 
@@ -91,12 +109,16 @@ void UCWolfFSM::UpdateState ( EJumpState _JumpState )
 
 void UCWolfFSM::UpdateState ( EAttackState _AttState )
 {
+	if ( !Me ) { return; }
+
 	MAttState = _AttState;
 	Anim->AAttState = _AttState;
 }
 
 void UCWolfFSM::UpdateState ( EOverridenState _OverState )
 {
+	if ( !Me ) { return; }
+
 	MOverState = _OverState;
 	Anim->AOverState = _OverState;
 }
@@ -121,6 +143,9 @@ void UCWolfFSM::SpawnFamiliar ( )
 
 void UCWolfFSM::IdleState ( )
 {
+// 공격 쿨타임이 차지 않은 상태인데 에너미가 너무 가까울 경우엔 뒤로 점프
+
+
 // ========= 탐지 -> 회전 -> 공격판단
 //일정 시간마다 실행
 	CurrentTime += GetWorld()->DeltaTimeSeconds;
@@ -133,27 +158,58 @@ void UCWolfFSM::IdleState ( )
 	// 타겟이 있을 경우에는 공격모드.
 	else
 	{
+		// 공격 쿨타임 지정
 		if ( CurrentTime > Me->AttackDelayTime )
 		{
-			UpdateState(EUpperState::Attack );
+			MoveToTarget ( TargetEnemy );
+			FVector dir = TargetDir ( TargetEnemy );
+
+			//사거리 안에 있을 경우 공격
+			if ( dir.Size() < Me->AttackRange )
+			{
+				CurrentTime = 0.f;
+				DecideAttack ( );
+				OnAttackProcess ( );
+				// UpdateState ( EUpperState::Attack );
+			}
+
 		}
 	}
 }
 
 void UCWolfFSM::JumpState ( )
 {
+	if ( Anim->IsJumping == false ) { return; }
+	
 	//점프 두 번 갈길 경우엔 Bool형 체크도 해주기
 	if ( Me->CanJump() )
 	{
-		Me->Jump();
+		Me->Jump ( );
+		Anim->IsJumping = true;
 	}
+
+
+	// 타겟과의 사거리 체크
+	//FVector dirToTarget = TargetEnemy->GetActorLocation ( ) - Me->GetActorLocation ( );
+	
+	FVector dirToTarget = Me->GetActorLocation ( ) - TargetEnemy->GetActorLocation ( );
+	float distToTarget = dirToTarget.Size ( );
+
+	dirToTarget.Normalize ( );
+	FVector targetLocation = Me->GetActorLocation ( ) + dirToTarget * 3;
+
+	// 이동 실행
+	Me->SetActorLocation ( targetLocation, true );
 }
 
 void UCWolfFSM::AttackState ( )
 {
+
 	// 회전
 		//TurnToTarget ( TargetEnemy );
-		//OnAttackProcess ( );
+
+		// OnAttackProcess ( );
+
 	// 공격 실행은 노티파이로, 점프공격 애니메이션이 있으면 좋을듯. 
 		// (없으면 물기 + Launch)
 }
@@ -201,17 +257,21 @@ void UCWolfFSM::SearchEnemy ( )
 		// 현재는 랜덤.
 	UpdateEnemyList ( );
 	
+
 	// 있을 경우 공격 상태로 전환
 	if (!EnemyList.IsEmpty())
 	{
+		if ( !Me ) { return; }
 		Me->IsInBattle = true;
 		SetOnTarget();
 	}
 
 	else
 	{
+		if ( !Me ) { return; }
 		Me->IsInBattle = false;
 	}
+
 }
 
 // 전투 상태인 경우에만 실행
@@ -265,7 +325,7 @@ void UCWolfFSM::TurnToTarget ( AActor* target )
 
 
 	FRotator newRotation = FMath::RInterpTo ( currentRotation , targetRotation , deltaTime , 3.f );
-	FRotator finalRot = FRotator ( newRotation.Pitch , newRotation.Yaw , 0.f );
+	FRotator finalRot = FRotator ( 0.f , newRotation.Yaw , 0.f );	//위쪽 안보게 하기
 
 	// 각도 크기만큼 돌리기
 	Me->SetActorRotation ( finalRot );
@@ -296,64 +356,128 @@ void UCWolfFSM::OnAttackProcess ( )
 {
 // 공격중인 상태로 변환
 	UpdateState ( EUpperState::Attack );
-
-	FVector dir = TargetDir ( TargetEnemy );
-	DecideAttack();
-
-	UpdateState ( MAttState );
+	UpdateState (MAttState);
 }
 
+void UCWolfFSM::EndAttackProcess ( )
+{
+	UpdateState ( EUpperState::Idle );	// 공격 루틴 뒷점프 없앨거면 Idle로
+	UpdateState ( EAttackState::None );
+	UpdateState ( EJumpState::None );
+
+	Me->OnAttOffProcess();
+}
+
+// 세부 공격 타입 결정
 void UCWolfFSM::DecideAttack ( )
 {
 
-// 세부 공격 타입 결정
-	MAttState = EAttackState::Attack1;	// 어떤 공격할지 바꾸기. 일단 물기 하나 넣고 테스트
-	
+// 공격 횟수가 쌓일 경우 SpecialAttack으로 변경.
+	if (Me->SpecialStack >= Me->SpecialMax)
+	{
+		MAttState = EAttackState::Special;
+		Me->SpecialStack = 0;
+		return;
+	}
+
+// 일반공격(물기)
+	MAttState = EAttackState::Attack1;	
+	Me->SpecialStack += 1;
+
 // 실행은 OnAttackProcess 에서
+}
+
+bool UCWolfFSM::CheckPath ( )
+{
+	FHitResult HitResult;
+	FVector Start = Me->GetActorLocation ( );
+	FVector ForwardDir = Me->GetActorForwardVector ( );
+	FVector End = Start + ForwardDir * 100.0f; // 100cm 앞까지 검사
+
+	FCollisionQueryParams TraceParams ( FName ( TEXT ( "ObstacleTrace" ) ) , true , Me );
+	TraceParams.bReturnPhysicalMaterial = false;
+	TraceParams.AddIgnoredActor ( Me ); // 자기 자신은 무시
+
+
+	bool bHit = GetWorld ( )->LineTraceSingleByChannel (
+		HitResult ,
+		Start ,
+		End ,
+		ECC_Visibility ,
+		TraceParams
+	);
+
+
+	if ( bHit == false) { return false; }
+
+	else
+	{
+		// 장애물이 감지되었을 경우
+		FVector RightDir = Me->GetActorRightVector ( );
+		FVector AvoidDir = FVector::CrossProduct ( HitResult.Normal , FVector::UpVector ).GetSafeNormal ( );
+
+		// 회피 방향으로 이동
+		Me->AddMovementInput ( AvoidDir , 1.0f );
+
+		return bHit;
+	}
 
 }
 
 void UCWolfFSM::MoveToTarget ( AActor* target )
 {
+
 // 타겟과의 사거리 체크
 	FVector dirToTarget = target->GetActorLocation ( ) - Me->GetActorLocation ( );
 	float distToTarget = dirToTarget.Size ( );
 
-// 타겟이 플레이어일 경우
-	if ( target->IsA ( ACPlayer::StaticClass ( ) ) )
+	// 사거리가 Max보다 멀어질 경우에는 IsFar = true / Min에 도달하면 false;
+	if ( distToTarget > Me->MaxDistance ) { Me->IsFar = true; }
+	else if ( distToTarget < Me->MinDistance ) { Me->IsFar = false; }
+
+	// 설정 거리보다 멀다면 플레이어 방향으로 이동.
+	if ( Me->IsFar == true )
 	{
-		// 사거리가 Max보다 멀어질 경우에는 IsFar = true / Min에 도달하면 false;
-		if ( distToTarget > Me->MaxDistance ) { Me->IsFar = true; }
-		else if ( distToTarget < Me->MinDistance ) { Me->IsFar = false; }
+		dirToTarget.Normalize ( );
 
-		// 설정 거리보다 멀다면 플레이어 방향으로 이동.
-		if ( Me->IsFar == true )
+			FHitResult HitResult;
+			FVector Start = Me->GetActorLocation ( );
+			FVector ForwardDir = Me->GetActorForwardVector ( );
+			FVector End = Start + ForwardDir * 200.0f; // 100cm 앞까지 검사
+
+			FCollisionQueryParams TraceParams ( FName ( TEXT ( "ObstacleTrace" ) ) , true , Me );
+			TraceParams.bReturnPhysicalMaterial = false;
+			TraceParams.AddIgnoredActor ( Me ); // 자기 자신은 무시
+
+// DrawDebugLine ( GetWorld ( ) , Start , End , FColor::Red , false , 1.0f , 0 , 2.0f );
+
+			bool bHit = GetWorld ( )->LineTraceSingleByChannel( HitResult, Start, End, ECC_Visibility, TraceParams );
+
+
+	// 회전 작동 안함
+		if ( bHit )
 		{
-			dirToTarget.Normalize ( );
+			// 장애물이 감지되었을 경우
+			FVector RightDir = Me->GetActorRightVector ( );
+			FVector AvoidDir = FVector::CrossProduct ( HitResult.Normal , FVector::UpVector ).GetSafeNormal ( );
 
+
+			// 회피 방향으로 캐릭터 회전
+			FRotator AvoidRotation = AvoidDir.Rotation ( );
+			FRotator CurrentRotation = Me->GetActorRotation ( );
+			FRotator NewRotation = FMath::RInterpTo ( CurrentRotation , AvoidRotation , GetWorld ( )->DeltaTimeSeconds , 5.0f );
+			Me->SetActorRotation ( NewRotation );
+			// 회피 방향으로 이동
+			Me->AddMovementInput ( AvoidDir , 1.0f );
+		}
+
+		else
+		{
 			TurnToTarget ( target );
 			Me->AddMovementInput ( dirToTarget , 1.0f );
 		}
-	}
-
-// 타겟이 에너미일 경우
-	else if ( target->IsA ( ACEnemyBase::StaticClass ( ) ) )
-	{
-		//사거리 범위까지 이동 & 회전
-		if ( distToTarget < Me->MinDistance )
-		{
-			dirToTarget.Normalize ( );
-
-			TurnToTarget ( target );
-			Me->AddMovementInput ( dirToTarget , 1.0f );
-
-			OnAttackProcess();
-		}
 
 	}
-
-
-
 
 }
 

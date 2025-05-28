@@ -14,7 +14,7 @@ UENUM()	// 상위 스테이트 머신
 enum class EUpperState : uint8
 {
 	None			UMETA(DisplayName = "None"),		// 소환 해제 대기상태
-	Start			UMETA(DisplayName = "Start"),		// 
+	Start			UMETA(DisplayName = "Start"),		
 	Idle			UMETA(DisplayName = "Idle"),
 	Jump			UMETA(DisplayName = "Jump"),
 	Attack			UMETA(DisplayName = "Attack"),
@@ -28,13 +28,15 @@ UENUM() // HFSM - 공격 상태
 enum class EAttackState : uint8
 {
 	None		UMETA(DisplayName = "None"),
-	Attack1		UMETA(DisplayName = "Attack1")
+	Attack1		UMETA(DisplayName = "Attack1"),
+	Special		UMETA(DisplayName = "Special")
 };
 
 UENUM() // HFSM - 이동 상태 (점프로 각도 조정등 수행)
 enum class EJumpState : uint8
 {
 	None		UMETA(DisplayName = "None"),
+	EndJump		UMETA(DisplayName = "EndJump"),
 	StopJump	UMETA(DisplayName = "StopJump"),
 
 	FrontJump	UMETA(DisplayName = "FrontJump"),
@@ -139,9 +141,11 @@ public:	// 에너미 색적
 
 public:	// 공격 실행 함수
 	void OnAttackProcess();		// 공격 실행하는 함수
+	void EndAttackProcess();	// 공격 관련 정리하는 함수
 	void DecideAttack();		// 어떤 공격할지 결정하는 함수
 
 public:	// 이동 관련 함수
+	bool CheckPath();
 	FVector TargetDir ( AActor* target );		// 타겟 Dir 구하기
 	void MoveToTarget( AActor* target );		// 타겟 방향으로 이동하기
 	void TurnToTarget( AActor* target );		// 타겟 방향으로 몸 돌리기
