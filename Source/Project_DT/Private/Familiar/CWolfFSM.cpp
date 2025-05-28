@@ -51,9 +51,13 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 	FString OverStateStr = UEnum::GetValueAsString ( MOverState );
 	GEngine->AddOnScreenDebugMessage ( 3 , 1 , FColor::Green , OverStateStr );
 
-	FColor IsJumpingColor = Anim->IsJumping ? FColor::Red : FColor::White;
-	FString logMsgIsJumping = FString::Printf ( TEXT ( "IsJumping: %s" ) , Anim->IsJumping ? TEXT ( "True" ) : TEXT ( "False" ) );
-	GEngine->AddOnScreenDebugMessage ( 5 , 1 , IsJumpingColor , logMsgIsJumping );
+// 	FColor IsJumpingColor = Anim->IsJumping ? FColor::Red : FColor::White;
+// 	FString logMsgIsJumping = FString::Printf ( TEXT ( "IsJumping: %s" ) , Anim->IsJumping ? TEXT ( "True" ) : TEXT ( "False" ) );
+// 	GEngine->AddOnScreenDebugMessage ( 5 , 1 , IsJumpingColor , logMsgIsJumping );
+
+	FColor IsOnSpecialColor = Me->IsOnSpecialAtt ? FColor::Red : FColor::White;
+	FString logMsgIsSpecial = FString::Printf ( TEXT ( "IsOnSpecial: %s" ) , Me->IsOnSpecialAtt ? TEXT ( "True" ) : TEXT ( "False" ) );
+	GEngine->AddOnScreenDebugMessage ( 5 , 1 , IsOnSpecialColor , logMsgIsSpecial );
 
 #pragma endregion LogMessageState
 
@@ -152,29 +156,32 @@ void UCWolfFSM::IdleState ( )
 
 // 탐지, 대상 지정
 	SearchEnemy ( );
-	//타겟이 없을 경우에는 플레이어 쫓아다니는 함수.
-	if ( Me->IsInBattle == false ) { MoveToTarget(Player); }
-
-	// 타겟이 있을 경우에는 공격모드.
-	else
-	{
-		// 공격 쿨타임 지정
-		if ( CurrentTime > Me->AttackDelayTime )
-		{
-			MoveToTarget ( TargetEnemy );
-			FVector dir = TargetDir ( TargetEnemy );
-
-			//사거리 안에 있을 경우 공격
-			if ( dir.Size() < Me->AttackRange )
-			{
-				CurrentTime = 0.f;
-				DecideAttack ( );
-				OnAttackProcess ( );
-				// UpdateState ( EUpperState::Attack );
-			}
-
-		}
+//타겟이 없을 경우에는 플레이어 쫓아다니는 함수.
+	if ( Me->IsInBattle == false ) 
+	{ 
+		MoveToTarget(Player); 
+		return;
 	}
+
+// 타겟이 있을 경우에는 공격모드.
+	
+	// 공격 쿨타임 지정
+	if ( CurrentTime > Me->AttackDelayTime )
+	{
+		MoveToTarget ( TargetEnemy );
+		FVector dir = TargetDir ( TargetEnemy );
+
+		//사거리 안에 있을 경우 공격
+		if ( dir.Size() < Me->AttackRange )
+		{
+			CurrentTime = 0.f;
+			DecideAttack ( );
+			OnAttackProcess ( );
+			// UpdateState ( EUpperState::Attack );
+		}
+
+	}
+	
 }
 
 void UCWolfFSM::JumpState ( )
@@ -204,9 +211,12 @@ void UCWolfFSM::JumpState ( )
 
 void UCWolfFSM::AttackState ( )
 {
+	if( Me->IsOnSpecialAtt )
+	{
+		// 회전
+		TurnToTarget ( TargetEnemy );
+	}
 
-	// 회전
-		//TurnToTarget ( TargetEnemy );
 
 		// OnAttackProcess ( );
 
@@ -355,6 +365,7 @@ void UCWolfFSM::TurnToTarget ( AActor* target )
 void UCWolfFSM::OnAttackProcess ( )
 {
 // 공격중인 상태로 변환
+
 	UpdateState ( EUpperState::Attack );
 	UpdateState (MAttState);
 }
