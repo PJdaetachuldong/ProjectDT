@@ -108,25 +108,25 @@ public:
     class UCBossFSM* FSMComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
-	class UAnimMontage* ComboAttack_01;
+	class UAnimMontage* AM_ComboAttack_01;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
-	class UAnimMontage* ComboAttack_02;
+	class UAnimMontage* AM_ComboAttack_02;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
-	class UAnimMontage* DashAttack;
+	class UAnimMontage* AM_DashAttack;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
-	class UAnimMontage* RangedAttack;
+	class UAnimMontage* AM_RangedAttack;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
 	class UAnimMontage* AM_Guard;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
-	class UAnimMontage* SPAttack;
+	class UAnimMontage* AM_SPAttack;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
-	class UAnimMontage* Break;
+	class UAnimMontage* AM_Break;
 	
 	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 };

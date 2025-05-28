@@ -22,5 +22,6 @@ void UCBossAnimNotify_RetrunNONE::Notify ( USkeletalMeshComponent* MeshComp , UA
 
 	CheckNull ( My );
 	
+	My->FSMComponent->State = EBossState::ATTACK;
 	My->FSMComponent->AttackState = EBossATTACKState::NONE;
 }

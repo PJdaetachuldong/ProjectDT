@@ -22,6 +22,9 @@ public:
 
 	ACharacter* Owner;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bool)
+	bool IsPlayingIdle = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State )
 	float Speed = 0.0f;
 

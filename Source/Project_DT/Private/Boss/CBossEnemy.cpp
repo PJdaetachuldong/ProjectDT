@@ -54,25 +54,25 @@ ACBossEnemy::ACBossEnemy()
 	ConstructorHelpers::FObjectFinder<UAnimMontage> TempCombo1 (L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/ComboAttack_01/AM_ComboAttack_01_01.AM_ComboAttack_01_01'");
 	if ( TempCombo1.Succeeded ( ) )
 	{
-		ComboAttack_01 = TempCombo1.Object;
+		AM_ComboAttack_01 = TempCombo1.Object;
 	}
 
 	ConstructorHelpers::FObjectFinder<UAnimMontage> TempCombo2 ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/ComboAttack_02/Combo_Attack_02.Combo_Attack_02'" );
 	if ( TempCombo2.Succeeded ( ) )
 	{
-		ComboAttack_02 = TempCombo2.Object;
+		AM_ComboAttack_02 = TempCombo2.Object;
 	}
 
 	ConstructorHelpers::FObjectFinder<UAnimMontage> TempDash ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/DashAttack/AM_DashAttack.AM_DashAttack'" );
 	if ( TempDash.Succeeded ( ) )
 	{
-		DashAttack = TempDash.Object;
+		AM_DashAttack = TempDash.Object;
 	}
 
 // 	ConstructorHelpers::FObjectFinder<UAnimMontage> TempRanged ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/ComboAttack_01/AM_ComboAttack_01_01.AM_ComboAttack_01_01'" );
 // 	if ( TempRanged.Succeeded ( ) )
 // 	{
-// 		RangedAttack = TempRanged.Object;
+// 		AM_RangedAttack = TempRanged.Object;
 // 	}
 
 	ConstructorHelpers::FObjectFinder<UAnimMontage> TempGuard ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/Guard/AM_Guard.AM_Guard'" );
@@ -84,13 +84,13 @@ ACBossEnemy::ACBossEnemy()
 	ConstructorHelpers::FObjectFinder<UAnimMontage> TempSP ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/SPAttack/AM_SPAttack.AM_SPAttack'" );
 	if ( TempSP.Succeeded ( ) )
 	{
-		SPAttack = TempSP.Object;
+		AM_SPAttack = TempSP.Object;
 	}
 
 	ConstructorHelpers::FObjectFinder<UAnimMontage> TempBreak ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/Break/AM_Break.AM_Break'" );
 	if ( TempBreak.Succeeded ( ) )
 	{
-		Break = TempBreak.Object;
+		AM_Break = TempBreak.Object;
 	}
 }
 

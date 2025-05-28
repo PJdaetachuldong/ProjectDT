@@ -25,6 +25,26 @@ void UCBossAnimNotify_Guard::NotifyBegin ( USkeletalMeshComponent* MeshComp , UA
 	My->OnGuardCollision();
 }
 
+void UCBossAnimNotify_Guard::NotifyTick ( USkeletalMeshComponent* MeshComp , UAnimSequenceBase* Animation , float FrameDeltaTime )
+{
+	Super::NotifyTick(MeshComp, Animation, FrameDeltaTime);
+
+	CheckNull ( MeshComp );
+	CheckNull ( MeshComp->GetOwner ( ) );
+
+	ACBossEnemy* My = Cast<ACBossEnemy> ( MeshComp->GetOwner ( ) );
+
+	CheckNull ( My );
+
+// 	CurTime += FrameDeltaTime;
+// 	if ( CurTime >= DelayTime )
+// 	{
+		//가드 체크확인 콜리전 활성화로 계속 체크
+		My->OnGuardCollision ( );
+		/*CurTime = 0.0f;*/
+	/*}*/
+}
+
 void UCBossAnimNotify_Guard::NotifyEnd ( USkeletalMeshComponent* MeshComp , UAnimSequenceBase* Animation )
 {
 	Super::NotifyEnd ( MeshComp , Animation );

@@ -78,17 +78,26 @@ void UCBossFSM::DAMAGEState()
 
 void UCBossFSM::BREAKState()
 {
-	//브레이크 상태가 되면 브레이크의 지속시간을 체크함
-	CurBreakTime +=GetWorld()->GetDeltaSeconds();
+	//AI 움직임 멈춤
+	AI->StopMovement();
 
-	//지속시간이 끝났다면
-	if ( CurBreakTime >= BreakLimitTime )
+	//만약 브레이크 애니메이션이 재생중이지 않으면 재생하게 만듦
+	if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->AM_Break ) )
 	{
-		//일어선 다음
-
-		//CHASE상태로 변환? ATTACK상태로 변환? 나중에 정하기
-		State = EBossState::ATTACK;
+		MyBoss->AnimInstance->Montage_Play ( MyBoss->AM_Break );
 	}
+
+// 	//브레이크 상태가 되면 브레이크의 지속시간을 체크함
+// 	CurBreakTime +=GetWorld()->GetDeltaSeconds();
+// 
+// 	//지속시간이 끝났다면
+// 	if ( CurBreakTime >= BreakLimitTime )
+// 	{
+// 		//일어선 다음
+// 
+// 		//CHASE상태로 변환? ATTACK상태로 변환? 나중에 정하기
+// 		State = EBossState::ATTACK;
+// 	}
 }
 
 void UCBossFSM::DIEState()
@@ -171,7 +180,7 @@ void UCBossFSM::NONEState()
 		CurComboAttackTime += GetWorld()->GetDeltaSeconds();
 
 		//만약 가드 조건이 충족되었을 경우
-		if ( MyBoss->GuardGage >= MyBoss->GuardPlaying/* 30.0f*/ )
+		if ( MyBoss->GuardGage >= /*MyBoss->GuardPlaying*/ 4.0f )
 		{
 			//가드 상태로 변화
 			AttackState = EBossATTACKState::COUNTERATTACK;
@@ -249,9 +258,9 @@ void UCBossFSM::DASHATTACKState()
 	AI->StopMovement();
 
 	//만약 대쉬 공격 애니메이션이 재생중이지 않으면 재생하게 만듦
-	if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->DashAttack ) )
+	if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->AM_DashAttack ) )
 	{
-		MyBoss->AnimInstance->Montage_Play ( MyBoss->DashAttack );
+		MyBoss->AnimInstance->Montage_Play ( MyBoss->AM_DashAttack );
 	}
 
 	//위치 셋팅이 되어있는 상태이면
@@ -318,9 +327,9 @@ void UCBossFSM::COMBOATTACKState()
 	{
 		case 0:
 			//콤보 공격이 실행중이지 않을경우 콤보공격 실행
-			if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->ComboAttack_01 ) )
+			if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->AM_ComboAttack_01 ) )
 			{
-				MyBoss->AnimInstance->Montage_Play ( MyBoss->ComboAttack_01 );
+				MyBoss->AnimInstance->Montage_Play ( MyBoss->AM_ComboAttack_01 );
 
 				//시간 초기화
 				CurComboAttackTime = 0.0f;
@@ -330,9 +339,9 @@ void UCBossFSM::COMBOATTACKState()
 		
 		case 1:
 			//콤보 공격이 실행중이지 않을경우 콤보공격 실행
-			if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->ComboAttack_02 ) )
+			if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->AM_ComboAttack_02 ) )
 			{
-				MyBoss->AnimInstance->Montage_Play ( MyBoss->ComboAttack_02 );
+				MyBoss->AnimInstance->Montage_Play ( MyBoss->AM_ComboAttack_02 );
 
 				//시간 초기화
 				CurComboAttackTime = 0.0f;
@@ -355,26 +364,32 @@ void UCBossFSM::COUNTERATTACKState()
 		MyBoss->AnimInstance->Montage_Play ( MyBoss->AM_Guard );
 	}
 
-	//가드 상태 지속시간을 체크함
-	CurGuardTime +=GetWorld()->GetDeltaSeconds();
+	//가드 애니메이션이 실행중일때만 캐릭터를 바라보게 회전함
+	if ( MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->AM_Guard ) )
+	{
+		//가드 상태 지속시간을 체크함
+		CurGuardTime +=GetWorld()->GetDeltaSeconds();
 
-	//가드 상태일때는 플레이어를 바라보도록 만듦
-	// 플레이어 방향 계산
-	FVector PlayerLocation = MyBoss->Target->GetActorLocation();
-	FVector PawnLocation = MyBoss->GetActorLocation();
-	FVector DirectionToPlayer = (PlayerLocation - PawnLocation).GetSafeNormal();
+		//가드 상태일때는 플레이어를 바라보도록 만듦
+		// 플레이어 방향 계산
+		FVector PlayerLocation = MyBoss->Target->GetActorLocation();
+		FVector PawnLocation = MyBoss->GetActorLocation();
+		FVector DirectionToPlayer = (PlayerLocation - PawnLocation).GetSafeNormal   ();
 
-	// Yaw 회전만 조정 (Pitch는 유지)
-	FRotator TargetRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
-	TargetRotation.Pitch = 0.0f; // Pitch를 0으로 설정해 수평 회전만 적용
-	TargetRotation.Roll = 0.0f;
+		// Yaw 회전만 조정 (Pitch는 유지)
+		FRotator TargetRotation = FRotationMatrix::MakeFromX	(DirectionToPlayer).Rotator();
+		TargetRotation.Pitch = 0.0f; // Pitch를 0으로 설정해 수평 회전만 적용
+		TargetRotation.Roll = 0.0f;
 
-	// 부드러운 회전을 위해 Interp 사용 (선택 사항)
-	FRotator CurrentRotation = MyBoss->GetActorRotation();
-	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 1.0f);
+		// 부드러운 회전을 위해 Interp 사용 (선택 사항)
+		FRotator CurrentRotation = MyBoss->GetActorRotation();
+		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation,	GetWorld()->GetDeltaSeconds(), 0.5f);
 
-	// Pawn 회전 설정
-	MyBoss->SetActorRotation (NewRotation);
+		// Pawn 회전 설정
+		MyBoss->SetActorRotation (NewRotation);
+	}
+
+	
 
 // 	//공격이 현재 에너미가 바라보는 방향에서 어느 각도로 맞았는지 체크하게 만듦
 // 	//SphereTrace와 내적을 사용해서 플레이어의 공격 각도를 체크하는 방식
@@ -447,9 +462,9 @@ void UCBossFSM::SPATTACKState()
 	AI->StopMovement();
 
 	//필살기 상태가 되면 애니메이션 재생
-	if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->SPAttack ) )
+	if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->AM_SPAttack ) )
 	{
-		MyBoss->AnimInstance->Montage_Play(MyBoss->SPAttack);
+		MyBoss->AnimInstance->Montage_Play(MyBoss->AM_SPAttack);
 	}
 	
 	CurSPReadyTime += GetWorld()->GetDeltaSeconds();
