@@ -7,8 +7,10 @@
 #include "Engine/DamageEvents.h"
 void UCDoAction_Combo::DoAction ()
 {
+	CLog::Log ( bParry );
+
 	CheckTrue ( DoActionDatas.Num ( ) < 1 );
-	CheckTrue ( State->IsSubActionMode ( ) );
+	//CheckTrue ( State->IsSubActionMode ( ) );
 
 	if ( bEnable )
 	{
@@ -63,7 +65,7 @@ void UCDoAction_Combo::End_DoAction ( )
 void UCDoAction_Combo::DoHeavyAction ( )
 {
 	CheckTrue ( DoHeavyActionDatas.Num ( ) < 1 );
-	CheckTrue ( State->IsSubActionMode ( ) );
+	//CheckTrue ( State->IsSubActionMode ( ) );
 
 
 	if ( bEnable )
@@ -143,6 +145,7 @@ void UCDoAction_Combo::ResetDoAction ( )
 {
 	Index = 0;
 	HeavyIndex = 0;
+	bParry = false;
 	DamageIndex = 0;
 
 	//bBeginAction = false;

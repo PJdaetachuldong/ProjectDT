@@ -29,6 +29,7 @@ void UCWeaponComponent::BeginPlay()
 		if ( !!DataAssets[i] )
 			DataAssets[i]->BeginPlay ( OwnerCharacter );
 	}
+	State = CHelpers::GetComponent<UCStateComponent> ( OwnerCharacter );
 }
 
 void UCWeaponComponent::TickComponent ( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction )
@@ -39,14 +40,14 @@ void UCWeaponComponent::TickComponent ( float DeltaTime , ELevelTick TickType , 
 		GetSubAction ( )->Tick ( DeltaTime );
 	if ( !!GetSubAction_Skill ( ) )
 		GetSubAction_Skill ( )->Tick ( DeltaTime );
-	if ( bIsCombatState ) {
-		CombatStateTime += DeltaTime;
-		if ( CombatStateTime >= 10.0f ) {
-			SetUnarmedMode ( );
-			CombatStateTime = 0.0f;
+
+	if (State->GetStateType()==EStateType::Idle){
+		CombatStateTime = +DeltaTime;
+		if ( CombatStateTime>=10 )
+		{
+
 		}
 	}
-	else CombatStateTime = 0;
 }
 
 bool UCWeaponComponent::IsIdleMode ( )
@@ -104,8 +105,7 @@ void UCWeaponComponent::SetUnarmedMode ( )
 	GetEquipment ( )->Unequip ( );
 
 	ChangeType ( EWeaponType::Max );
-	bIsCombatState = false;
-	CombatStateTime = 0.0f;
+
 
 }
 
@@ -155,7 +155,7 @@ void UCWeaponComponent::DoHeavyAction ( )
 void UCWeaponComponent::SubAction_Pressed()
 {
 	if ( !bCanParry ) return; // 연타 방지
-	UCStateComponent* State = CHelpers::GetComponent<UCStateComponent> ( OwnerCharacter );
+	State = CHelpers::GetComponent<UCStateComponent> ( OwnerCharacter );
 
 	//CheckFalse ( State->IsIdleMode ( ) );
 
@@ -250,8 +250,7 @@ void UCWeaponComponent::ChangeType ( EWeaponType InType )
 {
 	EWeaponType prevType = Type;
 	Type = InType;
-	bIsCombatState = true;
-	CombatStateTime = 0.0f;
+
 
 	if ( OnWeaponTypeChange.IsBound ( ) )
 		OnWeaponTypeChange.Broadcast ( prevType , InType );

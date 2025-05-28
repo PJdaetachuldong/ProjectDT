@@ -65,5 +65,11 @@ void UCDoAction::Begin_DoHeavyAction ( )
 
 void UCDoAction::DoActionParry ( EParryState parryState )
 {
-	State->SetIdleMode ( );
+	State->SetActionMode ( );
+}
+
+void UCDoAction::CounterAction ( )
+{
+	bBeginAction = true;
+
 }

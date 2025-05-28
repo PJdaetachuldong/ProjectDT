@@ -43,7 +43,7 @@ public:
 	virtual void Begin_Parry ( ) {};
 	virtual void End_Parry ( ) {};
 
-	virtual void CounterAction ( ) {};
+	virtual void CounterAction ( );
 
 	virtual void ResetDoAction ( ) {};
 

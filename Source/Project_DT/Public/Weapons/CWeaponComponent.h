@@ -82,6 +82,7 @@ public:
 	float CombatStateTime = 0.0f;
 private:
 	class ACharacter* OwnerCharacter;
+	class UCStateComponent* State;
 
 	EWeaponType Type = EWeaponType::Max;
 

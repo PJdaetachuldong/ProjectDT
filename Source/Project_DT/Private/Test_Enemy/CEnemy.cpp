@@ -58,7 +58,7 @@ void ACEnemy::Tick ( float DeltaTime )
 	Super::Tick ( DeltaTime );
 	Weapon->SetGreatSwordMode ( );
 
-	OverlapBegin();
+	//OverlapBegin();
 
 }
 
