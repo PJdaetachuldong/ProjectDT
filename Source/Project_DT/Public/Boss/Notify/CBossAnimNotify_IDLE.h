@@ -14,8 +14,8 @@ class PROJECT_DT_API UCBossAnimNotify_IDLE : public UAnimNotify
 {
 	GENERATED_BODY()
 	
-public:
-	FString GetNotifyName_Implementation ( ) const override;
-
-	void Notify ( USkeletalMeshComponent* MeshComp , UAnimSequenceBase* Animation ) override;
+// public:
+// 	FString GetNotifyName_Implementation ( ) const override;
+// 
+// 	void Notify ( USkeletalMeshComponent* MeshComp , UAnimSequenceBase* Animation ) override;
 };
