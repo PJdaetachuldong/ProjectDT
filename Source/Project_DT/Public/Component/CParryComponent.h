@@ -23,6 +23,7 @@ public:
 
 	FORCEINLINE void OnParryCollision ( ) { bIsParrying = true; }
 	FORCEINLINE void OffParryCollision ( ) { bIsParrying = false; }
+	FORCEINLINE bool GetParryState() { return bIsParrying; }
 
 
 protected:
