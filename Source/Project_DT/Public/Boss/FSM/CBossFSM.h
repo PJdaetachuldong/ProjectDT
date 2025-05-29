@@ -61,13 +61,19 @@ public:
 	float DashAttackCooltime = 5.0f;
 
 	//대쉬 공격 때 플레이어의 얼마나 뒤로 움직일지 정하는 변수
-	float DashAttackOverDist = 1100.0f;
+	float DashAttackOverDist = 700.0f;
+
+	//대쉬 공격 때 플레이어보다 약간 앞에서 멈추게 하는 변수
+	float DashAttackFrontDist = 450.0f;
 
 	//대쉬 공격을 할때 위치 선정을 했는지 확인하는 변수
 	bool IsSetDashAttackLocation = false;
 
 	//애니메이션 대쉬 공격 준비가 끝났는지 확인하는 bool
 	bool IsReadyDashAttack = false;
+
+	//대쉬 공격 이동중 사거리가 별로 차이가 안 나는지 확인하는 불
+	bool IsLowDist = false;
 
 	//대쉬 지속 시간
 	float DashDuration = 1.0f;
@@ -81,6 +87,9 @@ public:
 
 	//타겟의 위치
 	FVector CalculatedTargetLocation;
+
+	//대쉬 공격 위치를 설정하는 함수
+	void SetDashAttackLocation();
 
 	//EaseInSine 계산을 하는 함수
 	float EaseInSine(float x);

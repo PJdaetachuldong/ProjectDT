@@ -28,10 +28,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	class UCStateComponent* State;
-
+public:
 	UPROPERTY(VisibleAnywhere)
 	class UCParryComponent* Parry;
-
+private:
 	UPROPERTY(VisibleAnywhere)
 	class UCTargetingComponent* TargetComp;
 public:

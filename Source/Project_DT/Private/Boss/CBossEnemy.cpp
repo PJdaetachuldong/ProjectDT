@@ -10,6 +10,8 @@
 #include "Boss/CBossAnim.h"
 #include "Components/BoxComponent.h"
 #include "Character/CPlayer.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Component/CParryComponent.h"
 
 ACBossEnemy::ACBossEnemy()
 {
@@ -30,6 +32,8 @@ ACBossEnemy::ACBossEnemy()
 		SwordMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale , TEXT("Weapon_Socket"));
 
 		SwordCollComp = CreateDefaultSubobject<UBoxComponent>(L"SwordCollision");
+		SwordCollComp->OnComponentBeginOverlap.AddDynamic(this, &ACBossEnemy::WeaponOverlap);
+		SwordCollComp->SetCollisionProfileName(FName("BossWeapon"));
 		SwordCollComp->AttachToComponent(SwordMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Collision_Socket"));
 		SwordCollComp->SetBoxExtent(FVector(10, 48, 3));
 		//공격 판정 콜리전 비활성화
@@ -92,6 +96,12 @@ ACBossEnemy::ACBossEnemy()
 	{
 		AM_Break = TempBreak.Object;
 	}
+
+	ConstructorHelpers::FObjectFinder<UAnimMontage> TempShieldHit ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/Hit/AM_ShieldHit.AM_ShieldHit'" );
+	if ( TempShieldHit.Succeeded ( ) )
+	{
+		AM_ShieldHit = TempShieldHit.Object;
+	}
 }
 
 void ACBossEnemy::BeginPlay()
@@ -117,6 +127,8 @@ void ACBossEnemy::BeginPlay()
 	}
 
 	AnimInstance = GetMesh()->GetAnimInstance();
+
+	LoadStatsFromAsset();
 }
 
 void ACBossEnemy::Tick(float DeltaTime)
@@ -124,15 +136,14 @@ void ACBossEnemy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ACBossEnemy::SPBreak()
-{
-	
-}
+// void ACBossEnemy::SPBreak()
+// {
+// 	
+// }
 
-void ACBossEnemy::ReadyDashAttack ( )
+void ACBossEnemy::ReadyDashAttack()
 {
-	FSMComponent->IsSetDashAttackLocation = true;
-	FSMComponent->IsReadyDashAttack = true;
+	FSMComponent->SetDashAttackLocation();	
 }	
 
 void ACBossEnemy::OnSwordCollision()
@@ -227,17 +238,17 @@ void ACBossEnemy::OnGuardCollision ( )
 	if ( FSMComponent->CurGuardTime >= FSMComponent->LimiteGuardTime )
 	{
 		UAnimMontage* NowMontage = GetMesh()->GetAnimInstance ( )->GetCurrentActiveMontage ( );
-			if ( !NowMontage )
-			{
-				return;
-			}
+		if ( !NowMontage )
+		{
+			return;
+		}
 
-			//현재 몽타주가 재생중인 섹션 확인
-			FName NowSection = GetMesh()->GetAnimInstance ( )->Montage_GetCurrentSection ( NowMontage );
+		//현재 몽타주가 재생중인 섹션 확인
+		FName NowSection = GetMesh()->GetAnimInstance ( )->Montage_GetCurrentSection ( NowMontage );
 
-			//카운터 공격 애니메이션이 나오도록 재생
-			//해당 몽타주 섹션으로 이동
-			AnimInstance->Montage_JumpToSection(FName("Guard_End"), NowMontage);
+		//카운터 공격 애니메이션이 나오도록 재생
+		//해당 몽타주 섹션으로 이동
+		AnimInstance->Montage_JumpToSection(FName("Guard_End"), NowMontage);
 
 		/*GEngine->AddOnScreenDebugMessage ( 113 , 1.0f , FColor::White , TEXT ( "Guard Time Limite" ) );*/
 		//그냥 공격상태를 NONE상태로 되돌림
@@ -369,6 +380,51 @@ FName ACBossEnemy::GetNextSection ( FName SectionName )
 	return NAME_None;
 }
 
+void ACBossEnemy::RunCheckPlayerDist()
+{
+	//정해진 거리와의 거리를 측정
+	float LocationToDist = FVector::Dist ( GetActorLocation ( ) , FSMComponent->CalculatedTargetLocation );
+
+	UAnimMontage* NowMontage = GetMesh ( )->GetAnimInstance ( )->GetCurrentActiveMontage ( );
+
+	//만약 일정 거리 안이면
+	if ( LocationToDist <= 120.0f )
+	{
+		//대쉬 공격 애니메이션이 나오도록 만듦
+		if ( !NowMontage )
+		{
+			return;
+		}
+
+		//현재 몽타주가 재생중인 섹션 확인
+		FName NowSection = GetMesh ( )->GetAnimInstance ( )->Montage_GetCurrentSection ( NowMontage );
+
+		//대쉬 공격 섹션이 아닐경우
+		if(NowSection != "DashAttack" )
+		{ 
+			//돌진 공격 애니메이션이 나오도록 재생
+			//해당 몽타주 섹션으로 이동
+			AnimInstance->Montage_JumpToSection ( FName ( "DashAttack" ) , NowMontage );
+		}
+	}
+}
+
+void ACBossEnemy::DashAttackEnd()
+{
+	//돌진은 완료했다고 bool값 false로 전환
+	FSMComponent->IsSetDashAttackLocation = false;
+	//Navmesh를 이용하여 다시 이동하게 만듦
+	GetCharacterMovement()->SetMovementMode ( MOVE_Walking );
+	//이동 속도도 다시 원래 추적 속도로 되돌려줌
+	GetCharacterMovement()->MaxWalkSpeed = 200.0f;
+	//추적 시간도 초기화
+	FSMComponent->CurChaseTime = 0.0f;
+	//대쉬 공격 준비 초기화
+	FSMComponent->IsReadyDashAttack = false;
+	//불 초기화
+	FSMComponent->IsLowDist = false;
+}
+
 void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//가드가 성공한 경우에는 데미지 처리 및 피격 애니메이션이 안 나오도록 만듦
@@ -390,7 +446,7 @@ void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActo
 		GEngine->AddOnScreenDebugMessage ( 80 , 1.0f , FColor::Red , TEXT ( "Hit Boss" ) );
 
 		//현재 필살기를 공격하려고 준비중이라면
-		if ( FSMComponent->AttackState == EBossATTACKState::SPATTACK )
+		if ( IsReadySPAttack )
 		{
 			//데미지를 저장
 			FSMComponent->SetSPDamage(10.0f);
@@ -401,6 +457,17 @@ void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActo
 		{
 			//쉴드게이지가 감소하도록 설정
 			ShieldAmount -= /*Damage*/10.0f;
+
+			AnimInstance->Montage_Play ( AM_ShieldHit );
+
+			//쉴드 상태에서 몇번 맞았는지 체크함
+			ShieldHitCount++;
+
+			//만약 일정 횟수 이상 맞았을 경우
+			if ( ShieldHitCount >= ShieldHitCounter )
+			{
+				AnimInstance->Montage_JumpToSection ( FName ( "Counter" ) , AM_ShieldHit );
+			}
 
 			//만약 쉴드게이지 감소되어서 0이 된다면
 			if ( ShieldAmount <= 0.0f )
@@ -420,7 +487,9 @@ void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActo
 			//가드 애니메이션이 나오도록 만들어주기 / 단 필살기 준비중에는 일어나지 않게 / 브레이크 상태에서도 나오지 않게
 			if ( FSMComponent->AttackState != EBossATTACKState::SPATTACK || FSMComponent->State != EBossState::BREAK )
 			{
-				GEngine->AddOnScreenDebugMessage ( 82 , 1.0f , FColor::Red , TEXT ( "Boss Gard Animation" ) );
+				/*GEngine->AddOnScreenDebugMessage ( 82 , 1.0f , FColor::Red , TEXT ( "Boss Gard Animation" ) );*/
+
+				
 			}
 		}
 
@@ -434,7 +503,7 @@ void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActo
 			if ( CurHP <= 0.0f )
 			{
 				//사망 상태로 만듦
-				FSMComponent->State = EBossState::DIE;
+				/*FSMComponent->State = EBossState::DIE;*/
 
 				//만약 에너미 매니저가 있다면
 				if ( Manager )
@@ -452,4 +521,31 @@ void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActo
 			}
 		}
 	}
+}
+
+void ACBossEnemy::WeaponOverlap ( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult )
+{
+	ACPlayer* Player = Cast<ACPlayer>(OtherActor);
+
+	if ( Player )
+	{
+		//만약 플레이어가 패링 감지중이면
+		if( Player->Parry->bIsParrying )
+		{
+			//경직 애니메이션 재생
+			GEngine->AddOnScreenDebugMessage ( 130 , 1.0f , FColor::Red , TEXT ( "Player Parrying" ) );
+		}
+
+		//만약 대쉬 공격 애니메이션 중이라면
+		if ( !AnimInstance->Montage_IsPlaying ( AM_DashAttack ) )
+		{
+			IsDashAttackHit = true;
+		}
+	}
+}
+
+void ACBossEnemy::LoadStatsFromAsset ( )
+{
+	Super::LoadStatsFromAsset();
+
 }

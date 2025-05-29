@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
-#include "CBossAnimNotify_IDLE.generated.h"
+#include "CBossAnimNotify_ReadySP.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_DT_API UCBossAnimNotify_IDLE : public UAnimNotify
+class PROJECT_DT_API UCBossAnimNotify_ReadySP : public UAnimNotify
 {
 	GENERATED_BODY()
-	
+
 public:
 	FString GetNotifyName_Implementation ( ) const override;
 

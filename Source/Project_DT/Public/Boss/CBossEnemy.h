@@ -49,8 +49,11 @@ public:
 // 	//대쉬 공격이 실행되는 쿨타임 변수
 // 	float DashAttackCooltime = 25.0f;
 	
-	//콤보 공격을 저장하는 변수
-	
+	//대쉬 공격 시 정해진 위치와의 거리를 저장하는 변수
+	/*float LocationToDist = 0.0f;	*/
+
+	//돌진 공격이 맞았는지 판단하는 변수
+	bool IsDashAttackHit = false;
 	
 	//가드 조건 게이지
 	float GuardGage = 0.0f;
@@ -65,9 +68,15 @@ public:
 	float OnSPDamage = 0.0f;
 
 	//필살기 준비 자세때 패턴이 파훼될때까지 필요한 데미지를 설정하는 변수
-	float SPBreakDamageAmount = 150.0f;
+	float SPBreakDamageAmount = 50.0f;
 
-	void SPBreak();
+	bool IsReadySPAttack = false;
+
+	//쉴드 상태에서 공격을 몇회 맞았는지 체크하는 변수
+	int32 ShieldHitCount = 0;
+
+	//쉴드 상태에서 일정 횟수 이상 공격을 맞았을 경우 반격 공격이 실행되는 조건 변수
+	int32 ShieldHitCounter = 2;
 
 	//일단 임시로 하는 발사 위치 설정
 	UPROPERTY(EditAnywhere)
@@ -103,6 +112,10 @@ public:
 
 	FName GetNextSection(FName SectionName);
 
+	void RunCheckPlayerDist();
+
+	void DashAttackEnd();
+
 	// FSM 컴포넌트
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     class UCBossFSM* FSMComponent;
@@ -127,6 +140,14 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
 	class UAnimMontage* AM_Break;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_ShieldHit;
 	
 	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+
+	UFUNCTION( )
+	void WeaponOverlap ( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult );
+
+	virtual void LoadStatsFromAsset() override;
 };
