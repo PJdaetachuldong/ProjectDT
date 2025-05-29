@@ -36,6 +36,7 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 {
 	Super::TickComponent ( DeltaTime , TickType , ThisTickFunction );
 
+/*
 #pragma region LogMessageState
 
 // 최상위 스테이트
@@ -60,8 +61,9 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 	FString logMsgIsSpecial = FString::Printf ( TEXT ( "IsOnSpecial: %s" ) , Me->IsOnSpecialAtt ? TEXT ( "True" ) : TEXT ( "False" ) );
 	GEngine->AddOnScreenDebugMessage ( 5 , 1 , IsOnSpecialColor , logMsgIsSpecial );
 
-	GEngine->AddOnScreenDebugMessage ( 6 , 1.0f , FColor::Green , FString::SanitizeFloat ( CurrentTime ) );
+	// GEngine->AddOnScreenDebugMessage ( 6 , 1.0f , FColor::Green , FString::SanitizeFloat ( CurrentTime ) );
 #pragma endregion LogMessageState
+*/
 
 // 최상위 State
 	switch ( MUpState )
@@ -194,10 +196,9 @@ void UCWolfFSM::IdleState ( )
 	Me->IsCanAttack = true;
 
 	// 사거리 밖에 있을 경우 에너미를 향해 이동
-	if ( dir.Size ( ) >= Me->AttackRange )
+	if ( dir.Size ( ) > Me->AttackRange )
 	{
 		MoveToTarget ( TargetEnemy );
-		return;
 	}
 
 	//사거리 안에 있을 경우 공격
@@ -473,7 +474,7 @@ void UCWolfFSM::MoveToTarget ( AActor* target )
 
 	// 사거리가 Max보다 멀어질 경우에는 IsFar = true / Min에 도달하면 false;
 	if ( distToTarget > Me->MaxDistance ) { Me->IsFar = true; }
-	else if ( distToTarget < Me->MinDistance ) { Me->IsFar = false; }
+	else if ( distToTarget < Me->MinDistance - 50.f ) { Me->IsFar = false; }
 
 	// 설정 거리보다 멀다면 타겟 방향으로 이동.
 	if ( Me->IsFar == true )
@@ -530,7 +531,7 @@ void UCWolfFSM::FarFromTarget ( AActor* target )
 	float distToTarget = dirFromTarget.Size ( );
 
 	// 너무 가까우면 멀어지도록 이동
-	if ( distToTarget < Me->MinDistance )
+	if ( distToTarget < Me->MaxDistance )
 	{
 		dirFromTarget.Normalize ( );
 
