@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
-#include "CBossAnimNotify_IDLE.generated.h"
+#include "CBossAnimNotify_DashEnd.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_DT_API UCBossAnimNotify_IDLE : public UAnimNotify
+class PROJECT_DT_API UCBossAnimNotify_DashEnd : public UAnimNotify
 {
 	GENERATED_BODY()
 	

@@ -51,5 +51,6 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UCWeaponComponent* Weapon;
 
+public:
 	bool bIsParrying;
 };

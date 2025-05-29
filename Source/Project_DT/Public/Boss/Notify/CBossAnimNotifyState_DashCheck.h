@@ -4,19 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
-#include "CBossNotifyState_Guard.generated.h"
+#include "CBossAnimNotifyState_DashCheck.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECT_DT_API UCBossNotifyState_Guard : public UAnimNotifyState
+class PROJECT_DT_API UCBossAnimNotifyState_DashCheck : public UAnimNotifyState
 {
 	GENERATED_BODY()
 	
 public:
-	FString GetNotifyName_Implementation() const override;
+	FString GetNotifyName_Implementation ( ) const override;
 
 	virtual void NotifyBegin ( USkeletalMeshComponent* MeshComp , UAnimSequenceBase* Animation , float TotalDuration ) override;
+
+	virtual void NotifyTick ( USkeletalMeshComponent* MeshComp , UAnimSequenceBase* Animation , float FrameDeltaTime ) override;
+
 	virtual void NotifyEnd ( USkeletalMeshComponent* MeshComp , UAnimSequenceBase* Animation ) override;
 };

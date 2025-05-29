@@ -107,6 +107,20 @@ void UCBossFSM::DIEState()
 
 void UCBossFSM::NONEState()
 {
+	//임시로 약간 떨어트리는 코드
+	if ( FVector::Dist(MyBoss->GetActorLocation(), MyBoss->Target->GetActorLocation()) <= 150.0f )
+	{
+		AI->StopMovement();
+	}
+	//임시로 약간 떨어트리는 코드
+
+	//피격 상태면 아래가 진행되지않게
+	if(MyBoss->AnimInstance->Montage_IsPlaying(MyBoss->AM_ShieldHit)) 
+	{
+		AI->StopMovement();
+		return;
+	}
+
 	//공격 패턴 우선 순위
 	//SPATTACK(필살기) > RANGEDATTACK(원거리 공격) > DASHATTACK(대쉬 공격)
 	//COUNTERATTACK(가드 공격) > COMBOATTACK (콤보 공격)
@@ -161,7 +175,7 @@ void UCBossFSM::NONEState()
 			AttackState = EBossATTACKState::DASHATTACK;
 
 			//빠르게 달리는 느낌을 주기 위하여 이동속도 바꾸기
-			MyBoss->GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
+			MyBoss->GetCharacterMovement()->MaxWalkSpeed = 1100.0f;
 
 			//뒤에 코드 실행 안되게 리턴
 			return;
@@ -180,7 +194,7 @@ void UCBossFSM::NONEState()
 		CurComboAttackTime += GetWorld()->GetDeltaSeconds();
 
 		//만약 가드 조건이 충족되었을 경우
-		if ( MyBoss->GuardGage >= /*MyBoss->GuardPlaying*/ 4.0f )
+		if ( MyBoss->GuardGage >= /*MyBoss->GuardPlaying*/ 20.0f )
 		{
 			//가드 상태로 변화
 			AttackState = EBossATTACKState::COUNTERATTACK;
@@ -266,26 +280,26 @@ void UCBossFSM::DASHATTACKState()
 	//위치 셋팅이 되어있는 상태이면
 	if ( IsSetDashAttackLocation )
 	{
-		if ( IsReadyDashAttack )
-		{
+// 		if ( IsReadyDashAttack )
+// 		{
 			//돌진 시간을 업데이트
 			DashTimer += GetWorld ( )->GetDeltaSeconds ( ) / DashDuration;
 
-			//만약 시간이 정해진 시간 보다 커진다면
+			//만약 시간이 정해진 시간 보다 커지거나, 사거리 안에 들어왔을 경우
 			if ( DashTimer >= 1.0f )
 			{
 				//돌진은 완료했다고 bool값 false로 전환
 				IsSetDashAttackLocation = false;
 				//Navmesh를 이용하여 다시 이동하게 만듦
 				MyBoss->GetCharacterMovement ( )->SetMovementMode ( MOVE_Walking );
-				//공격 상태를 다시 NONE으로 되돌림
-				AttackState = EBossATTACKState::NONE;
 				//이동 속도도 다시 원래 추적 속도로 되돌려줌
 				MyBoss->GetCharacterMovement ( )->MaxWalkSpeed = 200.0f;
 				//추적 시간도 초기화
 				CurChaseTime = 0.0f;
 				//대쉬 공격 준비 초기화
 				IsReadyDashAttack = false;
+				//불 초기화
+				IsLowDist = false;
 				//리턴
 				return;
 			}
@@ -294,29 +308,17 @@ void UCBossFSM::DASHATTACKState()
 			float t = EaseInSine ( DashTimer );
 			//Lerp를 사용하여 사이를 보간
 			FVector NewLocation = FMath::Lerp ( StartDashLocation , CalculatedTargetLocation , t );
+			//Z축 이동 못하게 만듦
+			NewLocation.Z = StartDashLocation.Z;
 			//이동하게 함
 			MyBoss->SetActorLocation ( NewLocation );
-		}	
+		/*}*/	
 	}
 
 	//위치 세팅이 안되어있는 상태이면
 	else if ( !IsSetDashAttackLocation )
 	{
-		//위치를 설정 
-		/*IsSetDashAttackLocation = true;*/
-		DashTimer = 0.0f;
-		StartDashLocation = MyBoss->GetActorLocation();
-
-		//타겟의 위치를 설정
-		FVector TargetLocation = MyBoss->Target->GetActorLocation();
-		//뒤로 더 이동하기 위해 타겟의 방향을 계산
-		FVector DirectionToTarget = (TargetLocation - StartDashLocation).GetSafeNormal();
-
-		//플레이어 위치보다 더 뒤로 이동하게 값을 계산함
-		CalculatedTargetLocation = TargetLocation + (DirectionToTarget * DashAttackOverDist);
-
-		//Navmesh를 비활성화해줌
-		MyBoss->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		
 	}
 }
 
@@ -502,6 +504,12 @@ void UCBossFSM::SetSPDamage(float Damage)
 		//필살기 패턴이 파훼됨
 		GEngine->AddOnScreenDebugMessage ( 89 , 10.0f , FColor::Red , TEXT ( "SPAttack Break!!" ) );
 
+		//필살기 상태가 되면 애니메이션 재생
+		if ( MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->AM_SPAttack ) )
+		{
+			MyBoss->AnimInstance->Montage_Stop(0.0f, MyBoss->AM_SPAttack);
+		}
+
 		//공격상태는 NONE으로 변환
 		AttackState = EBossATTACKState::NONE;
 		//상태는 BREAK로 변환
@@ -509,6 +517,8 @@ void UCBossFSM::SetSPDamage(float Damage)
 
 		//시간 초기화
 		CurSPReadyTime = 0.0f;
+		//bool 초기화
+		MyBoss->IsReadySPAttack = false;
 	}
 }
 
@@ -524,6 +534,48 @@ void UCBossFSM::GetOwnerEnemy()
 	//자신의 주인과 AI를 받음
 	MyBoss = Cast<ACBossEnemy>(GetOwner());
 	AI = Cast<AAIController>(MyBoss->GetController());
+}
+
+void UCBossFSM::SetDashAttackLocation()
+{
+	DashTimer = 0.0f;
+	StartDashLocation = MyBoss->GetActorLocation();
+
+	//타겟의 위치를 설정
+	FVector TargetLocation = MyBoss->Target->GetActorLocation();
+	//뒤로 더 이동하기 위해 타겟의 방향을 계산
+	FVector DirectionToTarget = (TargetLocation -StartDashLocation).GetSafeNormal();
+
+	//플레이어 위치보다 더 뒤로 이동하게 값을 계산함
+/*	CalculatedTargetLocation = TargetLocation + (DirectionToTarget * DashAttackOverDist);*/
+
+	//플레이어 위치보다 약간 앞에서 멈추게 값을 계산함
+/*	CalculatedTargetLocation = TargetLocation - (DirectionToTarget * DashAttackFrontDist);*/
+
+	//타겟 위치를 목표로 설정
+	CalculatedTargetLocation = TargetLocation;
+
+	//Navmesh를 비활성화해줌
+	MyBoss->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+
+	// 타겟 방향 계산
+	FVector BossLocation = MyBoss->GetActorLocation();
+	FVector DirectionToPlayer = (CalculatedTargetLocation - BossLocation).GetSafeNormal();
+
+	// Yaw 회전만 조정 (Pitch는 유지)
+	FRotator TargetRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
+	TargetRotation.Pitch = 0.0f; // Pitch를 0으로 설정해 수평 회전만 적용
+	TargetRotation.Roll = 0.0f;
+
+	// 부드러운 회전을 위해 Interp 사용 (선택 사항)
+	FRotator CurrentRotation = MyBoss->GetActorRotation();
+	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 20.0f);
+
+	// Pawn 회전 설정
+	MyBoss->SetActorRotation(NewRotation);
+
+	//위치를 설정 
+	IsSetDashAttackLocation = true;
 }
 
 float UCBossFSM::EaseInSine ( float x )
