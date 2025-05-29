@@ -37,25 +37,25 @@ public:	//소켓 추가
 	class UBoxComponent* AttCollisionBite;
 
 public:	// 스탯 관련
-	float AttackDelayTime = 2.f;	// 공격 쿨타임
+	float AttackDelayTime = 3.f;	// 공격 쿨타임
 	float SearchRange = 2000.f;
 
 	float MoveMentSpeed = 300.f;
 	float MaxDistance = 400.f;
 	float MinDistance = 200.f;
+	float JumpDistance = 100.f;
 
-	float AttackRange = MinDistance;
+	float AttackRange = MinDistance - 50.f ;
 
 	int32 SpecialMax = 2;
 	int32 SpecialStack = 0;		// 맥스 스텟만큼 쌓이면 스페셜 발동
 								// 나중에는 플레이어가 발동하는 스킬로 바꿀 예정
 
 public:	// 스탯 관련
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status)
-	float MAXHP = 1000.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status)
-	float hp = MAXHP;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status)
+	float NormalWalkSpeed = 600.f;
+	float BackStepSpeed = 100.f;
+	float MAXHP = 100.f;
+	float Hp = MAXHP;
 	float MeleeBiteDMG = 30.f;	// 물기 데미지
 
 public:
@@ -79,7 +79,8 @@ public:
 	void InitBoxes();
 
 public:
-	void SetOnDesPawn( );
+	void SetOnSpawn ( );
+	void SetOnDeSpawn( );
 	void OnAttOffProcess();		// 공격 관련 bool값 전부 off
 
 public:	// 기타 함수

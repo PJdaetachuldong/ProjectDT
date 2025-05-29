@@ -55,18 +55,18 @@ void UCWolfAnimInstance::AnimNotify_DesPawn_End ( )
 {
 	if ( !Me ) { return; }
 
-	Me->SetOnDesPawn();
+	Me->SetOnDeSpawn();
 
 }
 
-void UCWolfAnimInstance::AnimNotify_Att_Bite_Start ( )
+void UCWolfAnimInstance::AnimNotify_Wolf_Att_Bite_Start ( )
 {
 	if ( !Me ) { return; }
 
 	Me->IsOnBiteAtt = true;
 }
 
-void UCWolfAnimInstance::AnimNotify_Att_Special_Start ( )
+void UCWolfAnimInstance::AnimNotify_Wolf_Att_Special_Start ( )
 {
 	if ( !Me ) { return; }
 
@@ -74,13 +74,14 @@ void UCWolfAnimInstance::AnimNotify_Att_Special_Start ( )
 	Me->IsOnSpecialAtt = true;
 }
 
-void UCWolfAnimInstance::AnimNotify_Land_End ( )
+void UCWolfAnimInstance::AnimNotify_Wolf_Land_End ( )
 {
+	if ( !FSM ) { return; }
 	FSM->EndAttackProcess ( );
 }
 
 
-void UCWolfAnimInstance::AnimNotify_Att_End ( )
+void UCWolfAnimInstance::AnimNotify_Wolf_Att_End ( )
 {
 	if ( !FSM ) { return; }
 	// FSM->EndAttackProcess();
@@ -104,18 +105,19 @@ void UCWolfAnimInstance::AnimNotify_Att_End ( )
 // FSM에서 하는게 나을지도?
 void UCWolfAnimInstance::Attack1 ( )
 {
-	FSM->UpdateState ( EAttackState::None );
-	FSM->UpdateState ( EUpperState::Jump );
-	FSM->UpdateState ( EJumpState::BackJump );
-	IsJumping = true;
+	 FSM->UpdateState ( EAttackState::None );
+	 FSM->UpdateState ( EUpperState::Idle );
+
+	// FSM->UpdateState ( EUpperState::Jump );
+	// FSM->UpdateState ( EJumpState::BackJump );
+	// IsJumping = true;
 }
 
 void UCWolfAnimInstance::AttackSpecial ( )
 {
-	FSM->EndAttackProcess ( );
+	FSM->UpdateState ( EAttackState::Attack1 );
 
-	// FSM->UpdateState ( EAttackState::None );
-	// FSM->UpdateState (EUpperState::Idle);	// 임시값
-	IsJumping = false;						// 임시2
-	// FSM->TurnToTarget(FSM->TargetEnemy);
+// 	FSM->UpdateState ( EAttackState::None );
+// 	FSM->UpdateState (EUpperState::Idle);	// 임시값
+// 	IsJumping = true;						// 임시2
 }

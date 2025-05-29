@@ -8,6 +8,7 @@
 #include "Character/CPlayer.h"
 #include "Enemy/EnemyBase/CEnemyBase.h"
 #include "Familiar/CWolfAnimInstance.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 UCWolfFSM::UCWolfFSM ( )
@@ -35,6 +36,7 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 {
 	Super::TickComponent ( DeltaTime , TickType , ThisTickFunction );
 
+/*
 #pragma region LogMessageState
 
 // 최상위 스테이트
@@ -51,11 +53,17 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 	FString OverStateStr = UEnum::GetValueAsString ( MOverState );
 	GEngine->AddOnScreenDebugMessage ( 3 , 1 , FColor::Green , OverStateStr );
 
-	FColor IsJumpingColor = Anim->IsJumping ? FColor::Red : FColor::White;
-	FString logMsgIsJumping = FString::Printf ( TEXT ( "IsJumping: %s" ) , Anim->IsJumping ? TEXT ( "True" ) : TEXT ( "False" ) );
-	GEngine->AddOnScreenDebugMessage ( 5 , 1 , IsJumpingColor , logMsgIsJumping );
+// 	FColor IsJumpingColor = Anim->IsJumping ? FColor::Red : FColor::White;
+// 	FString logMsgIsJumping = FString::Printf ( TEXT ( "IsJumping: %s" ) , Anim->IsJumping ? TEXT ( "True" ) : TEXT ( "False" ) );
+// 	GEngine->AddOnScreenDebugMessage ( 5 , 1 , IsJumpingColor , logMsgIsJumping );
 
+	FColor IsOnSpecialColor = Me->IsOnSpecialAtt ? FColor::Red : FColor::White;
+	FString logMsgIsSpecial = FString::Printf ( TEXT ( "IsOnSpecial: %s" ) , Me->IsOnSpecialAtt ? TEXT ( "True" ) : TEXT ( "False" ) );
+	GEngine->AddOnScreenDebugMessage ( 5 , 1 , IsOnSpecialColor , logMsgIsSpecial );
+
+	// GEngine->AddOnScreenDebugMessage ( 6 , 1.0f , FColor::Green , FString::SanitizeFloat ( CurrentTime ) );
 #pragma endregion LogMessageState
+*/
 
 // 최상위 State
 	switch ( MUpState )
@@ -132,14 +140,17 @@ void UCWolfFSM::SpawnFamiliar ( )
 	// ========= 소환 -> 탐지 -> Idle =========
 
 // 소환 파트
-	Me->IsSpawned = true;
-	UpdateState( EUpperState::Start );
+	Me->SetOnSpawn();
 
 // 탐지 파트	// 바로 공격할 때 사용. 대상 지정 필요할때마다 계속 갱신
 	SearchEnemy();
 
 // Idle은 애니메이션 노티파이로 넘길 예정  -  완료
 }
+
+// **********************************************************************************// 
+// *********************************** Idle State ***********************************// 
+// **********************************************************************************// 
 
 void UCWolfFSM::IdleState ( )
 {
@@ -152,29 +163,52 @@ void UCWolfFSM::IdleState ( )
 
 // 탐지, 대상 지정
 	SearchEnemy ( );
-	//타겟이 없을 경우에는 플레이어 쫓아다니는 함수.
-	if ( Me->IsInBattle == false ) { MoveToTarget(Player); }
+//타겟이 없을 경우에는 플레이어 쫓아다니는 함수.
+	if ( Me->IsInBattle == false ) 
+	{
+		MoveToTarget(Player); 
+		return;
+	}
 
-	// 타겟이 있을 경우에는 공격모드.
+// 타겟이 있을 경우에는 공격모드.
+	
+	// 공격 쿨타임 다 참 = 공격 가능 상태 On
+	FVector dir = TargetDir ( TargetEnemy );
+
+
+	// 아직 공격 쿨타임이 차지 않았을 경우
+	if ( CurrentTime < Me->AttackDelayTime )
+	{
+		// 점프해서 빼는것보다 슬슬 뒷걸음질 쳐서 빼는걸로 바꾸고싶음
+		FarFromTarget ( TargetEnemy );
+
+		// 그런데 특정 거리 안으로 들어오면 백점프 시키고 싶음.
+		if ( dir.Size ( ) < Me->JumpDistance )
+		{
+			UpdateState ( EUpperState::Jump );
+			UpdateState ( EJumpState::BackJump );
+			Anim->IsJumping = true;
+		}
+		return;
+	}
+
+	// 위 조건 통과 = 공격 쿨타임 다 참.
+	Me->IsCanAttack = true;
+
+	// 사거리 밖에 있을 경우 에너미를 향해 이동
+	if ( dir.Size ( ) > Me->AttackRange )
+	{
+		MoveToTarget ( TargetEnemy );
+	}
+
+	//사거리 안에 있을 경우 공격
 	else
 	{
-		// 공격 쿨타임 지정
-		if ( CurrentTime > Me->AttackDelayTime )
-		{
-			MoveToTarget ( TargetEnemy );
-			FVector dir = TargetDir ( TargetEnemy );
-
-			//사거리 안에 있을 경우 공격
-			if ( dir.Size() < Me->AttackRange )
-			{
-				CurrentTime = 0.f;
-				DecideAttack ( );
-				OnAttackProcess ( );
-				// UpdateState ( EUpperState::Attack );
-			}
-
-		}
+		DecideAttack ( );
+		OnAttackProcess ( );
+		CurrentTime = 0.f;
 	}
+
 }
 
 void UCWolfFSM::JumpState ( )
@@ -204,9 +238,12 @@ void UCWolfFSM::JumpState ( )
 
 void UCWolfFSM::AttackState ( )
 {
+	if( Me->IsOnSpecialAtt )
+	{
+		// 회전
+		TurnToTarget ( TargetEnemy );
+	}
 
-	// 회전
-		//TurnToTarget ( TargetEnemy );
 
 		// OnAttackProcess ( );
 
@@ -355,12 +392,15 @@ void UCWolfFSM::TurnToTarget ( AActor* target )
 void UCWolfFSM::OnAttackProcess ( )
 {
 // 공격중인 상태로 변환
+
 	UpdateState ( EUpperState::Attack );
 	UpdateState (MAttState);
 }
 
 void UCWolfFSM::EndAttackProcess ( )
 {
+	Me->IsCanAttack = false;
+
 	UpdateState ( EUpperState::Idle );	// 공격 루틴 뒷점프 없앨거면 Idle로
 	UpdateState ( EAttackState::None );
 	UpdateState ( EJumpState::None );
@@ -426,6 +466,7 @@ bool UCWolfFSM::CheckPath ( )
 
 void UCWolfFSM::MoveToTarget ( AActor* target )
 {
+	Me->GetCharacterMovement ( )->MaxWalkSpeed = Me->NormalWalkSpeed;
 
 // 타겟과의 사거리 체크
 	FVector dirToTarget = target->GetActorLocation ( ) - Me->GetActorLocation ( );
@@ -433,9 +474,9 @@ void UCWolfFSM::MoveToTarget ( AActor* target )
 
 	// 사거리가 Max보다 멀어질 경우에는 IsFar = true / Min에 도달하면 false;
 	if ( distToTarget > Me->MaxDistance ) { Me->IsFar = true; }
-	else if ( distToTarget < Me->MinDistance ) { Me->IsFar = false; }
+	else if ( distToTarget < Me->MinDistance - 50.f ) { Me->IsFar = false; }
 
-	// 설정 거리보다 멀다면 플레이어 방향으로 이동.
+	// 설정 거리보다 멀다면 타겟 방향으로 이동.
 	if ( Me->IsFar == true )
 	{
 		dirToTarget.Normalize ( );
@@ -479,5 +520,53 @@ void UCWolfFSM::MoveToTarget ( AActor* target )
 
 	}
 
+}
+
+void UCWolfFSM::FarFromTarget ( AActor* target )
+{
+	Me->GetCharacterMovement ( )->MaxWalkSpeed = Me->BackStepSpeed;
+
+	// 타겟과의 사거리 체크
+	FVector dirFromTarget = Me->GetActorLocation ( ) - target->GetActorLocation ( ); // 방향 반대
+	float distToTarget = dirFromTarget.Size ( );
+
+	// 너무 가까우면 멀어지도록 이동
+	if ( distToTarget < Me->MaxDistance )
+	{
+		dirFromTarget.Normalize ( );
+
+		FHitResult HitResult;
+		FVector Start = Me->GetActorLocation ( );
+		FVector BackwardDir = -Me->GetActorForwardVector ( ); // 뒤쪽 방향
+		FVector End = Start + BackwardDir * 200.0f; // 뒤쪽 200cm 검사
+
+		FCollisionQueryParams TraceParams ( FName ( TEXT ( "ObstacleTrace" ) ) , true , Me );
+		TraceParams.bReturnPhysicalMaterial = false;
+		TraceParams.AddIgnoredActor ( Me ); // 자기 자신 무시
+
+		// DrawDebugLine(GetWorld(), Start, End, FColor::Blue, false, 1.0f, 0, 2.0f);
+
+		bool bHit = GetWorld ( )->LineTraceSingleByChannel ( HitResult , Start , End , ECC_Visibility , TraceParams );
+
+		if ( bHit )
+		{
+			// 장애물이 뒤에 있을 경우
+			FVector AvoidDir = FVector::CrossProduct ( HitResult.Normal , FVector::UpVector ).GetSafeNormal ( );
+
+			// 회피 방향으로 회전
+			FRotator AvoidRotation = AvoidDir.Rotation ( );
+			FRotator CurrentRotation = Me->GetActorRotation ( );
+			FRotator NewRotation = FMath::RInterpTo ( CurrentRotation , AvoidRotation , GetWorld ( )->DeltaTimeSeconds , 5.0f );
+			Me->SetActorRotation ( NewRotation );
+
+			// 회피 방향으로 이동
+			Me->AddMovementInput ( AvoidDir , 1.0f );
+		}
+		else
+		{
+			TurnToTarget ( target );
+			Me->AddMovementInput ( dirFromTarget , 1.0f );
+		}
+	}
 }
 

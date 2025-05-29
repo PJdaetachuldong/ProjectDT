@@ -8,6 +8,7 @@
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
+#include "Enemy/EnemyBase/CEnemyBase.h"
 
 ACFamiliarWolf::ACFamiliarWolf ( )
 {
@@ -59,19 +60,25 @@ void ACFamiliarWolf::Tick ( float DeltaTime )
 {
 	Super::Tick ( DeltaTime );
 
-	if ( IsOnBiteAtt == true)
-	{ AttCollisionBite->SetCollisionEnabled ( ECollisionEnabled::QueryAndPhysics ); }
-	else 
-	{ 
-		HitPawn.Empty ( );	// 공격 사이클이 끝났으니 HitPawn 지워주기
-		AttCollisionBite->SetCollisionEnabled ( ECollisionEnabled::NoCollision ); 
-	}
-	
+
+ 	if ( IsOnBiteAtt == true)
+ 	{ AttCollisionBite->SetCollisionEnabled ( ECollisionEnabled::QueryAndPhysics ); }
+ 	else 
+ 	{ 
+ 		HitPawn.Empty ( );	// 공격 사이클이 끝났으니 HitPawn 지워주기
+ 		AttCollisionBite->SetCollisionEnabled ( ECollisionEnabled::NoCollision ); 
+ 	}
+
+	UCapsuleComponent* CapsuleComp = GetCapsuleComponent ( );
 
 	if ( IsOnSpecialAtt == true )
-	{ GetCapsuleComponent ( )->SetCollisionEnabled ( ECollisionEnabled::NoCollision ); }
+	{
+		CapsuleComp->SetCollisionResponseToChannel ( ECC_Pawn , ECR_Ignore );
+	}
 	else
-	{ GetCapsuleComponent ( )->SetCollisionEnabled ( ECollisionEnabled::QueryAndPhysics ); }
+	{
+		CapsuleComp->SetCollisionResponseToChannel ( ECC_Pawn , ECR_Block );
+	}
 
 }
 
@@ -89,16 +96,31 @@ void ACFamiliarWolf::InitBoxes ( )
 
 }
 
-void ACFamiliarWolf::SetOnDesPawn ( )
+
+
+void ACFamiliarWolf::SetOnSpawn ( )
 {
-	IsCanAttack = false;
+	IsSpawned = true;
+	FSM->UpdateState ( EUpperState::Start );
+}
+
+void ACFamiliarWolf::SetOnDeSpawn ( )
+{
+	IsSpawned = false;
+	OnAttOffProcess();
+
+	FSM->UpdateState ( EUpperState::None );
+	FSM->UpdateState ( EAttackState::None );
+	FSM->UpdateState ( EJumpState::None);
+	FSM->UpdateState ( EOverridenState::None);
 
 }
 
 void ACFamiliarWolf::OnAttOffProcess ( )
 {
+	IsCanAttack = false;
 	IsOnBiteAtt = false;
-	// Me->IsOnSpecialAtt = false;
+	IsOnSpecialAtt = false;
 }
 
 void ACFamiliarWolf::Landed ( const FHitResult& Hit )
