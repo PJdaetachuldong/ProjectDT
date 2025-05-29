@@ -20,7 +20,7 @@ public:
 	class UCDoAction* InDoAction
 	);
 public:
-	virtual void Pressed ( ) {};
+	virtual void Pressed ( );
 	virtual void Released ( ) {};
 
 	UFUNCTION ( BlueprintNativeEvent )

@@ -73,9 +73,7 @@ void UCParryComponent::DetectActor ( )
 		EParryState Quadrant = GetHitQuadrant ( Hit.ImpactPoint );
 
 		HandleTemporaryIgnore ( HitActor );
-		//UE_LOG ( LogTemp , Warning , TEXT ( "Parry State: %s" ) , *UEnum::GetValueAsString ( Quadrant ) );
 		Weapon->OnParry ( Quadrant );
-		//OnParryDetected.Broadcast ( Quadrant );
 	}
 }
 

@@ -20,6 +20,7 @@
 #include "Weapons/CWeaponComponent.h"
 #include "Component/CParryComponent.h"
 #include "Component/CTargetingComponent.h"
+#include "Component/CStatusComponent.h"
 // Sets default values
 ACPlayer::ACPlayer()
 {
@@ -70,6 +71,8 @@ ACPlayer::ACPlayer()
 	CHelpers::CreateActorComponent<UCTrajectoryComponent> ( this , &Trajectory , "Trajectory" );
 	CHelpers::CreateActorComponent<UCParryComponent> ( this , &Parry , "Parry" );
 	CHelpers::CreateActorComponent<UCTargetingComponent> ( this , &TargetComp , "TargetComp" );
+	CHelpers::CreateActorComponent<UCStatusComponent> ( this , &Status , "Status" );
+
 
 	//인풋 받기
 	CHelpers::GetAsset ( &IMC , AssetPaths::IMC );
@@ -84,6 +87,7 @@ ACPlayer::ACPlayer()
 	CHelpers::GetAsset ( &IA_RightAttack , AssetPaths::IA_RightClick );
 	CHelpers::GetAsset ( &IA_SpecialAttack , AssetPaths::IA_SpecialClick );
 	CHelpers::GetAsset ( &IA_Guard , AssetPaths::IA_GuardBtn );
+	CHelpers::GetAsset ( &IA_Heal , AssetPaths::IA_Heal );
 
 	CHelpers::GetAsset ( &IA_TestBtn , AssetPaths::IA_Test );
 	CHelpers::GetAsset ( &IA_TestBtn2 , AssetPaths::IA_Test2 );
@@ -94,7 +98,7 @@ void ACPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	Movement->OnRun ( );
-	//Movement->DisableControlRotation ( );
+	//Movement->EnableControlRotation ( );
 	APlayerController* PC = Cast<APlayerController> ( GetController ( ) );
 	UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem> ( PC->GetLocalPlayer ( ) );
 	subSys->AddMappingContext ( IMC , 0 );
@@ -107,6 +111,8 @@ void ACPlayer::BeginPlay()
 void ACPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	GEngine->AddOnScreenDebugMessage ( -1 , 0.0f , FColor::Green ,
+	FString::Printf ( TEXT ( "Health: %.1f | Mana: %.1f" ) , Status->GetHealth() , Status->GetMana()) );
 }
 
 // Called to bind functionality to input
@@ -124,7 +130,7 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction ( IA_Dash , ETriggerEvent::Completed , Movement , &UCMovementComponent::OnRun);
 		playerInput->BindAction ( IA_Avoid , ETriggerEvent::Completed , this , &ACPlayer::OnAvoid );
 		//playerInput->BindAction ( IA_Avoid , ETriggerEvent::Completed , TargetComp , &UCTargetingComponent::OnLookOn );
-		playerInput->BindAction ( IA_Jump , ETriggerEvent::Completed , this , &ACPlayer::Jump );
+		//playerInput->BindAction ( IA_Jump , ETriggerEvent::Completed , this , &ACPlayer::Jump );
 		playerInput->BindAction ( IA_LeftAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoAction );
 		playerInput->BindAction ( IA_RightAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoHeavyAction );
 		playerInput->BindAction ( IA_SpecialAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::SubAction_Skill_Pressed );
@@ -134,6 +140,7 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		playerInput->BindAction ( IA_TestBtn , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SetKatanaMode );
 		playerInput->BindAction ( IA_TestBtn2 , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SetGreatSwordMode );
+		playerInput->BindAction ( IA_Heal , ETriggerEvent::Started , this , &ACPlayer::Healing );
 	}
 }
 
@@ -154,8 +161,25 @@ void ACPlayer::OnAvoid ( )
 
 void ACPlayer::BackStep ()
 {
+	FVector InputDir = GetCharacterMovement ( )->GetLastInputVector ( );
 
-	Montages->PlayBackStepMode ();
+	if ( !InputDir.IsNearlyZero ( ) ) {
+		// 방향을 바라보게 회전
+		FRotator NewRotation = InputDir.Rotation ( );
+		NewRotation.Pitch = 0;
+		NewRotation.Roll = 0;
+		SetActorRotation ( NewRotation );
+
+		// 루트 모션 구르기 애니메이션 재생
+		Montages->PlayBackStepMode ();
+	}
+}
+
+void ACPlayer::Healing ( )
+{
+	Montages->PlayHealingMode ( );
+	Status->Damage ( 50 );
+	Status->UseMana ( 20 );
 }
 
 void ACPlayer::Jump ( ){
@@ -168,7 +192,7 @@ void ACPlayer::OnParryDetected ( EParryState ParryDirection )
 }
 
 void ACPlayer::End_BackStep() {
-	//Movement->DisableControlRotation ( );
 
 	State->SetIdleMode ( );
+	CLog::Log ( "End_BackStep");
 }

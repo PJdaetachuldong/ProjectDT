@@ -2,8 +2,9 @@
 
 
 #include "Notifies/CAnimNotify_EndState.h"
-#include "Utilities/CHelper.h"
+#include "Global.h"
 #include "Character/ICharacter.h"
+#include "Component/CStateComponent.h"
 
 FString UCAnimNotify_EndState::GetNotifyName_Implementation ( ) const
 {
@@ -17,8 +18,12 @@ void UCAnimNotify_EndState::Notify ( USkeletalMeshComponent* Meshcomp , UAnimSeq
 	CheckNull ( Meshcomp->GetOwner ( ) );
 
 	IICharacter* character = Cast<IICharacter> ( Meshcomp->GetOwner ( ) );
+	ACharacter* Owner = Cast<ACharacter> ( Meshcomp->GetOwner ( ) );
 	CheckNull ( character );
-
+	CheckNull ( Owner );
+	StateType=CHelpers::GetComponent<UCStateComponent> ( Owner )->GetStateType();
+	UE_LOG ( LogTemp , Warning , TEXT ( "StateType: %s" ) ,
+		*UEnum::GetValueAsString ( StateType ) );
 	switch ( StateType )
 	{
 	case EStateType::Idle:

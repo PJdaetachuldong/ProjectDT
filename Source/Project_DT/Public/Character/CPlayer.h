@@ -34,6 +34,10 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere)
 	class UCTargetingComponent* TargetComp;
+
+	UPROPERTY(VisibleAnywhere)
+	class UCStatusComponent* Status;
+
 public:
 	UPROPERTY(VisibleAnywhere)
 	class UCMovementComponent* Movement;
@@ -66,6 +70,10 @@ public:
 	class UInputAction* IA_SpecialAttack;
 	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
 	class UInputAction* IA_Guard;
+	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
+	class UInputAction* IA_Heal;
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UInputMappingContext* IMC;
 
@@ -91,6 +99,8 @@ private:
 	void OnAvoid();
 private:
 	void BackStep();
+private:
+	void Healing ( );
 private:
 	void Jump();
 private:

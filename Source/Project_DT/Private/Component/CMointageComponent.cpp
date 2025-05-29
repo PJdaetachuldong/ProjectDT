@@ -34,7 +34,7 @@ void UCMointageComponent::BeginPlay ( )
 	{
 		for ( FMontagesData* data : datas )
 		{
-			if ( (EStateType)i == data->Type )
+			if ( (EActState)i == data->Type )
 			{
 				Datas[i] = data;
 
@@ -71,17 +71,28 @@ void UCMointageComponent::TickComponent ( float DeltaTime , ELevelTick TickType 
 
 void UCMointageComponent::PlayBackStepMode ( )
 {
-	PlayAnimMontage ( EStateType::BackStep );
-
+	PlayAnimMontage ( EActState::DodgeF );
 }
 
 void UCMointageComponent::PlayDeadMode ( )
 {
-	PlayAnimMontage ( EStateType::Dead );
+	PlayAnimMontage ( EActState::Dead );
 
 }
 
-void UCMointageComponent::PlayAnimMontage ( EStateType InType )
+void UCMointageComponent::PlayEquipMode ( )
+{
+	PlayAnimMontage ( EActState::Equip );
+
+}
+
+void UCMointageComponent::PlayHealingMode ( )
+{
+	PlayAnimMontage ( EActState::Healing );
+
+}
+
+void UCMointageComponent::PlayAnimMontage ( EActState InType )
 {
 	CheckNull ( OwnerCharacter );
 

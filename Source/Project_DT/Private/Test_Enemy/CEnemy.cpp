@@ -18,7 +18,7 @@ ACEnemy::ACEnemy ( )
 	CHelpers::CreateActorComponent<UCMointageComponent> ( this , &Montages , "Montages" );
 	//CHelpers::CreateActorComponent<UCMovementComponent> ( this , &Movement , "Movement" );
 	CHelpers::CreateActorComponent<UCStateComponent> ( this , &State , "State" );
-	CHelpers::CreateActorComponent<UCWeaponComponent> ( this , &Weapon , "Weapon" );
+	//CHelpers::CreateActorComponent<UCWeaponComponent> ( this , &Weapon , "Weapon" );
 	//CHelpers::CreateActorComponent<UCStatusComponent> ( this , &Status , "Status" );
 
 
@@ -49,7 +49,8 @@ void ACEnemy::BeginPlay ( )
 
 	State->OnStateTypeChanged.AddDynamic ( this , &ACEnemy::OnStateTypeChanged );
 	//Weapon->SetKatanaMode();
-	Weapon->SetGreatSwordMode ( );
+	//Weapon->SetGreatSwordMode ( );
+	//Weapon->SetUnarmedMode ( );
 
 }
 
@@ -81,7 +82,7 @@ float ACEnemy::TakeDamage ( float DamageAmount , struct FDamageEvent const& Dama
 	CLog::Log ( Damage.Power );
 
 	//State->SetHittedMode ( );
-	Weapon->SetKatanaMode ( );
+	//Weapon->SetKatanaMode ( );
 
 	return damage;
 }
