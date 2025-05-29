@@ -51,11 +51,10 @@ public:	// 스탯 관련
 								// 나중에는 플레이어가 발동하는 스킬로 바꿀 예정
 
 public:	// 스탯 관련
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status)
-	float MAXHP = 1000.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status)
-	float hp = MAXHP;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status)
+	float NormalWalkSpeed = 600.f;
+	float BackStepSpeed = 200.f;
+	float MAXHP = 100.f;
+	float Hp = MAXHP;
 	float MeleeBiteDMG = 30.f;	// 물기 데미지
 
 public:
@@ -79,7 +78,8 @@ public:
 	void InitBoxes();
 
 public:
-	void SetOnDesPawn( );
+	void SetOnSpawn ( );
+	void SetOnDeSpawn( );
 	void OnAttOffProcess();		// 공격 관련 bool값 전부 off
 
 public:	// 기타 함수

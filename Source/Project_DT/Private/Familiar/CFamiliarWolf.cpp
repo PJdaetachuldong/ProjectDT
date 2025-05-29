@@ -95,14 +95,29 @@ void ACFamiliarWolf::InitBoxes ( )
 
 }
 
-void ACFamiliarWolf::SetOnDesPawn ( )
+
+
+void ACFamiliarWolf::SetOnSpawn ( )
 {
-	IsCanAttack = false;
+	IsSpawned = true;
+	FSM->UpdateState ( EUpperState::Start );
+}
+
+void ACFamiliarWolf::SetOnDeSpawn ( )
+{
+	IsSpawned = false;
+	OnAttOffProcess();
+
+	FSM->UpdateState ( EUpperState::None );
+	FSM->UpdateState ( EAttackState::None );
+	FSM->UpdateState ( EJumpState::None);
+	FSM->UpdateState ( EOverridenState::None);
 
 }
 
 void ACFamiliarWolf::OnAttOffProcess ( )
 {
+	IsCanAttack = false;
 	IsOnBiteAtt = false;
 	IsOnSpecialAtt = false;
 }

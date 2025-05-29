@@ -8,6 +8,7 @@
 #include "Character/CPlayer.h"
 #include "Enemy/EnemyBase/CEnemyBase.h"
 #include "Familiar/CWolfAnimInstance.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 UCWolfFSM::UCWolfFSM ( )
@@ -136,14 +137,17 @@ void UCWolfFSM::SpawnFamiliar ( )
 	// ========= 소환 -> 탐지 -> Idle =========
 
 // 소환 파트
-	Me->IsSpawned = true;
-	UpdateState( EUpperState::Start );
+	Me->SetOnSpawn();
 
 // 탐지 파트	// 바로 공격할 때 사용. 대상 지정 필요할때마다 계속 갱신
 	SearchEnemy();
 
 // Idle은 애니메이션 노티파이로 넘길 예정  -  완료
 }
+
+// **********************************************************************************// 
+// *********************************** Idle State ***********************************// 
+// **********************************************************************************// 
 
 void UCWolfFSM::IdleState ( )
 {
@@ -158,29 +162,47 @@ void UCWolfFSM::IdleState ( )
 	SearchEnemy ( );
 //타겟이 없을 경우에는 플레이어 쫓아다니는 함수.
 	if ( Me->IsInBattle == false ) 
-	{ 
+	{
+		Me->GetCharacterMovement ( )->MaxWalkSpeed = Me->NormalWalkSpeed;
 		MoveToTarget(Player); 
 		return;
 	}
 
 // 타겟이 있을 경우에는 공격모드.
 	
-	// 공격 쿨타임 지정
+	// 공격 쿨타임 다 참 = 공격 가능 상태 On
+	FVector dir = TargetDir ( TargetEnemy );
+
 	if ( CurrentTime > Me->AttackDelayTime )
-	{
-		MoveToTarget ( TargetEnemy );
-		FVector dir = TargetDir ( TargetEnemy );
+	{ 
+		Me->GetCharacterMovement ( )->MaxWalkSpeed = Me->NormalWalkSpeed;
+		Me->IsCanAttack = true; 
+	}
+
+	
+	else // 아직 공격 쿨타임이 차지 않았을 경우
+	{ 
+		// 점프해서 빼는것보다 슬슬 뒷걸음질 쳐서 빼는걸로 바꾸고싶음
+		Me->GetCharacterMovement ( )->MaxWalkSpeed = Me->BackStepSpeed;
+		FarFromTarget(TargetEnemy);
+		// 그런데 특정 거리 안으로 들어오면 백점프 시키고 싶음.
+		return; 
+	}
+
 
 		//사거리 안에 있을 경우 공격
 		if ( dir.Size() < Me->AttackRange )
 		{
-			CurrentTime = 0.f;
 			DecideAttack ( );
 			OnAttackProcess ( );
-			// UpdateState ( EUpperState::Attack );
+			CurrentTime = 0.f;
+		}
+		else
+		{
+			MoveToTarget ( TargetEnemy );
 		}
 
-	}
+
 	
 }
 
@@ -490,5 +512,63 @@ void UCWolfFSM::MoveToTarget ( AActor* target )
 
 	}
 
+}
+
+void UCWolfFSM::FarFromTarget ( AActor* target )
+{
+	// 타겟과의 사거리 체크
+	FVector dirFromTarget = Me->GetActorLocation ( ) - target->GetActorLocation ( ); // 방향 반대
+	float distToTarget = dirFromTarget.Size ( );
+
+	// 사거리가 Min보다 가까우면 IsTooClose = true, Max 이상이면 false;
+	if ( distToTarget < Me->MinDistance ) { Me->IsFar = false; }
+	else if ( distToTarget > Me->MaxDistance ) { Me->IsFar = true; }
+
+	// 너무 가까우면 멀어지도록 이동
+	if ( ! Me->IsFar )
+	{
+		dirFromTarget.Normalize ( );
+
+		FHitResult HitResult;
+		FVector Start = Me->GetActorLocation ( );
+		FVector BackwardDir = -Me->GetActorForwardVector ( ); // 뒤쪽 방향
+		FVector End = Start + BackwardDir * 200.0f; // 뒤쪽 200cm 검사
+
+		FCollisionQueryParams TraceParams ( FName ( TEXT ( "ObstacleTrace" ) ) , true , Me );
+		TraceParams.bReturnPhysicalMaterial = false;
+		TraceParams.AddIgnoredActor ( Me ); // 자기 자신 무시
+
+		// DrawDebugLine(GetWorld(), Start, End, FColor::Blue, false, 1.0f, 0, 2.0f);
+
+		bool bHit = GetWorld ( )->LineTraceSingleByChannel ( HitResult , Start , End , ECC_Visibility , TraceParams );
+
+		if ( bHit )
+		{
+			// 장애물이 뒤에 있을 경우
+			FVector AvoidDir = FVector::CrossProduct ( HitResult.Normal , FVector::UpVector ).GetSafeNormal ( );
+
+			// 회피 방향으로 회전
+			FRotator AvoidRotation = AvoidDir.Rotation ( );
+			FRotator CurrentRotation = Me->GetActorRotation ( );
+			FRotator NewRotation = FMath::RInterpTo ( CurrentRotation , AvoidRotation , GetWorld ( )->DeltaTimeSeconds , 5.0f );
+			Me->SetActorRotation ( NewRotation );
+
+			// 회피 방향으로 이동
+			Me->AddMovementInput ( AvoidDir , 1.0f );
+		}
+		else
+		{
+			TurnToTarget ( target );
+			/*
+			// 타겟에게서 멀어지는 방향으로 이동
+			FRotator AwayRotation = dirFromTarget.Rotation ( );
+			FRotator CurrentRotation = Me->GetActorRotation ( );
+			FRotator NewRotation = FMath::RInterpTo ( CurrentRotation , AwayRotation , GetWorld ( )->DeltaTimeSeconds , 5.0f );
+			Me->SetActorRotation ( NewRotation );
+			*/
+
+			Me->AddMovementInput ( dirFromTarget , 1.0f );
+		}
+	}
 }
 

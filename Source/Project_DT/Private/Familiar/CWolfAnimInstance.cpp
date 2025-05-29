@@ -55,7 +55,7 @@ void UCWolfAnimInstance::AnimNotify_DesPawn_End ( )
 {
 	if ( !Me ) { return; }
 
-	Me->SetOnDesPawn();
+	Me->SetOnDeSpawn();
 
 }
 

@@ -148,5 +148,6 @@ public:	// 이동 관련 함수
 	bool CheckPath();
 	FVector TargetDir ( AActor* target );		// 타겟 Dir 구하기
 	void MoveToTarget( AActor* target );		// 타겟 방향으로 이동하기
+	void FarFromTarget ( AActor* target );		// 타겟 방향에서 멀어지기
 	void TurnToTarget( AActor* target );		// 타겟 방향으로 몸 돌리기
 };
