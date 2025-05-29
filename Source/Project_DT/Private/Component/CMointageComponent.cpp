@@ -71,7 +71,7 @@ void UCMointageComponent::TickComponent ( float DeltaTime , ELevelTick TickType 
 
 void UCMointageComponent::PlayBackStepMode ( )
 {
-	PlayAnimMontage ( EActState::Dodge );
+	PlayAnimMontage ( EActState::DodgeF );
 }
 
 void UCMointageComponent::PlayDeadMode ( )

@@ -6,10 +6,10 @@
 #include "Components/ActorComponent.h"
 #include "CStateComponent.h"
 #include "CMointageComponent.generated.h"
-UENUM()
+UENUM ( )
 enum class EActState : uint8
 {
-	Dodge , Healing , Equip,Dead,Hit ,Max
+	DodgeF , DodgeB , DodgeL, DodgeR, DodgeFL, DodgeFR, DodgeBL, DodgeBR , Healing , Equip , Dead , Hit , Max
 };
 
 USTRUCT()

@@ -98,7 +98,7 @@ void ACPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	Movement->OnRun ( );
-	//Movement->DisableControlRotation ( );
+	//Movement->EnableControlRotation ( );
 	APlayerController* PC = Cast<APlayerController> ( GetController ( ) );
 	UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem> ( PC->GetLocalPlayer ( ) );
 	subSys->AddMappingContext ( IMC , 0 );
@@ -161,8 +161,18 @@ void ACPlayer::OnAvoid ( )
 
 void ACPlayer::BackStep ()
 {
+	FVector InputDir = GetCharacterMovement ( )->GetLastInputVector ( );
 
-	Montages->PlayBackStepMode ();
+	if ( !InputDir.IsNearlyZero ( ) ) {
+		// 방향을 바라보게 회전
+		FRotator NewRotation = InputDir.Rotation ( );
+		NewRotation.Pitch = 0;
+		NewRotation.Roll = 0;
+		SetActorRotation ( NewRotation );
+
+		// 루트 모션 구르기 애니메이션 재생
+		Montages->PlayBackStepMode ();
+	}
 }
 
 void ACPlayer::Healing ( )
@@ -182,7 +192,7 @@ void ACPlayer::OnParryDetected ( EParryState ParryDirection )
 }
 
 void ACPlayer::End_BackStep() {
-	//Movement->DisableControlRotation ( );
 
 	State->SetIdleMode ( );
+	CLog::Log ( "End_BackStep");
 }

@@ -1,4 +1,3 @@
 ,Type,Montage,PlayRate
-1,BackStep,AnimMontage'/Game/LHW/Asset/GhostSamurai_Bundle/GhostSamurai_Bundle/GhostSamurai/Katana/Apose/Dodge/Root/GhostSamurai_APose_Slide_F_Root_Montage.GhostSamurai_APose_Slide_F_Root_Montage',1
-2,Equp,AnimMontage'/Game/Buff_01_Seq_Montage.Buff_01_Seq_Montage',1
-3,Heal,AnimMontage'/Game/Potion_02_Seq_Montage.Potion_02_Seq_Montage',1
+1,Healing,AnimMontage'/Game/LHW/LittleGirlEllie/Potion_02_Seq_Montage.Potion_02_Seq_Montage',1
+2,DodgeF,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/Dodge_F.Dodge_F',1
