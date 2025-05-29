@@ -20,6 +20,7 @@
 #include "Weapons/CWeaponComponent.h"
 #include "Component/CParryComponent.h"
 #include "Component/CTargetingComponent.h"
+#include "Component/CStatusComponent.h"
 // Sets default values
 ACPlayer::ACPlayer()
 {
@@ -70,6 +71,8 @@ ACPlayer::ACPlayer()
 	CHelpers::CreateActorComponent<UCTrajectoryComponent> ( this , &Trajectory , "Trajectory" );
 	CHelpers::CreateActorComponent<UCParryComponent> ( this , &Parry , "Parry" );
 	CHelpers::CreateActorComponent<UCTargetingComponent> ( this , &TargetComp , "TargetComp" );
+	CHelpers::CreateActorComponent<UCStatusComponent> ( this , &Status , "Status" );
+
 
 	//인풋 받기
 	CHelpers::GetAsset ( &IMC , AssetPaths::IMC );
@@ -108,6 +111,8 @@ void ACPlayer::BeginPlay()
 void ACPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	GEngine->AddOnScreenDebugMessage ( -1 , 0.0f , FColor::Green ,
+	FString::Printf ( TEXT ( "Health: %.1f | Mana: %.1f" ) , Status->GetHealth() , Status->GetMana()) );
 }
 
 // Called to bind functionality to input
@@ -125,7 +130,7 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction ( IA_Dash , ETriggerEvent::Completed , Movement , &UCMovementComponent::OnRun);
 		playerInput->BindAction ( IA_Avoid , ETriggerEvent::Completed , this , &ACPlayer::OnAvoid );
 		//playerInput->BindAction ( IA_Avoid , ETriggerEvent::Completed , TargetComp , &UCTargetingComponent::OnLookOn );
-		playerInput->BindAction ( IA_Jump , ETriggerEvent::Completed , this , &ACPlayer::Jump );
+		//playerInput->BindAction ( IA_Jump , ETriggerEvent::Completed , this , &ACPlayer::Jump );
 		playerInput->BindAction ( IA_LeftAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoAction );
 		playerInput->BindAction ( IA_RightAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoHeavyAction );
 		playerInput->BindAction ( IA_SpecialAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::SubAction_Skill_Pressed );
@@ -135,7 +140,7 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		playerInput->BindAction ( IA_TestBtn , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SetKatanaMode );
 		playerInput->BindAction ( IA_TestBtn2 , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SetGreatSwordMode );
-		playerInput->BindAction ( IA_Heal , ETriggerEvent::Completed , Montages , &UCMointageComponent::PlayHealingMode );
+		playerInput->BindAction ( IA_Heal , ETriggerEvent::Started , this , &ACPlayer::Healing );
 	}
 }
 
@@ -158,6 +163,13 @@ void ACPlayer::BackStep ()
 {
 
 	Montages->PlayBackStepMode ();
+}
+
+void ACPlayer::Healing ( )
+{
+	Montages->PlayHealingMode ( );
+	Status->Damage ( 50 );
+	Status->UseMana ( 20 );
 }
 
 void ACPlayer::Jump ( ){

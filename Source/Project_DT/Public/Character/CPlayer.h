@@ -34,6 +34,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	class UCTargetingComponent* TargetComp;
+
+	UPROPERTY(VisibleAnywhere)
+	class UCStatusComponent* Status;
+
 public:
 	UPROPERTY(VisibleAnywhere)
 	class UCMovementComponent* Movement;
@@ -95,6 +99,8 @@ private:
 	void OnAvoid();
 private:
 	void BackStep();
+private:
+	void Healing ( );
 private:
 	void Jump();
 private:
