@@ -105,10 +105,12 @@ void UCWolfAnimInstance::AnimNotify_Wolf_Att_End ( )
 // FSM에서 하는게 나을지도?
 void UCWolfAnimInstance::Attack1 ( )
 {
-	FSM->UpdateState ( EAttackState::None );
-	FSM->UpdateState ( EUpperState::Jump );
-	FSM->UpdateState ( EJumpState::BackJump );
-	IsJumping = true;
+	 FSM->UpdateState ( EAttackState::None );
+	 FSM->UpdateState ( EUpperState::Idle );
+
+	// FSM->UpdateState ( EUpperState::Jump );
+	// FSM->UpdateState ( EJumpState::BackJump );
+	// IsJumping = true;
 }
 
 void UCWolfAnimInstance::AttackSpecial ( )

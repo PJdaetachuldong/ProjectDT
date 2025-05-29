@@ -60,6 +60,7 @@ void ACFamiliarWolf::Tick ( float DeltaTime )
 {
 	Super::Tick ( DeltaTime );
 
+
  	if ( IsOnBiteAtt == true)
  	{ AttCollisionBite->SetCollisionEnabled ( ECollisionEnabled::QueryAndPhysics ); }
  	else 

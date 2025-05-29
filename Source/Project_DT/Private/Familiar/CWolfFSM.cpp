@@ -60,6 +60,7 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 	FString logMsgIsSpecial = FString::Printf ( TEXT ( "IsOnSpecial: %s" ) , Me->IsOnSpecialAtt ? TEXT ( "True" ) : TEXT ( "False" ) );
 	GEngine->AddOnScreenDebugMessage ( 5 , 1 , IsOnSpecialColor , logMsgIsSpecial );
 
+	GEngine->AddOnScreenDebugMessage ( 6 , 1.0f , FColor::Green , FString::SanitizeFloat ( CurrentTime ) );
 #pragma endregion LogMessageState
 
 // 최상위 State
@@ -163,7 +164,6 @@ void UCWolfFSM::IdleState ( )
 //타겟이 없을 경우에는 플레이어 쫓아다니는 함수.
 	if ( Me->IsInBattle == false ) 
 	{
-		Me->GetCharacterMovement ( )->MaxWalkSpeed = Me->NormalWalkSpeed;
 		MoveToTarget(Player); 
 		return;
 	}
@@ -173,37 +173,41 @@ void UCWolfFSM::IdleState ( )
 	// 공격 쿨타임 다 참 = 공격 가능 상태 On
 	FVector dir = TargetDir ( TargetEnemy );
 
-	if ( CurrentTime > Me->AttackDelayTime )
-	{ 
-		Me->GetCharacterMovement ( )->MaxWalkSpeed = Me->NormalWalkSpeed;
-		Me->IsCanAttack = true; 
-	}
 
-	
-	else // 아직 공격 쿨타임이 차지 않았을 경우
-	{ 
+	// 아직 공격 쿨타임이 차지 않았을 경우
+	if ( CurrentTime < Me->AttackDelayTime )
+	{
 		// 점프해서 빼는것보다 슬슬 뒷걸음질 쳐서 빼는걸로 바꾸고싶음
-		Me->GetCharacterMovement ( )->MaxWalkSpeed = Me->BackStepSpeed;
-		FarFromTarget(TargetEnemy);
+		FarFromTarget ( TargetEnemy );
+
 		// 그런데 특정 거리 안으로 들어오면 백점프 시키고 싶음.
-		return; 
+		if ( dir.Size ( ) < Me->JumpDistance )
+		{
+			UpdateState ( EUpperState::Jump );
+			UpdateState ( EJumpState::BackJump );
+			Anim->IsJumping = true;
+		}
+		return;
 	}
 
+	// 위 조건 통과 = 공격 쿨타임 다 참.
+	Me->IsCanAttack = true;
 
-		//사거리 안에 있을 경우 공격
-		if ( dir.Size() < Me->AttackRange )
-		{
-			DecideAttack ( );
-			OnAttackProcess ( );
-			CurrentTime = 0.f;
-		}
-		else
-		{
-			MoveToTarget ( TargetEnemy );
-		}
+	// 사거리 밖에 있을 경우 에너미를 향해 이동
+	if ( dir.Size ( ) >= Me->AttackRange )
+	{
+		MoveToTarget ( TargetEnemy );
+		return;
+	}
 
+	//사거리 안에 있을 경우 공격
+	else
+	{
+		DecideAttack ( );
+		OnAttackProcess ( );
+		CurrentTime = 0.f;
+	}
 
-	
 }
 
 void UCWolfFSM::JumpState ( )
@@ -394,6 +398,8 @@ void UCWolfFSM::OnAttackProcess ( )
 
 void UCWolfFSM::EndAttackProcess ( )
 {
+	Me->IsCanAttack = false;
+
 	UpdateState ( EUpperState::Idle );	// 공격 루틴 뒷점프 없앨거면 Idle로
 	UpdateState ( EAttackState::None );
 	UpdateState ( EJumpState::None );
@@ -459,6 +465,7 @@ bool UCWolfFSM::CheckPath ( )
 
 void UCWolfFSM::MoveToTarget ( AActor* target )
 {
+	Me->GetCharacterMovement ( )->MaxWalkSpeed = Me->NormalWalkSpeed;
 
 // 타겟과의 사거리 체크
 	FVector dirToTarget = target->GetActorLocation ( ) - Me->GetActorLocation ( );
@@ -468,7 +475,7 @@ void UCWolfFSM::MoveToTarget ( AActor* target )
 	if ( distToTarget > Me->MaxDistance ) { Me->IsFar = true; }
 	else if ( distToTarget < Me->MinDistance ) { Me->IsFar = false; }
 
-	// 설정 거리보다 멀다면 플레이어 방향으로 이동.
+	// 설정 거리보다 멀다면 타겟 방향으로 이동.
 	if ( Me->IsFar == true )
 	{
 		dirToTarget.Normalize ( );
@@ -516,16 +523,14 @@ void UCWolfFSM::MoveToTarget ( AActor* target )
 
 void UCWolfFSM::FarFromTarget ( AActor* target )
 {
+	Me->GetCharacterMovement ( )->MaxWalkSpeed = Me->BackStepSpeed;
+
 	// 타겟과의 사거리 체크
 	FVector dirFromTarget = Me->GetActorLocation ( ) - target->GetActorLocation ( ); // 방향 반대
 	float distToTarget = dirFromTarget.Size ( );
 
-	// 사거리가 Min보다 가까우면 IsTooClose = true, Max 이상이면 false;
-	if ( distToTarget < Me->MinDistance ) { Me->IsFar = false; }
-	else if ( distToTarget > Me->MaxDistance ) { Me->IsFar = true; }
-
 	// 너무 가까우면 멀어지도록 이동
-	if ( ! Me->IsFar )
+	if ( distToTarget < Me->MinDistance )
 	{
 		dirFromTarget.Normalize ( );
 
@@ -559,14 +564,6 @@ void UCWolfFSM::FarFromTarget ( AActor* target )
 		else
 		{
 			TurnToTarget ( target );
-			/*
-			// 타겟에게서 멀어지는 방향으로 이동
-			FRotator AwayRotation = dirFromTarget.Rotation ( );
-			FRotator CurrentRotation = Me->GetActorRotation ( );
-			FRotator NewRotation = FMath::RInterpTo ( CurrentRotation , AwayRotation , GetWorld ( )->DeltaTimeSeconds , 5.0f );
-			Me->SetActorRotation ( NewRotation );
-			*/
-
 			Me->AddMovementInput ( dirFromTarget , 1.0f );
 		}
 	}

@@ -29,9 +29,6 @@ public:	// 수치값
 
 public:	// 불형 체크
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM_Move")
-	bool IsSpawned = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM_Move")
 	bool IsJumping = false;
 
 public://FSM State 관련

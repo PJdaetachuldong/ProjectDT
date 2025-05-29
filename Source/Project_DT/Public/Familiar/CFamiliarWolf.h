@@ -43,8 +43,9 @@ public:	// 스탯 관련
 	float MoveMentSpeed = 300.f;
 	float MaxDistance = 400.f;
 	float MinDistance = 200.f;
+	float JumpDistance = 100.f;
 
-	float AttackRange = MinDistance;
+	float AttackRange = 100.f;
 
 	int32 SpecialMax = 2;
 	int32 SpecialStack = 0;		// 맥스 스텟만큼 쌓이면 스페셜 발동
@@ -52,7 +53,7 @@ public:	// 스탯 관련
 
 public:	// 스탯 관련
 	float NormalWalkSpeed = 600.f;
-	float BackStepSpeed = 200.f;
+	float BackStepSpeed = 100.f;
 	float MAXHP = 100.f;
 	float Hp = MAXHP;
 	float MeleeBiteDMG = 30.f;	// 물기 데미지
