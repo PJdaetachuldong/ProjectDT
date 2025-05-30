@@ -21,6 +21,7 @@
 #include "Component/CParryComponent.h"
 #include "Component/CTargetingComponent.h"
 #include "Component/CStatusComponent.h"
+#include "Component/CPerfectDodgeComponent.h"
 // Sets default values
 ACPlayer::ACPlayer()
 {
@@ -70,8 +71,10 @@ ACPlayer::ACPlayer()
 	CHelpers::CreateActorComponent<UCStateComponent> ( this , &State , "State" );
 	CHelpers::CreateActorComponent<UCTrajectoryComponent> ( this , &Trajectory , "Trajectory" );
 	CHelpers::CreateActorComponent<UCParryComponent> ( this , &Parry , "Parry" );
+	CHelpers::CreateActorComponent<UCPerfectDodgeComponent> ( this , &Dodge, "Dodge" );
 	CHelpers::CreateActorComponent<UCTargetingComponent> ( this , &TargetComp , "TargetComp" );
 	CHelpers::CreateActorComponent<UCStatusComponent> ( this , &Status , "Status" );
+
 
 
 	//인풋 받기
@@ -163,7 +166,6 @@ void ACPlayer::BackStep ()
 {
 	FVector InputDir = GetCharacterMovement ( )->GetLastInputVector ( );
 
-	if ( !InputDir.IsNearlyZero ( ) ) {
 		// 방향을 바라보게 회전
 		FRotator NewRotation = InputDir.Rotation ( );
 		NewRotation.Pitch = 0;
@@ -172,7 +174,8 @@ void ACPlayer::BackStep ()
 
 		// 루트 모션 구르기 애니메이션 재생
 		Montages->PlayBackStepMode ();
-	}
+		//Montages->PlayPerfectDodgeL ();
+
 }
 
 void ACPlayer::Healing ( )

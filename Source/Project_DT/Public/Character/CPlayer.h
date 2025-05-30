@@ -31,6 +31,9 @@ private:
 public:
 	UPROPERTY(VisibleAnywhere)
 	class UCParryComponent* Parry;
+
+	UPROPERTY(VisibleAnywhere)
+	class UCPerfectDodgeComponent* Dodge;
 private:
 	UPROPERTY(VisibleAnywhere)
 	class UCTargetingComponent* TargetComp;

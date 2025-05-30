@@ -92,6 +92,17 @@ void UCMointageComponent::PlayHealingMode ( )
 
 }
 
+void UCMointageComponent::PlayPerfectDodgeL()
+{
+	PlayAnimMontage(EActState::PDodgeL);
+
+}
+
+void UCMointageComponent::PlayPerfectDodgeR()
+{
+	PlayAnimMontage(EActState::PDodgeR);
+}
+
 void UCMointageComponent::PlayAnimMontage ( EActState InType )
 {
 	CheckNull ( OwnerCharacter );

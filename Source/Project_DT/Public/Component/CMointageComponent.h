@@ -9,7 +9,7 @@
 UENUM ( )
 enum class EActState : uint8
 {
-	DodgeF , DodgeB , DodgeL, DodgeR, DodgeFL, DodgeFR, DodgeBL, DodgeBR , Healing , Equip , Dead , Hit , Max
+	Healing,DodgeF, PDodgeL, PDodgeR , DodgeB , DodgeL, DodgeR, DodgeFL, DodgeFR, DodgeBL, DodgeBR , Equip , Dead , Hit , Max
 };
 
 USTRUCT()
@@ -52,6 +52,8 @@ public:
 	void PlayDeadMode();
 	void PlayEquipMode ( );
 	void PlayHealingMode ( );
+	void PlayPerfectDodgeL ( );
+	void PlayPerfectDodgeR ( );
 
 private:
 	void PlayAnimMontage( EActState InType);
