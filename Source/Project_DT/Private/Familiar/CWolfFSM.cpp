@@ -36,7 +36,7 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 {
 	Super::TickComponent ( DeltaTime , TickType , ThisTickFunction );
 
-/*
+
 #pragma region LogMessageState
 
 // 최상위 스테이트
@@ -63,7 +63,7 @@ void UCWolfFSM::TickComponent ( float DeltaTime , ELevelTick TickType , FActorCo
 
 	// GEngine->AddOnScreenDebugMessage ( 6 , 1.0f , FColor::Green , FString::SanitizeFloat ( CurrentTime ) );
 #pragma endregion LogMessageState
-*/
+
 
 // 최상위 State
 	switch ( MUpState )
@@ -215,11 +215,12 @@ void UCWolfFSM::JumpState ( )
 {
 	if ( Anim->IsJumping == false ) { return; }
 	
+	TurnToTarget(TargetEnemy);
+
 	//점프 두 번 갈길 경우엔 Bool형 체크도 해주기
 	if ( Me->CanJump() )
 	{
 		Me->Jump ( );
-		Anim->IsJumping = true;
 	}
 
 
