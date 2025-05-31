@@ -12,6 +12,11 @@
 #include "Character/CPlayer.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Component/CParryComponent.h"
+#include "Weapons/CWeaponStuctures.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Global.h"
+#include "Boss/CBossWeapon.h"
+#include "Boss/DataAsset/HitDataAsset_BossToPlayer.h"
 
 ACBossEnemy::ACBossEnemy()
 {
@@ -21,24 +26,6 @@ ACBossEnemy::ACBossEnemy()
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ACBossEnemy::EnemyHitDamage);
 
 	FSMComponent = CreateDefaultSubobject<UCBossFSM>(TEXT("FSMComponent"));
-
-	SwordMesh = CreateDefaultSubobject<USkeletalMeshComponent>(L"SwordMesh");
-	SwordMesh->SetupAttachment(GetMesh());
-
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(L"/Script/Engine.SkeletalMesh'/Game/ODH/Asset/Boss/ElfArden/BaseMesh/Sword/SK_sword.SK_sword'");
-	if ( TempMesh.Succeeded() )
-	{
-		SwordMesh->SetSkeletalMesh(TempMesh.Object);
-		SwordMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale , TEXT("Weapon_Socket"));
-
-		SwordCollComp = CreateDefaultSubobject<UBoxComponent>(L"SwordCollision");
-		SwordCollComp->OnComponentBeginOverlap.AddDynamic(this, &ACBossEnemy::WeaponOverlap);
-		SwordCollComp->SetCollisionProfileName(FName("BossWeapon"));
-		SwordCollComp->AttachToComponent(SwordMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Collision_Socket"));
-		SwordCollComp->SetBoxExtent(FVector(10, 48, 3));
-		//공격 판정 콜리전 비활성화
-		SwordCollComp->SetCollisionEnabled ( ECollisionEnabled::NoCollision );
-	}
 
 	ConstructorHelpers::FObjectFinder<UAnimBlueprint> TempAnim (L"/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Boss/ABP_BossAnim.ABP_BossAnim'");
 	if ( TempAnim.Succeeded() )
@@ -102,13 +89,38 @@ ACBossEnemy::ACBossEnemy()
 	{
 		AM_ShieldHit = TempShieldHit.Object;
 	}
+
+	ConstructorHelpers::FObjectFinder<UHitDataAsset_BossToPlayer> TempHitData (L"/Script/Project_DT.HitDataAsset_BossToPlayer'/Game/ODH/DataAsset/DA_Hit.DA_Hit'");
+	if (TempHitData.Succeeded())
+	{
+		HitData = TempHitData.Object;
+	}
 }
 
 void ACBossEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//임시로 타겟을 그냥 플레이어로 지정
 	Target = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	//임시로 타겟을 그냥 플레이어로 지정
+
+	//무기 생성
+	if (MyWeapon)
+	{
+		FTransform SocketTransform = GetMesh()->GetSocketTransform(FName("Weapon_Socket"));
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = GetInstigator();
+
+		SpawnWeapon = GetWorld()->SpawnActor<ACBossWeapon>(MyWeapon, SocketTransform.GetLocation(), SocketTransform.Rotator(),SpawnParams);
+
+		if (SpawnWeapon)
+		{
+			SpawnWeapon->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Weapon_Socket"));
+		}
+	}
 
 	//원거리 공격을 최대 설정 값만큼 미리 생성함
 	for ( int32 i = 0; i < MaxRangedAttackCount; ++i )
@@ -129,6 +141,79 @@ void ACBossEnemy::BeginPlay()
 	AnimInstance = GetMesh()->GetAnimInstance();
 
 	LoadStatsFromAsset();
+
+	//몽타주 매핑 초기화
+	InitializeMontageMap();
+}
+
+void ACBossEnemy::InitializeMontageMap()
+{
+	if (AM_ComboAttack_01)
+	{
+		TArray<FMontageRateScale> ComboAttack01Rates;
+		ComboAttack01Rates.Add(FMontageRateScale{FName("ComboAttack_01_01"), 0.5f});
+		ComboAttack01Rates.Add(FMontageRateScale{FName("ComboAttack_01_02"), 0.7f});
+		ComboAttack01Rates.Add(FMontageRateScale{FName("ComboAttack_01_03"), 0.7f});
+		ComboAttack01Rates.Add(FMontageRateScale{FName("ComboAttack_01_04"), 0.7f});
+		MontageScaleMap.Add(AM_ComboAttack_01, ComboAttack01Rates);
+	}
+	
+	if (AM_ComboAttack_02)
+	{
+		TArray<FMontageRateScale> ComboAttack02Rates;
+		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_01"), 0.7f});
+		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_02"), 0.7f});
+		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_03"), 0.7f});
+		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_04"), 0.7f});
+		MontageScaleMap.Add(AM_ComboAttack_02, ComboAttack02Rates);
+	}
+
+	if (AM_DashAttack)
+	{
+		TArray<FMontageRateScale> DashAttackRates;
+		DashAttackRates.Add(FMontageRateScale{FName("DashAttackReady"), 0.7f});
+		DashAttackRates.Add(FMontageRateScale{FName("Run"), 0.7f});
+		DashAttackRates.Add(FMontageRateScale{FName("DashAttack"), 0.7f});
+		MontageScaleMap.Add(AM_DashAttack, DashAttackRates);
+	}
+
+// 	if (AM_RangedAttack)
+// 	{
+// 		TArray<FMontageRateScale> RangedAttackRates;
+// 		RangedAttackRates.Add(FMontageRateScale{ FName("DashAttackReady"), 0.7f });
+// 		RangedAttackRates.Add(FMontageRateScale{ FName("Run"), 0.7f });
+// 		RangedAttackRates.Add(FMontageRateScale{ FName("DashAttack"), 0.7f });
+//		MontageScaleMap.Add(AM_RangedAttack, RangedAttackRates);
+// 	}
+
+	if (AM_Guard)
+	{
+		TArray<FMontageRateScale> GuardRates;
+		GuardRates.Add(FMontageRateScale{ FName("Guard_Start"), 0.7f });
+		GuardRates.Add(FMontageRateScale{ FName("GuardStarting"), 0.7f });
+		GuardRates.Add(FMontageRateScale{ FName("Guard_End"), 0.7f });
+		GuardRates.Add(FMontageRateScale{ FName("Counter"), 0.7f });
+		MontageScaleMap.Add(AM_Guard, GuardRates);
+	}
+
+	if (AM_SPAttack)
+	{
+		TArray<FMontageRateScale> SPAttackRates;
+		SPAttackRates.Add(FMontageRateScale{ FName("SPAttackStart"), 0.7f });
+		SPAttackRates.Add(FMontageRateScale{ FName("SPAttackLoop"), 0.7f });
+		SPAttackRates.Add(FMontageRateScale{ FName("SPAttack"), 0.7f });
+		MontageScaleMap.Add(AM_SPAttack, SPAttackRates);
+	}
+
+	if (AM_ShieldHit)
+	{
+		TArray<FMontageRateScale> GuardRates;
+		GuardRates.Add(FMontageRateScale{ FName("Hit"), 0.7f });
+		GuardRates.Add(FMontageRateScale{ FName("Interaction"), 0.7f });
+		GuardRates.Add(FMontageRateScale{ FName("Counter"), 0.7f });
+		GuardRates.Add(FMontageRateScale{ FName("End"), 0.7f });
+		MontageScaleMap.Add(AM_ShieldHit, GuardRates);
+	}
 }
 
 void ACBossEnemy::Tick(float DeltaTime)
@@ -148,22 +233,21 @@ void ACBossEnemy::ReadyDashAttack()
 
 void ACBossEnemy::OnSwordCollision()
 {
-	
 	//블프에서 안 터지게 막아주기
-	if(SwordCollComp)
+	if(SpawnWeapon)
 	{ 
 		//공격 콜리전 활성화
-		SwordCollComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		SpawnWeapon->SwordCollComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}
 }
 
 void ACBossEnemy::OffSwordCollision()
 {
 	//블프에서 안 터지게 막아주기
-	if(SwordCollComp)
+	if(SpawnWeapon)
 	{ 
 		//공격 콜리전 비활성화
-		SwordCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		SpawnWeapon->SwordCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
@@ -178,10 +262,10 @@ void ACBossEnemy::OnGuardCollision ( )
 
 	DrawDebugSphere ( GetWorld ( ) , GetActorLocation ( ) , 130.0f , 21 , FColor::Green , false , 0.1f );
 
-	//일단 닿은게 플레이어라면 
+	//일단 닿은게 플레이어 무기면 
 	if ( bHit && Hit.GetActor()->IsA(ACAttachment::StaticClass()) )
 	{
-		//플레이어와의 각도를 계산함
+		//플레이어 무기와의 각도를 계산함
 		FVector ToPlayer = (Hit.GetActor()->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
 		
 		float DotProduct = FVector::DotProduct(GetActorForwardVector(), ToPlayer);
@@ -265,7 +349,7 @@ void ACBossEnemy::OffGuardCollision ( )
 	if ( GuardCollComp )
 	{
 		//공격 판정 콜리전 비활성화
-		SwordCollComp->SetCollisionEnabled ( ECollisionEnabled::NoCollision );
+		/*SwordCollComp->SetCollisionEnabled ( ECollisionEnabled::NoCollision );*/
 	}
 }
 
@@ -425,6 +509,26 @@ void ACBossEnemy::DashAttackEnd()
 	FSMComponent->IsLowDist = false;
 }
 
+float ACBossEnemy::SetRateDown(UAnimMontage* CurrentMontage, FName CurrentSection)
+{
+	//몽타주에 해당하는 배열 찾기
+	if (TArray<FMontageRateScale>* RateScales = MontageScaleMap.Find(CurrentMontage))
+	{
+		//섹션 이름에 맞는 Rate Scale값 찾기
+		for (const FMontageRateScale& RateScale : *RateScales)
+		{
+			if (RateScale.SectionName == CurrentSection)
+			{
+				return RateScale.RateScale;
+			}
+		}
+	}
+
+	//매핑이 없으면 기본값 전환
+	float DefaultRateScale = 1.0f;
+	return	DefaultRateScale;
+}
+
 void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//가드가 성공한 경우에는 데미지 처리 및 피격 애니메이션이 안 나오도록 만듦
@@ -467,6 +571,9 @@ void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActo
 			if ( ShieldHitCount >= ShieldHitCounter )
 			{
 				AnimInstance->Montage_JumpToSection ( FName ( "Counter" ) , AM_ShieldHit );
+
+				//맞은 횟수 초기화
+				ShieldHitCount = 0;
 			}
 
 			//만약 쉴드게이지 감소되어서 0이 된다면
@@ -523,25 +630,39 @@ void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 }
 
-void ACBossEnemy::WeaponOverlap ( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult )
+void ACBossEnemy::Hitted()
 {
-	ACPlayer* Player = Cast<ACPlayer>(OtherActor);
-
-	if ( Player )
-	{
-		//만약 플레이어가 패링 감지중이면
-		if( Player->Parry->bIsParrying )
+	Damage.Power = 0;
+	
+	if (!!Damage.Event && !!Damage.Event->HitData) {
+		FHitData* data = Damage.Event->HitData;
+		data->PlayMontage(this);
+		data->PlayHitStop(GetWorld());
 		{
-			//경직 애니메이션 재생
-			GEngine->AddOnScreenDebugMessage ( 130 , 1.0f , FColor::Red , TEXT ( "Player Parrying" ) );
-		}
+			FVector start = GetActorLocation();
+			FVector target = Damage.Character->GetActorLocation();
+			FVector direction = target - start;
+			direction.Normalize();
 
-		//만약 대쉬 공격 애니메이션 중이라면
-		if ( !AnimInstance->Montage_IsPlaying ( AM_DashAttack ) )
-		{
-			IsDashAttackHit = true;
+			LaunchCharacter(-direction * data->Launch, false, false);
+			SetActorRotation(UKismetMathLibrary::FindLookAtRotation(start, target));
 		}
 	}
+	Damage.Character = nullptr;
+	Damage.Causer = nullptr;
+	Damage.Event = nullptr;
+}
+
+float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	float damage = Super::TakeDamage(TakeDamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	Damage.Power = damage;
+	Damage.Character = Cast<ACharacter>(EventInstigator->GetPawn());
+	Damage.Causer = DamageCauser;
+	Damage.Event = (FActionDamageEvent*)&DamageEvent;
+	CLog::Log(Damage.Power);
+	Hitted();
+	return TakeDamageAmount;
 }
 
 void ACBossEnemy::LoadStatsFromAsset ( )

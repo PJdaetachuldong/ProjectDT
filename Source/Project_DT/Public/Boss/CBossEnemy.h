@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Enemy/EnemyBase/CEnemyBase.h"
+#include "DataAsset/HitDataAsset_BossToPlayer.h"
 #include "CBossEnemy.generated.h"
 
 /**
@@ -84,12 +85,6 @@ public:
 	//일단 임시로 하는 발사 위치 설정
 
 	UPROPERTY(EditAnywhere)
-	USkeletalMeshComponent* SwordMesh;
-
-	UPROPERTY(EditAnywhere )
-	class UBoxComponent* SwordCollComp;
-
-	UPROPERTY(EditAnywhere)
 	class UBoxComponent* GuardCollComp;
 
 	UAnimInstance* AnimInstance;
@@ -115,6 +110,8 @@ public:
 	void RunCheckPlayerDist();
 
 	void DashAttackEnd();
+
+	float SetRateDown(UAnimMontage* CurrentMontage, FName CurrentSection);
 
 	// FSM 컴포넌트
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -143,11 +140,49 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
 	class UAnimMontage* AM_ShieldHit;
+
+	//Rate Scale 매핑 초기화 함수
+	void InitializeMontageMap();
+
+	TMap<UAnimMontage*, TArray<FMontageRateScale>> MontageScaleMap;
+
+	UPROPERTY(EditAnywhere, Category = Weapon)
+	TSubclassOf<class ACBossWeapon> MyWeapon;
+
+	class ACBossWeapon* SpawnWeapon;
+
+	UPROPERTY(EditAnywhere, Category = DataAsset)
+	UHitDataAsset_BossToPlayer* HitData;
 	
 	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
-	UFUNCTION( )
-	void WeaponOverlap ( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult );
-
 	virtual void LoadStatsFromAsset() override;
+
+	////////플레이어 데미지 부분////////////
+    private:
+        struct FEnemyDamageData
+        {
+            float Power;
+            class ACharacter* Character;
+            class AActor* Causer;
+
+            struct FActionDamageEvent* Event;
+        } Damage;
+
+protected:
+    virtual void Hitted();
+public:
+    float TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+};
+
+USTRUCT(BlueprintType)
+struct FMontageRateScale
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName SectionName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RateScale;
 };
