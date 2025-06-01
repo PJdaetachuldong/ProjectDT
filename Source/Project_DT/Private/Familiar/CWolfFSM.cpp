@@ -223,7 +223,7 @@ void UCWolfFSM::JumpState ( )
 		Me->Jump ( );
 	}
 
-
+	//수정중
 	// 타겟과의 사거리 체크
 	//FVector dirToTarget = TargetEnemy->GetActorLocation ( ) - Me->GetActorLocation ( );
 	
