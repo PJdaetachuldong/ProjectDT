@@ -153,6 +153,11 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = DataAsset)
 	UHitDataAsset_BossToPlayer* HitData;
+
+	// 클래스 멤버로 매핑 테이블 초기화
+	TMap<FName, EAttackType> AttackSectionToEnumMap;
+
+	void InitAttackTMap();
 	
 	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
@@ -185,4 +190,18 @@ struct FMontageRateScale
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RateScale;
+};
+
+UENUM(BlueprintType)
+enum class EAttackType : uint8
+{
+    Attack01_01,
+    Attack01_02,
+    Attack01_03,
+    Attack01_04,
+    Attack02_01,
+    Attack02_02,
+    Attack02_03,
+    Attack02_04,
+    None
 };

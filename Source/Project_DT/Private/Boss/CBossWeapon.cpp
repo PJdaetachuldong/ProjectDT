@@ -67,7 +67,7 @@ void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		}
 
 		// 사용자 정의 데미지 이벤트 생성
-		MyBoss->HitData->HitDatas[0].SendDamage(MyBoss, this, Player);
+		MyBoss->HitData->HitDatas[HitNumber].SendDamage(MyBoss, this, Player);
 
 // 		//만약 대쉬 공격 애니메이션 중이라면
 // 		if (!AnimInstance->Montage_IsPlaying(AM_DashAttack))

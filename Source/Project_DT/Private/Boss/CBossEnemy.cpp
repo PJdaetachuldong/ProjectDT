@@ -144,6 +144,9 @@ void ACBossEnemy::BeginPlay()
 
 	//몽타주 매핑 초기화
 	InitializeMontageMap();
+
+	//공격 섹션 이름 초기화
+	InitAttackTMap();
 }
 
 void ACBossEnemy::InitializeMontageMap()
@@ -669,4 +672,18 @@ void ACBossEnemy::LoadStatsFromAsset ( )
 {
 	Super::LoadStatsFromAsset();
 
+}
+
+void ACBossEnemy::InitAttackTMap()
+{
+	AttackSectionToEnumMap = {
+		{ FName("ComboAttack_01_01"), EAttackType::Attack01_01},
+		{ FName("ComboAttack_01_02"), EAttackType::Attack01_02},
+		{ FName("ComboAttack_01_03"), EAttackType::Attack01_03},
+		{ FName("ComboAttack_01_04"), EAttackType::Attack01_04},
+		{ FName("ComboAttack_02_01"), EAttackType::Attack02_01},
+		{ FName("ComboAttack_02_02"), EAttackType::Attack02_02},
+		{ FName("ComboAttack_02_03"), EAttackType::Attack02_03},
+		{ FName("ComboAttack_02_04"), EAttackType::Attack02_04}
+	};
 }
