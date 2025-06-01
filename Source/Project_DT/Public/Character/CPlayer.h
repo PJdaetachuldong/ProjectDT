@@ -41,6 +41,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UCStatusComponent* Status;
 
+	//UPROPERTY(VisibleAnywhere)
+	//class UMnhTracerComponent* TracerComponent;
+
 public:
 	UPROPERTY(VisibleAnywhere)
 	class UCMovementComponent* Movement;

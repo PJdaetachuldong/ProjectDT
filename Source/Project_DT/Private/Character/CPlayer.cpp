@@ -74,6 +74,7 @@ ACPlayer::ACPlayer()
 	CHelpers::CreateActorComponent<UCPerfectDodgeComponent> ( this , &Dodge, "Dodge" );
 	CHelpers::CreateActorComponent<UCTargetingComponent> ( this , &TargetComp , "TargetComp" );
 	CHelpers::CreateActorComponent<UCStatusComponent> ( this , &Status , "Status" );
+	//CHelpers::CreateActorComponent<UMnhTracerComponent> ( this , &TracerComponent, "TracerComponent" );
 
 
 

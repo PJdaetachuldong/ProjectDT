@@ -28,6 +28,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaTime) override;
 public:
 	UFUNCTION( BlueprintImplementableEvent )
 	void OnBeginEquip();
@@ -61,5 +62,24 @@ protected:
 	UPROPERTY ( BlueprintReadOnly , Category = "Game" )
 	class ACharacter* OwnerCharacter;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class USkeletalMeshComponent* SkeletalMesh;
 
+private:
+	bool bCollisionTraceEnabled = false;
+
+	FVector PrevStartLocation;
+	FVector PrevEndLocation;
+	FVector CurrentStartLocation;
+	FVector CurrentEndLocation;
+
+
+	TArray<FHitResult> HitResults;
+	void PerformTriangleTrace(
+		const FVector& A,
+		const FVector& B,
+		const FVector& C,
+		TArray<FHitResult>& OutHits);
+	FVector BezierCurve(const FVector& P0, const FVector& P1, const FVector& P2, float T);
+	bool bInitialized = false;
 };

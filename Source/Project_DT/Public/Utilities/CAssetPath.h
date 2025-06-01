@@ -6,8 +6,8 @@
 namespace AssetPaths
 {
     //캐릭터 기본 세팅
-    constexpr const TCHAR* CHARACTER_MESH = TEXT ( "/Script/Engine.SkeletalMesh'/Game/LHW/Asset/GhostSamurai_Bundle/GhostSamurai_Bundle/GhostSamurai/Character/Mesh/SK_GhostSamurai.SK_GhostSamurai'" );
-    constexpr const TCHAR* CHARACTER_ANIM = TEXT ( "/Script/Engine.AnimBlueprint'/Game/LHW/Blueprint/ABP_Player.ABP_Player_C'" );
+    constexpr const TCHAR* CHARACTER_MESH = TEXT ( "/Script/Engine.SkeletalMesh'/Game/LHW/LittleGirlEllie/BaseMesh/Separate/SK_body.SK_body'" );
+    constexpr const TCHAR* CHARACTER_ANIM = TEXT ( "/Script/Engine.AnimBlueprint'/Game/LHW/Blueprint/Character/ABP_Ellie.ABP_Ellie_C'" );
     //캐릭터 입력 인풋
     constexpr const TCHAR* IA_MoveForward = TEXT ( "/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_MoveForward.IA_MoveForward'" );
     constexpr const TCHAR* IA_MoveRight = TEXT ( "/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_MoveRight.IA_MoveRight'" );
@@ -25,6 +25,7 @@ namespace AssetPaths
     constexpr const TCHAR* IMC = TEXT ( "/Script/EnhancedInput.InputMappingContext'/Game/LHW/Input/IMC_Player.IMC_Player'" );
     constexpr const TCHAR* IA_Test = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Test.IA_Test'" );
     constexpr const TCHAR* IA_Test2 = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Test2.IA_Test2'" );
+    constexpr const TCHAR* ChostTrail = TEXT ("/Script/Engine.MaterialInstanceConstant'/Game/LHW/Material/M_GhostTrail_Inst.M_GhostTrail_Inst'" );
 
 
 }

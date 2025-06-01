@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Character/ACGhostTrail.h"
 
 #define CheckTrue(x) { if(x == true) return; }
 #define CheckTrueResult(x, y) { if(x == true) return y; }
@@ -162,5 +163,19 @@ public:
 
 			return;
 		}
+	}
+	static AACGhostTrail* Play_GhostTrail(TSubclassOf<AACGhostTrail>& InClass, class ACharacter* InOwner) {
+		CheckNullResult(InClass, nullptr);
+		CheckNullResult(InOwner, nullptr);
+		FActorSpawnParameters parmars;
+		parmars.Owner = InOwner;
+		parmars.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		FVector location = InOwner->GetActorLocation();
+		location.Z -= InOwner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
+		FTransform transform;
+		transform.SetTranslation(location);
+
+		return InOwner->GetWorld()->SpawnActor<AACGhostTrail>(InClass, transform, parmars);
 	}
 };
