@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Components/ShapeComponent.h"
 #include "Components/SceneComponent.h"
+#include "Enemy/EnemyBase/CEnemyBase.h"
 // Sets default values
 ACAttachment::ACAttachment()
 {
@@ -105,9 +106,12 @@ void ACAttachment::Tick(float DeltaTime)
 	// 7. 히트 처리
 	for (const FHitResult& Hit : HitResults)
 	{
-		if (Hit.GetActor())
+		if (Hit.GetActor()->IsA(ACEnemyBase::StaticClass()))
 		{
+			ACEnemyBase* Enemy = Cast<ACEnemyBase>(Hit.GetActor());
+			Enemy->Hit();
 			GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Yellow, FString::Printf(TEXT("Hit: %s"), *Hit.GetActor()->GetName()));
+
 		}
 	}
 	DrawDebugBox(GetWorld(), CurrentStartLocation, FVector(2.f), FColor::Blue, false, 0.1f);
@@ -178,7 +182,7 @@ void ACAttachment::PerformTriangleTrace(
 
 	// A to B
 	FHitResult Hit1;
-	if (World->LineTraceSingleByChannel(Hit1, A, B, ECC_GameTraceChannel1, Params))
+	if (World->LineTraceSingleByChannel(Hit1, A, B, ECC_EngineTraceChannel5, Params))
 	{
 		OutHits.Add(Hit1);
 		DrawDebugLine(World, A, B, FColor::Red, false, 0.1f, 0, 2.f);
@@ -190,7 +194,7 @@ void ACAttachment::PerformTriangleTrace(
 
 	// B to C
 	FHitResult Hit2;
-	if (World->LineTraceSingleByChannel(Hit2, B, C, ECC_GameTraceChannel1, Params))
+	if (World->LineTraceSingleByChannel(Hit2, B, C, ECC_EngineTraceChannel5, Params))
 	{
 		OutHits.Add(Hit2);
 		DrawDebugLine(World, B, C, FColor::Red, false, 0.1f, 0, 2.f);
@@ -202,7 +206,7 @@ void ACAttachment::PerformTriangleTrace(
 
 	// C to A
 	FHitResult Hit3;
-	if (World->LineTraceSingleByChannel(Hit3, C, A, ECC_GameTraceChannel1, Params))
+	if (World->LineTraceSingleByChannel(Hit3, C, A, ECC_EngineTraceChannel5, Params))
 	{
 		OutHits.Add(Hit3);
 		DrawDebugLine(World, C, A, FColor::Red, false, 0.1f, 0, 2.f);

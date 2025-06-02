@@ -120,7 +120,21 @@ private:
 public:
 	void End_BackStep() override;
 
+	////////플레이어 데미지 부분////////////
+	private:
+		struct FEnemyDamageData
+		{
+			float Power;
+			class ACharacter* Character;
+			class AActor* Causer;
 
+			struct FActionDamageEvent* Event;
+		} Damage;
+
+protected:
+	virtual void Hitted();
+public:
+	float TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 
 };

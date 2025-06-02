@@ -3,7 +3,7 @@
 
 #include "Enemy/EnemyBase/CEnemyBase.h"
 #include "Enemy/FSM/CMeleeEnemyFSM.h"
-
+#include "Global.h"
 // Sets default values
 ACEnemyBase::ACEnemyBase()
 {
@@ -25,7 +25,7 @@ ACEnemyBase::ACEnemyBase()
 void ACEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -52,7 +52,7 @@ void ACEnemyBase::AttackRandomInt()
 
 // 	//랜덤값을 뽑아서 일정값 이상일 경우 다시 공격권을 뿌리게 만듦
 // 	int32 RandomInt = FMath::RandRange(1,100);
-// 
+//
 // 	if (RandomInt >= 70)
 // 	{
 // 		Manager->ReturnbCanAttack();
@@ -64,7 +64,7 @@ bool bFromSweep, const FHitResult& SweepResult)
 {
 	// 	float ActualDamage = FMath::Max(0.0f, Damage /*- Defence*/);
 	// 	CurHP = FMath::Clamp(CurHP - ActualDamage, 0.0f, MaxHP);
-	// 
+	//
 	// 	if (CurHP <= 0.0f)
 	// 	{
 	// 		OnDeath();
@@ -106,4 +106,8 @@ void ACEnemyBase::OnPlayerLost()
 void ACEnemyBase::OnDeath()
 {
 
+}
+
+void ACEnemyBase::Hit()
+{
 }

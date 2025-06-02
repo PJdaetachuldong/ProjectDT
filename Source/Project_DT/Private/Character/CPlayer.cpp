@@ -22,6 +22,7 @@
 #include "Component/CTargetingComponent.h"
 #include "Component/CStatusComponent.h"
 #include "Component/CPerfectDodgeComponent.h"
+#include "Weapons/CWeaponStuctures.h"
 // Sets default values
 ACPlayer::ACPlayer()
 {
@@ -199,4 +200,39 @@ void ACPlayer::End_BackStep() {
 
 	State->SetIdleMode ( );
 	CLog::Log ( "End_BackStep");
+}
+
+void ACPlayer::Hitted()
+{
+	Damage.Power = 0;
+
+	if (!!Damage.Event && !!Damage.Event->HitData) {
+		FHitData* data = Damage.Event->HitData;
+		data->PlayMontage(this);
+		data->PlayHitStop(GetWorld());
+		{
+			FVector start = GetActorLocation();
+			FVector target = Damage.Character->GetActorLocation();
+			FVector direction = target - start;
+			direction.Normalize();
+
+			LaunchCharacter(-direction * data->Launch, false, false);
+			SetActorRotation(UKismetMathLibrary::FindLookAtRotation(start, target));
+		}
+	}
+	Damage.Character = nullptr;
+	Damage.Causer = nullptr;
+	Damage.Event = nullptr;
+}
+
+float ACPlayer::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	float damage = Super::TakeDamage(TakeDamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	Damage.Power = damage;
+	Damage.Character = Cast<ACharacter>(EventInstigator->GetPawn());
+	Damage.Causer = DamageCauser;
+	Damage.Event = (FActionDamageEvent*)&DamageEvent;
+	CLog::Log(Damage.Power);
+	Hitted();
+	return TakeDamageAmount;
 }

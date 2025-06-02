@@ -116,6 +116,7 @@ void UCWolfAnimInstance::Attack1 ( )
 void UCWolfAnimInstance::AttackSpecial ( )
 {
 	FSM->UpdateState ( EAttackState::Attack1 );
+	Me->IsOnSpecialAtt = false;
 
 // 	FSM->UpdateState ( EAttackState::None );
 // 	FSM->UpdateState (EUpperState::Idle);	// 임시값

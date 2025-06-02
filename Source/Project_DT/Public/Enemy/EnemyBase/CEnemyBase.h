@@ -21,10 +21,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	float MaxHP;
@@ -43,7 +43,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	float AttackRange;  //공격이 실행되는 범위
-    
+
 	// FSM 컴포넌트
 //     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 //     class UCMeleeEnemyFSM* FSMComponent;
@@ -91,4 +91,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void OnDeath();
+
+	virtual void Hit();
 };
