@@ -194,7 +194,7 @@ void UCBossFSM::NONEState()
 		CurComboAttackTime += GetWorld()->GetDeltaSeconds();
 
 		//만약 가드 조건이 충족되었을 경우
-		if ( MyBoss->GuardGage >= /*MyBoss->GuardPlaying*/ 15.0f )
+		if ( MyBoss->GuardGage >= MyBoss->GuardPlaying /*4.0f*/ )
 		{
 			//가드 상태로 변화
 			AttackState = EBossATTACKState::COUNTERATTACK;
