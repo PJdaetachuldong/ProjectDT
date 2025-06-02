@@ -1,0 +1,153 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Enemy/EnemyBase/CEnemyBase.h"
+#include "CBossEnemy.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class PROJECT_DT_API ACBossEnemy : public ACEnemyBase
+{
+	GENERATED_BODY()
+	
+public:
+	ACBossEnemy();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	//원거리 공격 오브젝트 할당
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ACRangeAttack> RangedAttackFactory;
+
+	//원거리 공격 오브젝트를 Object Pool로 관리
+	//오브젝트의 최초 생성 수 (혹시몰라 여유분까지)
+	int32 MaxRangedAttackCount = 4;
+
+	//원거리 공격 오브젝트 목록
+	UPROPERTY(EditAnywhere, Category = ObjectPool)
+	TArray<class ACRangeAttack*> RangedAttackList;
+
+// 	//플레이어와의 거리를 저장하는 변수
+// 	float TargetDist = 0.0f;
+// 
+// 	//어느 거리가 먼 거리인지 설정하는 변수
+// 	float LongDist = 700.0f;
+// 
+// 	//거리가 먼 상태에서 시간이 얼마나 지났는지 저장하는 변수
+// 	float CurChaseTime = 0.0f;
+// 
+// 	//대쉬 공격이 실행되는 쿨타임 변수
+// 	float DashAttackCooltime = 25.0f;
+	
+	//대쉬 공격 시 정해진 위치와의 거리를 저장하는 변수
+	/*float LocationToDist = 0.0f;	*/
+
+	//돌진 공격이 맞았는지 판단하는 변수
+	bool IsDashAttackHit = false;
+	
+	//가드 조건 게이지
+	float GuardGage = 0.0f;
+
+	//가드가 실행되는 조건 설정 변수
+	float GuardPlaying = 10.0f;
+
+	//가드가 성공하였는지 체크하는 변수
+	bool IsGuardSucssess = false;
+
+	//준비 자세일때 받은 데미지의 총량을 저장하는 변수
+	float OnSPDamage = 0.0f;
+
+	//필살기 준비 자세때 패턴이 파훼될때까지 필요한 데미지를 설정하는 변수
+	float SPBreakDamageAmount = 50.0f;
+
+	bool IsReadySPAttack = false;
+
+	//쉴드 상태에서 공격을 몇회 맞았는지 체크하는 변수
+	int32 ShieldHitCount = 0;
+
+	//쉴드 상태에서 일정 횟수 이상 공격을 맞았을 경우 반격 공격이 실행되는 조건 변수
+	int32 ShieldHitCounter = 2;
+
+	//일단 임시로 하는 발사 위치 설정
+	UPROPERTY(EditAnywhere)
+	class USceneComponent* ThrowPosition;
+	//일단 임시로 하는 발사 위치 설정
+
+	UPROPERTY(EditAnywhere)
+	USkeletalMeshComponent* SwordMesh;
+
+	UPROPERTY(EditAnywhere )
+	class UBoxComponent* SwordCollComp;
+
+	UPROPERTY(EditAnywhere)
+	class UBoxComponent* GuardCollComp;
+
+	UAnimInstance* AnimInstance;
+	
+	void ReadyDashAttack();
+
+	void OnSwordCollision();
+
+	void OffSwordCollision();
+
+	void OnGuardCollision();
+
+	void OffGuardCollision();
+
+	bool CheckPlayer();
+
+	void AttackTurn();
+
+	void PlayNextSectionAttack( UAnimMontage* CurrentMontage , FName CurrentSection );
+
+	FName GetNextSection(FName SectionName);
+
+	void RunCheckPlayerDist();
+
+	void DashAttackEnd();
+
+	// FSM 컴포넌트
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    class UCBossFSM* FSMComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_ComboAttack_01;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_ComboAttack_02;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_DashAttack;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_RangedAttack;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_Guard;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_SPAttack;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_Break;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_ShieldHit;
+	
+	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+
+	UFUNCTION( )
+	void WeaponOverlap ( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult );
+
+	virtual void LoadStatsFromAsset() override;
+};
