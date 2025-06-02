@@ -51,11 +51,11 @@ ACPlayer::ACPlayer()
 	SpringArm->bDoCollisionTest = false;
 	SpringArm->bEnableCameraLag = true;
 
-	GetCharacterMovement ( )->bOrientRotationToMovement = true; // 이동 방향을 바라보게
+	GetCharacterMovement ( )->bOrientRotationToMovement = true;
 	GetCharacterMovement ( )->bUseControllerDesiredRotation = false;
 
 	// 카메라 설정
-	SpringArm->bUsePawnControlRotation = true; // SpringArm이 컨트롤러 회전을 따르지 않음
+	SpringArm->bUsePawnControlRotation = true;
 	Camera->bUsePawnControlRotation = false;
 
 	SpringArm->bInheritPitch = true;
@@ -166,18 +166,51 @@ void ACPlayer::OnAvoid ( )
 
 void ACPlayer::BackStep ()
 {
-	FVector InputDir = GetCharacterMovement ( )->GetLastInputVector ( );
+	FVector InputDir = GetCharacterMovement()->GetLastInputVector();
+	InputDir.Z = 0;
+	InputDir.Normalize();
 
-		// 방향을 바라보게 회전
-		FRotator NewRotation = InputDir.Rotation ( );
-		NewRotation.Pitch = 0;
-		NewRotation.Roll = 0;
-		SetActorRotation ( NewRotation );
+	if (InputDir.IsNearlyZero())
+		return;
 
-		// 루트 모션 구르기 애니메이션 재생
-		Montages->PlayBackStepMode ();
-		//Montages->PlayPerfectDodgeL ();
+	// 현재 캐릭터의 바라보는 방향 기준으로 입력 벡터를 로컬 방향으로 변환
+	FVector Forward = GetActorForwardVector();
+	FVector Right = GetActorRightVector();
 
+	float ForwardDot = FVector::DotProduct(Forward, InputDir);
+	float RightDot = FVector::DotProduct(Right, InputDir);
+
+	// 라디안으로 방향 결정
+	float Angle = FMath::Atan2(RightDot, ForwardDot); // 오른쪽이 양수, 왼쪽이 음수
+	float Degree = FMath::RadiansToDegrees(Angle);
+
+	EActState DodgeDirection = EActState::DodgeF;
+
+	if (Degree >= -22.5f && Degree < 22.5f)
+		DodgeDirection = EActState::DodgeF;
+	else if (Degree >= 22.5f && Degree < 67.5f)
+		DodgeDirection = EActState::DodgeFR;
+	else if (Degree >= 67.5f && Degree < 112.5f)
+		DodgeDirection = EActState::DodgeR;
+	else if (Degree >= 112.5f && Degree < 157.5f)
+		DodgeDirection = EActState::DodgeBR;
+	else if (Degree >= 157.5f || Degree < -157.5f)
+		DodgeDirection = EActState::DodgeB;
+	else if (Degree >= -157.5f && Degree < -112.5f)
+		DodgeDirection = EActState::DodgeBL;
+	else if (Degree >= -112.5f && Degree < -67.5f)
+		DodgeDirection = EActState::DodgeL;
+	else if (Degree >= -67.5f && Degree < -22.5f)
+		DodgeDirection = EActState::DodgeFL;
+
+	// 방향을 바라보게 회전
+	FRotator NewRotation = InputDir.Rotation();
+	NewRotation.Pitch = 0;
+	NewRotation.Roll = 0;
+	SetActorRotation(NewRotation);
+
+	// 해당 방향의 루트 모션 애니메이션 실행
+	Montages->PlayBackStepMode(DodgeDirection);
 }
 
 void ACPlayer::Healing ( )

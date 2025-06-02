@@ -20,7 +20,7 @@ void UCAnimNotifyState_PerfectDodge::NotifyBegin(USkeletalMeshComponent* MeshCom
 	UCTargetingComponent* Target = CHelpers::GetComponent<UCTargetingComponent>(MeshComp->GetOwner());
 	CheckNull(Dodge);
 	CheckNull(Target);
-	Target->ResetLockOn();
+	//Target->ResetLockOn();
 	Dodge->StartPerfectDodge();
 
 }

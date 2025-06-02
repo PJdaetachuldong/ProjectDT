@@ -109,9 +109,13 @@ void ACAttachment::Tick(float DeltaTime)
 		if (Hit.GetActor()->IsA(ACEnemyBase::StaticClass()))
 		{
 			ACEnemyBase* Enemy = Cast<ACEnemyBase>(Hit.GetActor());
+			if (EnemyActor == Enemy)return;
+			EnemyActor = Enemy;
 			Enemy->Hit();
 			GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Yellow, FString::Printf(TEXT("Hit: %s"), *Hit.GetActor()->GetName()));
 
+			if (OnAttachmentBeginOverlap.IsBound())
+				OnAttachmentBeginOverlap.Broadcast(OwnerCharacter, this, Cast<ACharacter>(Hit.GetActor()));
 		}
 	}
 	DrawDebugBox(GetWorld(), CurrentStartLocation, FVector(2.f), FColor::Blue, false, 0.1f);
@@ -131,6 +135,7 @@ void ACAttachment::OnCollisions ( )
 		OnAttachmentBeginCollision.Broadcast ( );
 
 	bCollisionTraceEnabled = true;
+	EnemyActor = nullptr;
 
 }
 
@@ -154,8 +159,6 @@ void ACAttachment::OnComponentBeginOverlap ( UPrimitiveComponent* OverlappedComp
 	CheckTrue ( OwnerCharacter == OtherActor );
 	CheckTrue ( OwnerCharacter->GetClass ( ) == OtherActor->GetClass ( ) );
 
-	if ( OnAttachmentBeginOverlap.IsBound ( ) )
-		OnAttachmentBeginOverlap.Broadcast ( OwnerCharacter , this , Cast<ACharacter> ( OtherActor ) );
 }
 
 void ACAttachment::OnComponentEndOverlap ( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex )

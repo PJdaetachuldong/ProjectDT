@@ -3,6 +3,7 @@
 #include "Global.h"
 #include "Component/CMointageComponent.h"
 #include "Boss/CBossEnemy.h"
+#include "Boss/CBossWeapon.h"
 UCPerfectDodgeComponent::UCPerfectDodgeComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -59,7 +60,7 @@ void UCPerfectDodgeComponent::PerformBoxTrace()
     // 충돌이 감지되면 방향에 따라 몽타주 재생
     if (bHit)
     {
-        if (HitResult.GetActor() && HitResult.GetActor()->IsA(ACBossEnemy::StaticClass()))
+        if (HitResult.GetActor() && HitResult.GetActor()->IsA(ACBossWeapon::StaticClass()))
         {
             // 충돌 지점과 플레이어 위치를 비교해 방향 계산
             FVector HitLocation = HitResult.ImpactPoint;

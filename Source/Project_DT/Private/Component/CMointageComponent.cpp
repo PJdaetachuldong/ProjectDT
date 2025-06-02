@@ -3,7 +3,7 @@
 
 #include "Component/CMointageComponent.h"
 #include "GameFramework/Character.h"
-#include "Utilities/CHelper.h"
+#include "Global.h"
 
 // Sets default values for this component's properties
 UCMointageComponent::UCMointageComponent()
@@ -30,7 +30,7 @@ void UCMointageComponent::BeginPlay ( )
 	TArray<FMontagesData*> datas;
 	DataTable->GetAllRows<FMontagesData> ( "" , datas );
 
-	for ( int32 i = 0; i < (int32)EStateType::Max; i++ )
+	for ( int32 i = 0; i < (int32)EActState::Max; i++ )
 	{
 		for ( FMontagesData* data : datas )
 		{
@@ -69,20 +69,20 @@ void UCMointageComponent::TickComponent ( float DeltaTime , ELevelTick TickType 
 	// ...
 }
 
-void UCMointageComponent::PlayBackStepMode ( )
+void UCMointageComponent::PlayBackStepMode (EActState InType)
 {
-	PlayAnimMontage ( EActState::DodgeF );
+	PlayAnimMontage (InType);
 }
 
 void UCMointageComponent::PlayDeadMode ( )
 {
-	PlayAnimMontage ( EActState::Dead );
+	//PlayAnimMontage ( EActState::Dead );
 
 }
 
 void UCMointageComponent::PlayEquipMode ( )
 {
-	PlayAnimMontage ( EActState::Equip );
+	//PlayAnimMontage ( EActState::Equip );
 
 }
 
@@ -108,14 +108,13 @@ void UCMointageComponent::PlayAnimMontage ( EActState InType )
 	CheckNull ( OwnerCharacter );
 
 	FMontagesData* data = Datas[(int32)InType];
-
+	CLog::Log((int32)InType);
 	if ( data == nullptr || data->Montage == nullptr )
 	{
 		GLog->Log ( ELogVerbosity::Error , "None montages data" );
 
 		return;
 	}
-
 	OwnerCharacter->PlayAnimMontage ( data->Montage , data->PlayRate );
 }
 

@@ -1,5 +1,12 @@
 ,Type,Montage,PlayRate
 1,Healing,AnimMontage'/Game/LHW/LittleGirlEllie/Potion_02_Seq_Montage.Potion_02_Seq_Montage',1
 2,DodgeF,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/Dodge_F.Dodge_F',1
-3,PDodgeL,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/MT_PerfectDodge_L.MT_PerfectDodge_L',1
-4,PDodgeR,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/MT_PerfectDodge_R.MT_PerfectDodge_R',1
+3,DodgeB,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/Dodge_B.Dodge_B',1
+4,DodgeL,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/Dodge_L.Dodge_L',1
+5,DodgeR,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/Dodge_R.Dodge_R',1
+6,DodgeFL,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/Dodge_FL.Dodge_FL',1
+7,DodgeFR,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/Dodge_FR.Dodge_FR',1
+8,DodgeBL,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/Dodge_BL.Dodge_BL',1
+9,DodgeBR,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/Dodge_BR.Dodge_BR',1
+10,PDodgeL,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/MT_PerfectDodge_L.MT_PerfectDodge_L',1
+11,PDodgeR,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/MT_PerfectDodge_R.MT_PerfectDodge_R',1
