@@ -4,6 +4,8 @@
 #include "Component/CMointageComponent.h"
 #include "GameFramework/Character.h"
 #include "Global.h"
+#include "Component/CStateComponent.h"
+#include "Component/CStatusComponent.h"
 
 // Sets default values for this component's properties
 UCMointageComponent::UCMointageComponent()
@@ -25,6 +27,9 @@ void UCMointageComponent::BeginPlay ( )
 		return;
 	}
 	OwnerCharacter = Cast<ACharacter> ( GetOwner ( ) );
+	State = CHelpers::GetComponent<UCStateComponent>(OwnerCharacter);
+	Status = CHelpers::GetComponent<UCStatusComponent>(OwnerCharacter);
+
 
 
 	TArray<FMontagesData*> datas;
@@ -61,12 +66,9 @@ void UCMointageComponent::BeginPlay ( )
 }
 
 
-// Called every frame
 void UCMointageComponent::TickComponent ( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent ( DeltaTime , TickType , ThisTickFunction );
-
-	// ...
 }
 
 void UCMointageComponent::PlayBackStepMode (EActState InType)
@@ -76,14 +78,18 @@ void UCMointageComponent::PlayBackStepMode (EActState InType)
 
 void UCMointageComponent::PlayDeadMode ( )
 {
-	//PlayAnimMontage ( EActState::Dead );
+	PlayAnimMontage ( EActState::Dead );
+	FTimerHandle handler;
+
+	OwnerCharacter->DisableInput(nullptr);
+	GetWorld()->GetTimerManager().SetTimer(handler,[this]() {
+		Respawn();
+		}, 2,false);
 
 }
 
 void UCMointageComponent::PlayEquipMode ( )
 {
-	//PlayAnimMontage ( EActState::Equip );
-
 }
 
 void UCMointageComponent::PlayHealingMode ( )
@@ -103,16 +109,35 @@ void UCMointageComponent::PlayPerfectDodgeR()
 	PlayAnimMontage(EActState::PDodgeR);
 }
 
+void UCMointageComponent::PlayPerfectDodge()
+{
+	PlayAnimMontage(EActState::PDodge);
+}
+
+void UCMointageComponent::Dead()
+{
+	PlayAnimMontage(EActState::Dead);
+}
+
+void UCMointageComponent::Respawn()
+{
+	if(OwnerCharacter&&State&& Status){
+	OwnerCharacter->SetActorLocation(RespawnPosition);
+	OwnerCharacter->EnableInput(nullptr);
+	State->SetIdleMode();
+	Status->Heal(100);
+	}
+}
+
 void UCMointageComponent::PlayAnimMontage ( EActState InType )
 {
 	CheckNull ( OwnerCharacter );
+	GLog->Log(ELogVerbosity::Error, "montages data");
 
 	FMontagesData* data = Datas[(int32)InType];
-	CLog::Log((int32)InType);
 	if ( data == nullptr || data->Montage == nullptr )
 	{
 		GLog->Log ( ELogVerbosity::Error , "None montages data" );
-
 		return;
 	}
 	OwnerCharacter->PlayAnimMontage ( data->Montage , data->PlayRate );

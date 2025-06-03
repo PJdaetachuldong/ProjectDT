@@ -41,9 +41,6 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UCStatusComponent* Status;
 
-	//UPROPERTY(VisibleAnywhere)
-	//class UMnhTracerComponent* TracerComponent;
-
 public:
 	UPROPERTY(VisibleAnywhere)
 	class UCMovementComponent* Movement;
@@ -106,6 +103,8 @@ private:
 private:
 	void BackStep();
 private:
+	void DeadHandler();
+private:
 	void Healing ( );
 private:
 	void Jump();
@@ -119,8 +118,6 @@ private:
 
 public:
 	void End_BackStep() override;
-
-	////////플레이어 데미지 부분////////////
 	private:
 		struct FEnemyDamageData
 		{
@@ -130,11 +127,9 @@ public:
 
 			struct FActionDamageEvent* Event;
 		} Damage;
-
 protected:
 	virtual void Hitted();
+
 public:
 	float TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
-
-
 };

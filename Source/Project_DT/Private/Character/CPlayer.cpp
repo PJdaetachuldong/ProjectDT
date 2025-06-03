@@ -23,10 +23,8 @@
 #include "Component/CStatusComponent.h"
 #include "Component/CPerfectDodgeComponent.h"
 #include "Weapons/CWeaponStuctures.h"
-// Sets default values
 ACPlayer::ACPlayer()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	CHelpers::CreateComponent<USpringArmComponent> ( this , &SpringArm , "SpringArm" , GetMesh ( ) );
 	CHelpers::CreateComponent<UCameraComponent> ( this , &Camera , "Camera" , SpringArm );
@@ -54,7 +52,6 @@ ACPlayer::ACPlayer()
 	GetCharacterMovement ( )->bOrientRotationToMovement = true;
 	GetCharacterMovement ( )->bUseControllerDesiredRotation = false;
 
-	// 카메라 설정
 	SpringArm->bUsePawnControlRotation = true;
 	Camera->bUsePawnControlRotation = false;
 
@@ -64,7 +61,6 @@ ACPlayer::ACPlayer()
 
 
 	GetCharacterMovement ( )->bUseControllerDesiredRotation = false;
-	//GetCharacterMovement ( )->RotationRate = FRotator ( ( 0 , 720 , 0 ) );
 
 	CHelpers::CreateActorComponent<UCWeaponComponent> ( this , &Weapon , "Weapon" );
 	CHelpers::CreateActorComponent<UCMointageComponent> ( this , &Montages , "Montages" );
@@ -75,7 +71,6 @@ ACPlayer::ACPlayer()
 	CHelpers::CreateActorComponent<UCPerfectDodgeComponent> ( this , &Dodge, "Dodge" );
 	CHelpers::CreateActorComponent<UCTargetingComponent> ( this , &TargetComp , "TargetComp" );
 	CHelpers::CreateActorComponent<UCStatusComponent> ( this , &Status , "Status" );
-	//CHelpers::CreateActorComponent<UMnhTracerComponent> ( this , &TracerComponent, "TracerComponent" );
 
 
 
@@ -112,7 +107,6 @@ void ACPlayer::BeginPlay()
 	Parry->OnParryDetected.AddDynamic ( this , &ACPlayer::OnParryDetected );
 }
 
-// Called every frame
 void ACPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -120,7 +114,6 @@ void ACPlayer::Tick(float DeltaTime)
 	FString::Printf ( TEXT ( "Health: %.1f | Mana: %.1f" ) , Status->GetHealth() , Status->GetMana()) );
 }
 
-// Called to bind functionality to input
 void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -154,6 +147,8 @@ void ACPlayer::OnStateTypeChanged ( EStateType InPrevType , EStateType InNewType
 	switch ( InNewType )
 	{
 	case EStateType::BackStep: BackStep ( ); break;
+	case EStateType::Dead: DeadHandler(); break;
+
 	}
 }
 
@@ -170,8 +165,7 @@ void ACPlayer::BackStep ()
 	InputDir.Z = 0;
 	InputDir.Normalize();
 
-	if (InputDir.IsNearlyZero())
-		return;
+	//if (InputDir.IsNearlyZero())return;
 
 	// 현재 캐릭터의 바라보는 방향 기준으로 입력 벡터를 로컬 방향으로 변환
 	FVector Forward = GetActorForwardVector();
@@ -181,36 +175,60 @@ void ACPlayer::BackStep ()
 	float RightDot = FVector::DotProduct(Right, InputDir);
 
 	// 라디안으로 방향 결정
-	float Angle = FMath::Atan2(RightDot, ForwardDot); // 오른쪽이 양수, 왼쪽이 음수
+	float Angle = FMath::Atan2(RightDot, ForwardDot);
 	float Degree = FMath::RadiansToDegrees(Angle);
 
 	EActState DodgeDirection = EActState::DodgeF;
 
-	if (Degree >= -22.5f && Degree < 22.5f)
+	if (Degree >= -22.5f && Degree < 22.5f){
 		DodgeDirection = EActState::DodgeF;
-	else if (Degree >= 22.5f && Degree < 67.5f)
-		DodgeDirection = EActState::DodgeFR;
-	else if (Degree >= 67.5f && Degree < 112.5f)
-		DodgeDirection = EActState::DodgeR;
-	else if (Degree >= 112.5f && Degree < 157.5f)
-		DodgeDirection = EActState::DodgeBR;
-	else if (Degree >= 157.5f || Degree < -157.5f)
-		DodgeDirection = EActState::DodgeB;
-	else if (Degree >= -157.5f && Degree < -112.5f)
-		DodgeDirection = EActState::DodgeBL;
-	else if (Degree >= -112.5f && Degree < -67.5f)
-		DodgeDirection = EActState::DodgeL;
-	else if (Degree >= -67.5f && Degree < -22.5f)
-		DodgeDirection = EActState::DodgeFL;
+		Dodge->DodgeRotate = TEXT("Back");
 
-	// 방향을 바라보게 회전
+	}
+	else if (Degree >= 22.5f && Degree < 67.5f){
+		DodgeDirection = EActState::DodgeFR;
+		Dodge->DodgeRotate = TEXT("Right");
+	}
+	else if (Degree >= 67.5f && Degree < 112.5f){
+		DodgeDirection = EActState::DodgeR;
+		Dodge->DodgeRotate = TEXT("Right");
+
+	}
+	else if (Degree >= 112.5f && Degree < 157.5f){
+		DodgeDirection = EActState::DodgeBR;
+		Dodge->DodgeRotate = TEXT("Right");
+
+	}
+	else if (Degree >= 157.5f || Degree < -157.5f){
+		DodgeDirection = EActState::DodgeB;
+		Dodge->DodgeRotate = TEXT("Back");
+
+	}
+	else if (Degree >= -157.5f && Degree < -112.5f){
+		DodgeDirection = EActState::DodgeBL;
+		Dodge->DodgeRotate = TEXT("Left");
+
+	}
+	else if (Degree >= -112.5f && Degree < -67.5f){
+		DodgeDirection = EActState::DodgeL;
+		Dodge->DodgeRotate = TEXT("Left");
+
+	}
+	else if (Degree >= -67.5f && Degree < -22.5f){
+		Dodge->DodgeRotate = TEXT("Left");
+		DodgeDirection = EActState::DodgeFL;
+	}
 	FRotator NewRotation = InputDir.Rotation();
 	NewRotation.Pitch = 0;
 	NewRotation.Roll = 0;
 	SetActorRotation(NewRotation);
 
-	// 해당 방향의 루트 모션 애니메이션 실행
 	Montages->PlayBackStepMode(DodgeDirection);
+}
+
+void ACPlayer::DeadHandler()
+{
+	Montages->PlayDeadMode();
 }
 
 void ACPlayer::Healing ( )
@@ -228,7 +246,6 @@ void ACPlayer::OnParryDetected ( EParryState ParryDirection )
 {
 	Weapon->OnParry ( ParryDirection );
 }
-
 void ACPlayer::End_BackStep() {
 
 	State->SetIdleMode ( );
@@ -237,6 +254,11 @@ void ACPlayer::End_BackStep() {
 
 void ACPlayer::Hitted()
 {
+	if (Status->Damage(Damage.Power) <= 0) {
+		State->SetDeadMode();
+		return;
+	}
+	State->SetHittedMode();
 	Damage.Power = 0;
 
 	if (!!Damage.Event && !!Damage.Event->HitData) {

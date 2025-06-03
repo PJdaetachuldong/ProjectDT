@@ -60,43 +60,27 @@ void UCPerfectDodgeComponent::PerformBoxTrace()
     // 충돌이 감지되면 방향에 따라 몽타주 재생
     if (bHit)
     {
-        if (HitResult.GetActor() && HitResult.GetActor()->IsA(ACBossWeapon::StaticClass()))
+        if (HitResult.GetActor() && HitResult.GetActor()->IsA(AActor::StaticClass()))
         {
-            // 충돌 지점과 플레이어 위치를 비교해 방향 계산
-            FVector HitLocation = HitResult.ImpactPoint;
-            FVector PlayerLocation = OwnerCharacter->GetActorLocation();
-            FVector PlayerRight = OwnerCharacter->GetActorRightVector(); // 플레이어의 오른쪽 방향 벡터
-
-            // 충돌 지점을 플레이어의 로컬 공간으로 변환
-            FVector DirectionToHit = (HitLocation - PlayerLocation).GetSafeNormal();
-
-            // 오른쪽 벡터와 충돌 방향의 내적을 계산
-            float DotProduct = FVector::DotProduct(DirectionToHit, PlayerRight);
-
-            // 내적 값에 따라 왼쪽/오른쪽 구분
-            if (DotProduct > 0.0f) // 충돌 지점이 플레이어 기준 오른쪽
-            {
-                PlayDodgeMontage(true); // 오른쪽 회피
-            }
-            else // 충돌 지점이 플레이어 기준 왼쪽
-            {
-                PlayDodgeMontage(false); // 왼쪽 회피
-            }
+                PlayDodgeMontage();
         }
     }
 }
 
 // 몽타주 재생
-void UCPerfectDodgeComponent::PlayDodgeMontage(bool bDodgeRight)
+void UCPerfectDodgeComponent::PlayDodgeMontage()
 {
     if (!Montage) return;
 
-    if (bDodgeRight)
+    if (DodgeRotate =="Left")
     {
         Montage->PlayPerfectDodgeL();
     }
-    else
+    else if(DodgeRotate == "Right")
     {
         Montage->PlayPerfectDodgeR();
+    }
+    else {
+        Montage->PlayPerfectDodge();
     }
 }
