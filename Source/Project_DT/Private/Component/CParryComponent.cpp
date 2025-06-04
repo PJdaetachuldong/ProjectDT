@@ -5,6 +5,7 @@
 #include "Global.h"
 #include "Weapons/CAttachment.h"
 #include "Weapons/CWeaponComponent.h"
+#include "Boss/CBossWeapon.h"
 // Sets default values for this component's properties
 UCParryComponent::UCParryComponent()
 {
@@ -26,7 +27,6 @@ void UCParryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if ( bIsParrying )
 		DetectActor ( );
-	// ...
 }
 
 void UCParryComponent::DetectActor ( )
@@ -104,4 +104,75 @@ void UCParryComponent::HandleTemporaryIgnore ( AActor* ActorToIgnore )
 	{
 		TemporarilyIgnoredActors.Empty();
 	} , 0.2f , false );
+}
+
+void UCParryComponent::OnGuard()
+{
+	if (bIsGuarding)
+		return;
+
+	bIsGuarding = true;
+
+	// 반복적인 스피어 트레이스 시작
+	GetWorld()->GetTimerManager().SetTimer(
+		GuardTraceTimer,
+		this,
+		&UCParryComponent::PerformGuardTrace,
+		GuardTraceInterval,
+		true
+	);
+}
+
+void UCParryComponent::OffGuard()
+{
+	if (!bIsGuarding)
+		return;
+
+	bIsGuarding = false;
+
+	// 타이머 종료
+	GetWorld()->GetTimerManager().ClearTimer(GuardTraceTimer);
+}
+
+void UCParryComponent::PerformGuardTrace()
+{
+	AActor* Owner = GetOwner();
+	if (!Owner)
+		return;
+
+	FVector Start = Owner->GetActorLocation() + FVector(0, 0, 0); // 높이 보정
+	FVector Forward = Owner->GetActorForwardVector();
+	FVector End = Start + Forward;
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(Owner);
+
+	bool bHit = GetWorld()->SweepSingleByChannel(
+		HitResult,
+		Start,
+		End,
+		FQuat::Identity,
+		ECC_GameTraceChannel3,
+		FCollisionShape::MakeSphere(TraceRadius),
+		Params
+	);
+
+#if WITH_EDITOR
+	// 시각화
+	DrawDebugLine(GetWorld(), Start, End, FColor::Blue, false, 0.1f);
+	DrawDebugSphere(GetWorld(), End, TraceRadius, 16, bHit ? FColor::Green : FColor::Red, false, 0.1f);
+#endif
+
+	if (bHit)
+	{
+		// 공격 감지 시 처리
+		AActor* HitActor = HitResult.GetActor();
+		if (HitActor->IsA(ACBossWeapon::StaticClass()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Guarded against: %s"), *HitActor->GetName());
+
+			// 여기에 블로킹 효과, 이펙트, 사운드, 스태미나 소비 등 추가
+		}
+	}
 }

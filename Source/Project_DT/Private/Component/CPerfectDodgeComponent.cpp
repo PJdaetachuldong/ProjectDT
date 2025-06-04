@@ -60,7 +60,7 @@ void UCPerfectDodgeComponent::PerformBoxTrace()
     // 충돌이 감지되면 방향에 따라 몽타주 재생
     if (bHit)
     {
-        if (HitResult.GetActor() && HitResult.GetActor()->IsA(AActor::StaticClass()))
+        if (HitResult.GetActor() && HitResult.GetActor()->IsA(ACBossWeapon::StaticClass()))
         {
                 PlayDodgeMontage();
         }
