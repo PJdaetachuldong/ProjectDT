@@ -22,7 +22,7 @@ void UCBossAnimNotify_Guard::NotifyBegin ( USkeletalMeshComponent* MeshComp , UA
 	CheckNull ( My );
 
 	//가드 체크확인 콜리전 활성화
-	My->OnGuardCollision();
+	//My->OnGuardCollision();
 }
 
 void UCBossAnimNotify_Guard::NotifyTick ( USkeletalMeshComponent* MeshComp , UAnimSequenceBase* Animation , float FrameDeltaTime )
@@ -40,7 +40,7 @@ void UCBossAnimNotify_Guard::NotifyTick ( USkeletalMeshComponent* MeshComp , UAn
 // 	if ( CurTime >= DelayTime )
 // 	{
 		//가드 체크확인 콜리전 활성화로 계속 체크
-		My->OnGuardCollision ( );
+		//My->OnGuardCollision ( );
 		/*CurTime = 0.0f;*/
 	/*}*/
 }
@@ -57,7 +57,7 @@ void UCBossAnimNotify_Guard::NotifyEnd ( USkeletalMeshComponent* MeshComp , UAni
 	CheckNull ( My );
 
 	//가드 체크확인 콜리전 비활성화
-	My->OffGuardCollision();
+	//My->OffGuardCollision();
 
 	//가드 조건 초기화
 	My->GuardGage = 0.0f;

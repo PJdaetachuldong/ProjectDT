@@ -81,11 +81,17 @@ public:
 
 	void OffSwordCollision();
 
-	void OnGuardCollision();
+	bool OnGuardCollision();
 
 	void OffGuardCollision();
 
 	bool CheckPlayer();
+
+	FVector Attack3Location;
+
+	void SetLocation();
+
+	bool CheckAttack1_3Player();
 
 	void AttackTurn();
 
