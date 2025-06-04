@@ -167,33 +167,7 @@ void UCWeaponComponent::SubAction_Pressed()
 
 
 
-	//parry->OnParryCollision();
 
-	//// 5프레임 뒤에 콜리전 끄기 (60FPS 기준 약 0.083초)
-	//FTimerHandle TimerHandle;
-	//FTimerDelegate TimerDelegate;
-
-	//// 람다 캡처 방식 또는 바인딩 방식 사용 가능
-	//TimerDelegate.BindLambda([parry]()
-	//{
-	//	parry->OffParryCollision();
-	//});
-
-	//GetWorld()->GetTimerManager().SetTimer(
-	//	TimerHandle,
-	//	TimerDelegate,
-	//	5.0f / 60.0f, // 약 0.083초
-	//	false // 반복 안 함
-	//);
-	//FTimerHandle PH;
-
-	//bCanParry = false;
-	//GetWorld ( )->GetTimerManager ( ).SetTimer (
-	//	PH,
-	//	[this]( ){bCanParry = true; } ,
-	//	0.2f , // 쿨타임 0.3초 (원하는 시간으로)
-	//	false
-	//);
 }
 
 void UCWeaponComponent::SubAction_Released ( )
@@ -213,14 +187,12 @@ void UCWeaponComponent::SubAction_Skill_Pressed ( )
 	if ( !!GetSubAction_Skill ( ) ){
 		GetSubAction_Skill ( )->Pressed ( );
 	}
-
 }
 
 void UCWeaponComponent::SubAction_Skill_Released ( )
 {
 	if ( !!GetSubAction_Skill ( ) )
 		GetSubAction_Skill ( )->Released ( );
-
 }
 
 void UCWeaponComponent::OnParry ( EParryState ParryState )

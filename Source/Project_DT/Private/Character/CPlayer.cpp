@@ -288,6 +288,7 @@ float ACPlayer::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& Da
 	Damage.Causer = DamageCauser;
 	Damage.Event = (FActionDamageEvent*)&DamageEvent;
 	CLog::Log(Damage.Power);
-	Hitted();
+	if (Parry->GetGuardState())return 0;
+		Hitted();
 	return TakeDamageAmount;
 }

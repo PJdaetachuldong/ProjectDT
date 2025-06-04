@@ -24,6 +24,7 @@ public:
 	FORCEINLINE void OnParryCollision ( ) { bIsParrying = true; }
 	FORCEINLINE void OffParryCollision ( ) { bIsParrying = false; }
 	FORCEINLINE bool GetParryState() { return bIsParrying; }
+	FORCEINLINE bool GetGuardState() { return bIsGuarding; }
 
 
 protected:
@@ -51,6 +52,8 @@ private:
 	class ACharacter* OwnerCharacter;
 	UPROPERTY(VisibleAnywhere)
 	class UCWeaponComponent* Weapon;
+	UPROPERTY(VisibleAnywhere)
+	class UCStateComponent* State;
 
 public:
 	bool bIsParrying;
@@ -71,5 +74,5 @@ private:
 	float GuardTraceInterval = 0.05f; // 20 fps
 
 	// Trace settings
-	float TraceRadius = 50.f;
+	float TraceRadius = 100.f;
 };

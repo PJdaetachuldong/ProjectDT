@@ -6,6 +6,7 @@
 #include "Weapons/CAttachment.h"
 #include "Weapons/CWeaponComponent.h"
 #include "Boss/CBossWeapon.h"
+#include "Component/CStateComponent.h"
 // Sets default values for this component's properties
 UCParryComponent::UCParryComponent()
 {
@@ -19,6 +20,7 @@ void UCParryComponent::BeginPlay()
 	Super::BeginPlay();
 	OwnerCharacter = Cast<ACharacter> ( GetOwner ( ) );
 	Weapon = CHelpers::GetComponent<UCWeaponComponent> ( GetOwner ( ) );
+	State = CHelpers::GetComponent<UCStateComponent> ( GetOwner ( ) );
 }
 
 
@@ -110,7 +112,33 @@ void UCParryComponent::OnGuard()
 {
 	if (bIsGuarding)
 		return;
+	OnParryCollision();
 
+// 5프레임 뒤에 콜리전 끄기 (60FPS 기준 약 0.083초)
+FTimerHandle TimerHandle;
+FTimerDelegate TimerDelegate;
+
+// 람다 캡처 방식 또는 바인딩 방식 사용 가능
+TimerDelegate.BindLambda([this]()
+{
+	OffParryCollision();
+});
+
+GetWorld()->GetTimerManager().SetTimer(
+	TimerHandle,
+	TimerDelegate,
+	20.0f / 60.0f, // 약 0.083초
+	false // 반복 안 함
+);
+FTimerHandle PH;
+
+//bCanParry = false;
+//GetWorld ( )->GetTimerManager ( ).SetTimer (
+//	PH,
+//	[this]( ){bCanParry = true; } ,
+//	0.2f , // 쿨타임 0.3초 (원하는 시간으로)
+//	false
+//);
 	bIsGuarding = true;
 
 	// 반복적인 스피어 트레이스 시작
@@ -170,9 +198,11 @@ void UCParryComponent::PerformGuardTrace()
 		AActor* HitActor = HitResult.GetActor();
 		if (HitActor->IsA(ACBossWeapon::StaticClass()))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Guarded against: %s"), *HitActor->GetName());
-
-			// 여기에 블로킹 효과, 이펙트, 사운드, 스태미나 소비 등 추가
+			auto* AnimInstance = Cast<UAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
+			UAnimMontage* CurrentMontage = AnimInstance->GetCurrentActiveMontage();
+			if (CurrentMontage) {
+				AnimInstance->Montage_JumpToSection(FName("Hit"), CurrentMontage);
+			}
 		}
 	}
 }
