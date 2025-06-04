@@ -54,4 +54,22 @@ private:
 
 public:
 	bool bIsParrying;
+
+public:
+	void OnGuard();
+	void OffGuard();
+	void PerformGuardTrace();
+
+private:
+	// Timer for repeated tracing
+	FTimerHandle GuardTraceTimer;
+
+	// Guard state
+	bool bIsGuarding = false;
+
+	// Guard trace interval
+	float GuardTraceInterval = 0.05f; // 20 fps
+
+	// Trace settings
+	float TraceRadius = 50.f;
 };

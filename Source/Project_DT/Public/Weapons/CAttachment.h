@@ -64,6 +64,10 @@ protected:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class USkeletalMeshComponent* SkeletalMesh;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class UNiagaraSystem* TrailNiagaraSystem;
+
+	class UNiagaraComponent* TrailNiagaraStart;
 
 private:
 	bool bCollisionTraceEnabled = false;
@@ -82,4 +86,6 @@ private:
 		TArray<FHitResult>& OutHits);
 	FVector BezierCurve(const FVector& P0, const FVector& P1, const FVector& P2, float T);
 	bool bInitialized = false;
+
+	class AActor* EnemyActor;
 };

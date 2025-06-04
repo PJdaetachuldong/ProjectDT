@@ -36,7 +36,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void Damage(float InAmount);
+	float Damage(float InAmount);
 	void Heal ( float InAmount );
 	void UseMana ( float InAmount );
 	void RecoverMana ( float InAmount );

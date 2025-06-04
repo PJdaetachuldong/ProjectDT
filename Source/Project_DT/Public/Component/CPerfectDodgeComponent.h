@@ -49,5 +49,7 @@ private:
     void PerformBoxTrace();
 
     // 몽타주 재생 함수
-    void PlayDodgeMontage(bool bDodgeRight);
+    void PlayDodgeMontage();
+public:
+    FString DodgeRotate = TEXT("Back");
 };

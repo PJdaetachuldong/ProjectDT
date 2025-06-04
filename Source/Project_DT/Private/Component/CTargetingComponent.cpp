@@ -189,7 +189,8 @@ void UCTargetingComponent::UpdateLockOn ( float DeltaTime )
 
     // 캐릭터 회전 보간
     FRotator NewCharRotation = FMath::RInterpTo ( OwnerCharacter->GetActorRotation ( ) , TargetRotation , DeltaTime , 100.f );
-    OwnerCharacter->SetActorRotation ( NewCharRotation );
+    if(!Movement->GetCancelLockOn())
+        OwnerCharacter->SetActorRotation ( NewCharRotation );
 
     // 카메라도 타겟 바라보게 (컨트롤러 회전 보간)
     AController* Controller = OwnerCharacter->GetController ( );
@@ -203,7 +204,8 @@ void UCTargetingComponent::UpdateLockOn ( float DeltaTime )
 
         // 컨트롤러 회전 보간
         FRotator NewControlRot = FMath::RInterpTo ( ControlRot , CamToTargetRot , DeltaTime , 5.f );
-        //Controller->SetControlRotation ( NewControlRot );
+        Controller->SetControlRotation ( NewControlRot );
+        FRotator lookAtRot = UKismetMathLibrary::FindLookAtRotation(OwnerCharacter->GetActorLocation(), LockedOnTarget->GetActorLocation());
     }
 
     // 디버그

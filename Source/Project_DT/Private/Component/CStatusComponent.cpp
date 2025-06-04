@@ -19,10 +19,11 @@ void UCStatusComponent::BeginPlay ( )
 	Mana = MaxMana;
 }
 
-void UCStatusComponent::Damage ( float InAmount )
+float UCStatusComponent::Damage ( float InAmount )
 {
 	Health += ( InAmount * -1.0f );
 	Health = FMath::Clamp ( Health , 0.0f , MaxHealth );
+	return Health;
 }
 
 void UCStatusComponent::Heal ( float InAmount )

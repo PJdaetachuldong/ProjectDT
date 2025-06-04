@@ -25,13 +25,11 @@ void UCStateComponent::TickComponent ( float DeltaTime , ELevelTick TickType , F
 void UCStateComponent::SetIdleMode ( )
 {
 	ChangeType ( EStateType::Idle );
-
 }
 
 void UCStateComponent::SetBackStepMode ( )
 {
 	ChangeType ( EStateType::BackStep );
-
 }
 
 void UCStateComponent::SetEquipMode ( )
@@ -43,13 +41,11 @@ void UCStateComponent::SetEquipMode ( )
 void UCStateComponent::SetHittedMode ( )
 {
 	ChangeType ( EStateType::Hitted );
-
 }
 
 void UCStateComponent::SetDeadMode ( )
 {
 	ChangeType ( EStateType::Dead );
-
 }
 
 void UCStateComponent::SetActionMode ( )

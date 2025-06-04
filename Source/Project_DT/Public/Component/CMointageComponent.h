@@ -9,7 +9,7 @@
 UENUM ( )
 enum class EActState : uint8
 {
-	Healing,DodgeF, PDodgeL, PDodgeR , DodgeB , DodgeL, DodgeR, DodgeFL, DodgeFR, DodgeBL, DodgeBR , Equip , Dead , Hit , Max
+	Healing,DodgeF, DodgeB , DodgeL, DodgeR, DodgeFL, DodgeFR, DodgeBL, DodgeBR , PDodgeL, PDodgeR,Dead, PDodge, Max
 };
 
 USTRUCT()
@@ -48,18 +48,26 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 public:
-	void PlayBackStepMode();
+	void PlayBackStepMode(EActState InType);
 	void PlayDeadMode();
 	void PlayEquipMode ( );
 	void PlayHealingMode ( );
 	void PlayPerfectDodgeL ( );
 	void PlayPerfectDodgeR ( );
+	void PlayPerfectDodge ( );
+	void Dead();
+	void Respawn();
 
 private:
 	void PlayAnimMontage( EActState InType);
 
 private:
 	class ACharacter* OwnerCharacter;
-	FMontagesData* Datas[(int32)EStateType::Max];
+	FMontagesData* Datas[(int32)EActState::Max];
+	class UCStateComponent* State;
+	class UCStatusComponent* Status;
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FVector RespawnPosition=FVector::ZeroVector;
 
 };
