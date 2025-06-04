@@ -58,4 +58,7 @@ void UCBossAnimNotify_Guard::NotifyEnd ( USkeletalMeshComponent* MeshComp , UAni
 
 	//가드 체크확인 콜리전 비활성화
 	My->OffGuardCollision();
+
+	//가드 조건 초기화
+	My->GuardGage = 0.0f;
 }

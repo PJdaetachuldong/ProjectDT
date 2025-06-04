@@ -7,6 +7,7 @@
 #include "Weapons/CWeaponStuctures.h"
 #include "Boss/CBossEnemy.h"
 #include "Kismet/GameplayStatics.h"
+#include "Boss/FSM/CBossFSM.h"
 
 // Sets default values
 ACBossWeapon::ACBossWeapon()
@@ -51,23 +52,49 @@ void ACBossWeapon::Tick(float DeltaTime)
 	}
 }
 
+bool ACBossWeapon::CheckGuardBool()
+{
+	return IsGuard;
+}
+
 void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	ACPlayer* Player = Cast<ACPlayer>(OtherActor);
 
 	if (Player)
 	{
-		//만약 플레이어가 패링 감지중이면
-		if (Player->Parry->bIsParrying)
+		//가드가 가능한 공격일 경우
+		if (IsGuard)
 		{
-			//경직 애니메이션 재생
-			GEngine->AddOnScreenDebugMessage(130, 1.0f, FColor::Red, TEXT("Player Parrying"));
+			//만약 플레이어가 패링 감지중이면
+			if (Player->Parry->bIsParrying)
+			{
+				//경직 애니메이션 재생
+				GEngine->AddOnScreenDebugMessage(130, 1.0f, FColor::Red, TEXT("Player Parrying"));
 
-			return;
+				//현재 재생중인 몽타주 멈춤
+				MyBoss->AnimInstance->StopAllMontages(0.0f);
+				MyBoss->FSMComponent->AttackState = EBossATTACKState::NONE;
+
+				MyBoss->AnimInstance->Montage_Play(MyBoss->AM_ParringInteraction);
+
+				return;
+			}
+
+			// 사용자 정의 데미지 이벤트 생성
+			MyBoss->HitData->HitDatas[HitNumber].SendDamage(MyBoss, this, Player);
 		}
 
-		// 사용자 정의 데미지 이벤트 생성
-		MyBoss->HitData->HitDatas[HitNumber].SendDamage(MyBoss, this, Player);
+		//가드 불가능 공격일 경우
+		else
+		{
+			//경직 애니메이션 재생
+			GEngine->AddOnScreenDebugMessage(130, 1.0f, FColor::Red, TEXT("This Don't Guard"));
+
+			//무조건 사용자 정의 데미지 이벤트 생성
+			MyBoss->HitData->HitDatas[HitNumber].SendDamage(MyBoss, this, Player);
+		}
+		
 
 // 		//만약 대쉬 공격 애니메이션 중이라면
 // 		if (!AnimInstance->Montage_IsPlaying(AM_DashAttack))
