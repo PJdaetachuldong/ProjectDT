@@ -64,10 +64,6 @@ protected:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class USkeletalMeshComponent* SkeletalMesh;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	class UNiagaraSystem* TrailNiagaraSystem;
-
-	class UNiagaraComponent* TrailNiagaraStart;
 
 private:
 	bool bCollisionTraceEnabled = false;

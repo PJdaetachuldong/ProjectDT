@@ -40,7 +40,7 @@ ACPlayer::ACPlayer()
 
 	SpringArm->SetRelativeLocation ( FVector ( 0 , 0 , 140 ) );
 	SpringArm->SetRelativeRotation ( FRotator ( 0 , 90,0 ) );
-	SpringArm->TargetArmLength = 300;
+	SpringArm->TargetArmLength = 250;
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -98,7 +98,6 @@ void ACPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	Movement->OnRun ( );
-	//Movement->EnableControlRotation ( );
 	APlayerController* PC = Cast<APlayerController> ( GetController ( ) );
 	UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem> ( PC->GetLocalPlayer ( ) );
 	subSys->AddMappingContext ( IMC , 0 );
@@ -148,14 +147,12 @@ void ACPlayer::OnStateTypeChanged ( EStateType InPrevType , EStateType InNewType
 	{
 	case EStateType::BackStep: BackStep ( ); break;
 	case EStateType::Dead: DeadHandler(); break;
-
 	}
 }
 
 void ACPlayer::OnAvoid ( )
 {
-	if ( !State->IsIdleMode ( ) ) return;
-	if ( !Movement->CanMove ( ) ) return;
+	if ( State->IsIdleMode ( ) or State->IsCancelMode())
 		State->SetBackStepMode ();
 }
 
@@ -289,6 +286,7 @@ float ACPlayer::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& Da
 	Damage.Event = (FActionDamageEvent*)&DamageEvent;
 	CLog::Log(Damage.Power);
 	if (Parry->GetGuardState())return 0;
+	//if (Dodge->GetGuardState())return 0;
 		Hitted();
 	return TakeDamageAmount;
 }

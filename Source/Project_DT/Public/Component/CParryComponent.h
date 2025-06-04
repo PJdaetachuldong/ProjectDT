@@ -74,5 +74,5 @@ private:
 	float GuardTraceInterval = 0.05f; // 20 fps
 
 	// Trace settings
-	float TraceRadius = 100.f;
+	float TraceRadius = 60.f;
 };

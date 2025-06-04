@@ -33,7 +33,7 @@ private:
 
     // 박스 트레이스 크기
     UPROPERTY(EditAnywhere, Category = "PerfectDodge")
-    FVector BoxExtent = FVector(50.0f, 50.0f, 50.0f);
+    FVector BoxExtent = FVector(50.0f, 50.0f, 80.0f);
     UPROPERTY()
     class ACharacter* OwnerCharacter;
     UPROPERTY()

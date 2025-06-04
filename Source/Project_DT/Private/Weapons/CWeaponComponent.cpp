@@ -154,7 +154,7 @@ void UCWeaponComponent::DoHeavyAction ( )
 
 void UCWeaponComponent::SubAction_Pressed()
 {
-	if ( !bCanParry ) return; // 연타 방지
+	//if ( !bCanParry ) return;
 	State = CHelpers::GetComponent<UCStateComponent> ( OwnerCharacter );
 
 	//CheckFalse ( State->IsIdleMode ( ) );

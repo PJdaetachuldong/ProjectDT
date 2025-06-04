@@ -14,14 +14,7 @@ ACAttachment::ACAttachment()
 	CHelpers::CreateComponent ( this , &Root , "Root" );
 	CHelpers::CreateComponent<USkeletalMeshComponent>(this, &SkeletalMesh, "SkeletalMesh");
 	SkeletalMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	TrailNiagaraStart = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TrailNiagaraStart"));
-	TrailNiagaraStart->SetupAttachment(SkeletalMesh);
-	TrailNiagaraStart->AttachToComponent(
-		SkeletalMesh, // 또는 다른 Attach 대상 컴포넌트
-		FAttachmentTransformRules::SnapToTargetIncludingScale,
-		"Bottom"
-	);
-	TrailNiagaraStart->bAutoActivate = false;
+
 
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -48,12 +41,7 @@ void ACAttachment::BeginPlay()
 	}
 
 	Super::BeginPlay ( );
-	if (TrailNiagaraSystem && TrailNiagaraStart)
-	{
-		TrailNiagaraStart->SetAsset(TrailNiagaraSystem);
-		TrailNiagaraStart->Activate(true);
 
-	}
 }
 
 void ACAttachment::Tick(float DeltaTime)
@@ -133,16 +121,6 @@ void ACAttachment::Tick(float DeltaTime)
 				OnAttachmentBeginOverlap.Broadcast(OwnerCharacter, this, Cast<ACharacter>(Hit.GetActor()));
 		}
 	}
-	if (SkeletalMesh && TrailNiagaraStart)
-	{
-		// 시작 위치를 매 프레임 따라가게
-		//TrailNiagaraStart->SetWorldLocation(CurrentStartLocation);
-		//TrailNiagaraStartEnd->SetWorldLocation(CurrentEndLocation);
-
-		// 끝 위치는 User 파라미터로 전달
-		//TrailNiagaraStart->SetNiagaraVariableVec3(TEXT("User.endpaticle_position"), CurrentStartLocation);
-		//TrailNiagaraStartEnd->SetNiagaraVariableVec3(TEXT("User.endpaticle_position"), CurrentEndLocation);
-	}
 	DrawDebugBox(GetWorld(), CurrentStartLocation, FVector(2.f), FColor::Blue, false, 0.1f);
 	DrawDebugBox(GetWorld(), CurrentEndLocation, FVector(2.f), FColor::Red, false, 0.1f);
 	DrawDebugBox(GetWorld(), PrevStartLocation, FVector(2.f), FColor::Cyan, false, 0.1f);
@@ -161,8 +139,6 @@ void ACAttachment::OnCollisions ( )
 
 	bCollisionTraceEnabled = true;
 	EnemyActor = nullptr;
-	TrailNiagaraStart->ResetSystem();
-	TrailNiagaraStart->Activate(true);
 
 }
 
@@ -179,9 +155,6 @@ void ACAttachment::OffCollisions ( )
 	CurrentStartLocation = FVector::ZeroVector;
 	CurrentEndLocation = FVector::ZeroVector;
 	bInitialized = false;
-	if(TrailNiagaraStart){
-		TrailNiagaraStart->Deactivate();
-	}
 }
 
 void ACAttachment::OnComponentBeginOverlap ( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult )

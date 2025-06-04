@@ -22,10 +22,6 @@ void UCMovementComponent::BeginPlay()
 	OwnerCharacter = Cast<ACharacter> ( GetOwner ( ) );
 	Weapon = CHelpers::GetComponent<UCWeaponComponent> ( OwnerCharacter );
 	TargetComp = CHelpers::GetComponent<UCTargetingComponent> ( OwnerCharacter );
-
-
-	// ...
-
 }
 
 void UCMovementComponent::SetSpeed ( ESpeedType InType )
@@ -47,7 +43,6 @@ void UCMovementComponent::OnRun ( )
 	SetSpeed ( ESpeedType::Run );
 
 }
-
 void UCMovementComponent::OnWalk ( )
 {
 	SetSpeed ( ESpeedType::Walk );
@@ -61,7 +56,6 @@ void UCMovementComponent::EnableControlRotation ( )
 	OwnerCharacter->GetCharacterMovement ( )->bOrientRotationToMovement = false;
 	OwnerCharacter->GetCharacterMovement ( )->bUseControllerDesiredRotation = true;
 }
-
 void UCMovementComponent::DisableControlRotation ( )
 {
 	OwnerCharacter->bUseControllerRotationYaw = false;
@@ -128,16 +122,12 @@ void UCMovementComponent::OnVerticalLook ( const FInputActionValue& Value )
 {
 	float Scale = Value.Get<float> ( );
 
-
 	OwnerCharacter->AddControllerPitchInput ( Scale * VerticalLook * GetWorld ( )->GetDeltaSeconds ( ) );
 }
-
 void UCMovementComponent::Move ( )
 {
 	bCanMove = true;
-
 }
-
 void UCMovementComponent::Stop ( )
 {
 	bCanMove = false;

@@ -31,51 +31,59 @@ void UCParryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		DetectActor ( );
 }
 
-void UCParryComponent::DetectActor ( )
+void UCParryComponent::DetectActor()
 {
-	if ( !GetOwner ( ) ) return;
+	if (!GetOwner()) return;
 
-	FVector Location = GetOwner ( )->GetActorLocation ( );
+	FVector Start = GetOwner()->GetActorLocation();
+	FVector Forward = GetOwner()->GetActorForwardVector();
+	FVector End = Start + Forward;
+
 	FHitResult Hit;
 	FCollisionQueryParams Params;
-	Params.AddIgnoredActor ( GetOwner ( ) );
+	Params.AddIgnoredActor(GetOwner());
 
-	for ( AActor* Ignored : TemporarilyIgnoredActors )
-		Params.AddIgnoredActor ( Ignored );
+	for (AActor* Ignored : TemporarilyIgnoredActors)
+		Params.AddIgnoredActor(Ignored);
 
-	FVector HalfExtent = FVector ( 50.f , 50.f , 100.f );
-	FCollisionShape BoxShape = FCollisionShape::MakeBox ( HalfExtent );
 
-	bool bHit = GetWorld ( )->SweepSingleByChannel (
-		Hit ,
-		Location ,
-		Location ,
-		FQuat::Identity ,
-		ECC_GameTraceChannel3 ,
-		BoxShape ,
+	bool bHit = GetWorld()->SweepSingleByChannel(
+		Hit,
+		Start,
+		End,
+		FQuat::Identity,
+		ECC_GameTraceChannel3,
+		FCollisionShape::MakeSphere(TraceRadius+10.0f),
 		Params
 	);
 
-	DrawDebugBox ( GetWorld ( ) , Location , HalfExtent , FQuat::Identity , FColor::Green , false , 0.1f );
+#if WITH_EDITOR
+	// 시각화
+	DrawDebugLine(GetWorld(), Start, End, FColor::Yellow, false, 0.1f, 0, 1.5f);
+	DrawDebugSphere(GetWorld(), End, TraceRadius+10.0f, 16, FColor::Green, false, 0.1f);
+#endif
 
-	AActor* HitActor = Hit.GetActor ( );
-	if ( bHit && HitActor && HitActor->IsA ( AActor::StaticClass ( ) ) )
+	AActor* HitActor = Hit.GetActor();
+	if (bHit && HitActor && HitActor->IsA(ACBossWeapon::StaticClass()))
 	{
-		if ( TemporarilyIgnoredActors.Contains ( HitActor ) )
+		if (TemporarilyIgnoredActors.Contains(HitActor))
 			return;
 
-		if ( !IsInDetectionAngle ( HitActor ) )
-			return;
+		//if (!IsInDetectionAngle(HitActor))
+		//	return;
 
-		CLog::Log ( "Hit" );
+		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 20.f, 12, FColor::Red, false, 1.0f);
+		DrawDebugLine(GetWorld(), Start, HitActor->GetActorLocation(), FColor::Blue, false, 1.0f, 0, 2.0f);
 
-		DrawDebugSphere ( GetWorld ( ) , Hit.ImpactPoint , 20.f , 12 , FColor::Red , false , 1.0f );
-		DrawDebugLine ( GetWorld ( ) , Location , HitActor->GetActorLocation ( ) , FColor::Blue , false , 1.0f , 0 , 2.0f );
+		EParryState Quadrant = GetHitQuadrant(Hit.ImpactPoint);
 
-		EParryState Quadrant = GetHitQuadrant ( Hit.ImpactPoint );
+		HandleTemporaryIgnore(HitActor);
 
-		HandleTemporaryIgnore ( HitActor );
-		Weapon->OnParry ( Quadrant );
+		// 가드 해제 처리 (애니메이션 없이 즉시 상태만 끊기)
+			bIsGuarding = false;
+			GetWorld()->GetTimerManager().ClearTimer(GuardTraceTimer);
+
+		Weapon->OnParry(Quadrant);
 	}
 }
 
@@ -110,8 +118,7 @@ void UCParryComponent::HandleTemporaryIgnore ( AActor* ActorToIgnore )
 
 void UCParryComponent::OnGuard()
 {
-	if (bIsGuarding)
-		return;
+	//if (bIsGuarding)return;
 	OnParryCollision();
 
 // 5프레임 뒤에 콜리전 끄기 (60FPS 기준 약 0.083초)
@@ -127,7 +134,7 @@ TimerDelegate.BindLambda([this]()
 GetWorld()->GetTimerManager().SetTimer(
 	TimerHandle,
 	TimerDelegate,
-	20.0f / 60.0f, // 약 0.083초
+	5.0f / 60.0f, // 약 0.083초
 	false // 반복 안 함
 );
 FTimerHandle PH;
@@ -153,8 +160,6 @@ FTimerHandle PH;
 
 void UCParryComponent::OffGuard()
 {
-	if (!bIsGuarding)
-		return;
 
 	bIsGuarding = false;
 

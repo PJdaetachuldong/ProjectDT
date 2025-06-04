@@ -54,6 +54,11 @@ void UCStateComponent::SetActionMode ( )
 
 }
 
+void UCStateComponent::SetCancelMode()
+{
+	ChangeType(EStateType::Cancel);
+}
+
 void UCStateComponent::OnSubActionMode ( )
 {
 	bInSubActionMode = true;
