@@ -683,8 +683,17 @@ void ACBossEnemy::Hitted()
 	if (!!Damage.Event && !!Damage.Event->HitData) {
 		FHitData* data = Damage.Event->HitData;
 
-		if (ShieldAmount <= 0.0f){data->PlayMontage(this);}
+		if (ShieldAmount <= 0.0f)
+		{
+			if(FSMComponent->State == EBossState::BREAK)
+			{
+				FSMComponent->State = EBossState::ATTACK;
+				FSMComponent->AttackState = EBossATTACKState::NONE;
+			}
 
+			data->PlayMontage(this);
+		}
+		
 		data->PlayHitStop(GetWorld());
 		{
 			FVector start = GetActorLocation();
@@ -749,16 +758,20 @@ void ACBossEnemy::Hit()
 			{
 				// -가 된 쉴드 게이지만큼 체력을 깎아줌
 				CurHP += ShieldAmount;
-				//브레이크 상태로 됨
-				FSMComponent->State = EBossState::BREAK;
+
+				if (FSMComponent->State != EBossState::BREAK)
+				{
+					//브레이크 상태로 됨
+					FSMComponent->State = EBossState::BREAK;
+				}
 			}
 		}
 
 		//공격 모션이 재생중이 아니라면
 		else
 		{
-			//검으로 막는 애니메이션 재생
-			if (!AnimInstance->Montage_IsPlaying(AM_ShieldHit))
+			//쉴드가 있는 경우에는 검으로 막는 애니메이션 재생
+			if (ShieldAmount > 0 ||!AnimInstance->Montage_IsPlaying(AM_ShieldHit))
 			{
 				AnimInstance->Montage_Play(AM_ShieldHit);
 			}
@@ -777,8 +790,11 @@ void ACBossEnemy::Hit()
 				// -가 된 쉴드 게이지만큼 체력을 깎아줌
 				CurHP += ShieldAmount;
 
-				//브레이크 상태로 됨
-				FSMComponent->State = EBossState::BREAK;
+				if (FSMComponent->State != EBossState::BREAK)
+				{
+					//브레이크 상태로 됨
+					FSMComponent->State = EBossState::BREAK;
+				}
 				//아래 코드가 실행 안되게 리턴
 				return;
 			}

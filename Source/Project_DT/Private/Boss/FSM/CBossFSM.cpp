@@ -108,6 +108,9 @@ void UCBossFSM::DIEState()
 
 void UCBossFSM::NONEState()
 {
+	//쉴드가 까진 상태면 밑에 실행 안함
+	if(MyBoss->ShieldAmount<=0.0f) return;
+
 	//임시로 약간 떨어트리는 코드
 	if (TargetDist <= 150.0f)
 	{
@@ -449,6 +452,9 @@ void UCBossFSM::SideMove()
 		//만약 이동한 위치랑 얼마 차이가 나지 않으면 다시 플레이어를 향해 움직임
 		if (FVector::Dist(TargetSideLocation, MyBoss->GetActorLocation()) <= 150.0f)
 		{
+			//좌우 이동을 하기전 위치에서 거리값 계산을 막기위해 이동 후 위치를 마지막 위치로 설정
+			LastLocation = MyBoss->GetActorLocation();
+
 			//0으로 되돌려서 다시 플레이어를 향해 움직이게 만듦
 			TotalMoveDistance = 0.0f;
 
@@ -530,6 +536,8 @@ void UCBossFSM::DASHATTACKState()
 				IsReadyDashAttack = false;
 				//불 초기화
 				IsLowDist = false;
+				//좌우 이동을 하기전 위치에서 거리값 계산을 막기위해 이동 후 위치를 마지막 위치로 설정
+				LastLocation = MyBoss->GetActorLocation();
 				//리턴
 				return;
 			}
