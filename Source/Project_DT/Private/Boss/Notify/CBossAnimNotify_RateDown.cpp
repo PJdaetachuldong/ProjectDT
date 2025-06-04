@@ -4,6 +4,7 @@
 #include "Boss/Notify/CBossAnimNotify_RateDown.h"
 #include "Global.h"
 #include "Boss/CBossEnemy.h"
+#include "Boss/CBossWeapon.h"
 
 FString UCBossAnimNotify_RateDown::GetNotifyName_Implementation() const
 {
@@ -34,9 +35,10 @@ void UCBossAnimNotify_RateDown::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 	//현재 진행중인 몽타주와 섹션을 함수의 매개변수로 보내서 그에 할당된 Rate값을 받아옴
 	float RateScale = My->SetRateDown(NowMontage, NowSection);
 
+	My->SpawnWeapon->IsGuard = My->SetGuardBool(NowMontage, NowSection);
+	
 	//받은 Rate값을 설정해줌
 	My->AnimInstance->Montage_SetPlayRate(NowMontage, RateScale);
 
-	//먼저 필살기 준비 자세를 취함
 	GEngine->AddOnScreenDebugMessage(170, 8.0f, FColor::Orange, TEXT("Rate Down"));
 }

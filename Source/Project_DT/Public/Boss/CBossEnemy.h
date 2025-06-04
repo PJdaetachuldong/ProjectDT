@@ -38,20 +38,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = ObjectPool)
 	TArray<class ACRangeAttack*> RangedAttackList;
 
-// 	//플레이어와의 거리를 저장하는 변수
-// 	float TargetDist = 0.0f;
-// 
-// 	//어느 거리가 먼 거리인지 설정하는 변수
-// 	float LongDist = 700.0f;
-// 
-// 	//거리가 먼 상태에서 시간이 얼마나 지났는지 저장하는 변수
-// 	float CurChaseTime = 0.0f;
-// 
-// 	//대쉬 공격이 실행되는 쿨타임 변수
-// 	float DashAttackCooltime = 25.0f;
-	
-	//대쉬 공격 시 정해진 위치와의 거리를 저장하는 변수
-	/*float LocationToDist = 0.0f;	*/
+	//현재 쉴드가 없는 시간을 체크하는 변수
+	float CurBreakTime = 0.0f;
+
+	//쉴드가 다시 복구되는 시간
+	float ResetShieldTime = 7.0f;
 
 	//돌진 공격이 맞았는지 판단하는 변수
 	bool IsDashAttackHit = false;
@@ -65,12 +56,7 @@ public:
 	//가드가 성공하였는지 체크하는 변수
 	bool IsGuardSucssess = false;
 
-	//준비 자세일때 받은 데미지의 총량을 저장하는 변수
-	float OnSPDamage = 0.0f;
-
-	//필살기 준비 자세때 패턴이 파훼될때까지 필요한 데미지를 설정하는 변수
-	float SPBreakDamageAmount = 50.0f;
-
+	//현재 필살기를 사용하려고 준비 자세를 취하고 있는지 확인하는 변수
 	bool IsReadySPAttack = false;
 
 	//쉴드 상태에서 공격을 몇회 맞았는지 체크하는 변수
@@ -79,13 +65,13 @@ public:
 	//쉴드 상태에서 일정 횟수 이상 공격을 맞았을 경우 반격 공격이 실행되는 조건 변수
 	int32 ShieldHitCounter = 2;
 
+	//쉴드가 있을때 카운터까지 횟수 체크하는 시간
+	float GuardingTime = 0.0f;
+
 	//일단 임시로 하는 발사 위치 설정
 	UPROPERTY(EditAnywhere)
 	class USceneComponent* ThrowPosition;
 	//일단 임시로 하는 발사 위치 설정
-
-	UPROPERTY(EditAnywhere)
-	class UBoxComponent* GuardCollComp;
 
 	UAnimInstance* AnimInstance;
 	
@@ -112,6 +98,8 @@ public:
 	void DashAttackEnd();
 
 	float SetRateDown(UAnimMontage* CurrentMontage, FName CurrentSection);
+
+	bool SetGuardBool(UAnimMontage* CurrentMontage, FName CurrentSection);
 
 	// FSM 컴포넌트
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -141,6 +129,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
 	class UAnimMontage* AM_ShieldHit;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_ParringInteraction;
+
 	//Rate Scale 매핑 초기화 함수
 	void InitializeMontageMap();
 
@@ -151,10 +142,22 @@ public:
 
 	class ACBossWeapon* SpawnWeapon;
 
+	UPROPERTY(EditAnywhere, Category = SPAttack)
+	TSubclassOf<class ASPAttackCheckCollision> SPAttackCollision;
+
+	UPROPERTY(EditAnywhere, Category = SPAttack)
+	class ASPAttackCheckCollision* SpawnSpColli;
+
+	void SetSPColli();
+
+	void SPAttack();
+
+	void EndSPAttack();
+
 	UPROPERTY(EditAnywhere, Category = DataAsset)
 	UHitDataAsset_BossToPlayer* HitData;
 
-	// 클래스 멤버로 매핑 테이블 초기화
+	//각 공격을 쉽게 불러올 수 있게 맵으로 정리
 	TMap<FName, EAttackType> AttackSectionToEnumMap;
 
 	void InitAttackTMap();
@@ -178,6 +181,8 @@ protected:
     virtual void Hitted();
 public:
     float TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	virtual void Hit() override;
 };
 
 USTRUCT(BlueprintType)
@@ -190,6 +195,9 @@ struct FMontageRateScale
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RateScale;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsGuard;
 };
 
 UENUM(BlueprintType)

@@ -51,8 +51,28 @@ public:
 	//거리가 먼 상태에서 시간이 얼마나 지났는지 저장하는 변수
 	float CurChaseTime = 0.0f;
 
+	//공격 상태에서 이동한 거리를 저장하는 변수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float TotalMoveDistance = 0.0f;
+
+	//마지막 있던 위치
+	FVector LastLocation;
+
+	//좌 또는 우로 움직이게 하는 변수
+	void SideMove();
+
+	//좌우 이동 위치
+	FVector TargetSideLocation;
+
+	//좌우 이동이 정해졌다고 체크하는 불
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsSideMoveSetting = false;
+
 	//원거리 공격 오브젝트를 소환하는 함수
-	void SpawnRangedActor(FVector Direction);
+	void SpawnRangedActor();
+
+	//원거리 공격 몇번했는지 체크함
+	int32 RangedAttackCount = 0;
 
 	//임의로 던지는 공격이 두번 일어나게 만드는 타이머
 	float CurRandgedTime = 0.0f;
@@ -94,17 +114,20 @@ public:
 	//EaseInSine 계산을 하는 함수
 	float EaseInSine(float x);
 
-	//가드 상태 지속시간을 체크함
-	float CurGuardTime = 0.0f;
-
-	//가드 상태 제한시간 변수
-	float LimiteGuardTime = 3.5f;
-
 	//필살기 준비자세일 때 받는 데미지의 총량을 저장하는 변수
 	float OnSpDamageAmount = 0.0f;
 
 	//필살기 준비 자세때 패턴이 파훼될때까지 필요한 데미지를 설정하는 변수
 	float SPBreakDamageAmount = 50.0f;
+
+	//처음 필살기를 사용했는지 체크하는 불
+	bool IsFirstSPAttack = false;
+
+	//현재 공격 스택
+	int32 CurAttackStack = 0;
+
+	//필살기 공격 사용가능하도록 만드는 스택
+	int32 SPAttackStack = 30;
 
 	//임의로 적은 필살기 사용 조건
 	float TestCurSPTime = 0.0f;

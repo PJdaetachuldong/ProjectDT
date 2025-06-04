@@ -69,38 +69,5 @@ void UCBossAnimNotify_AttackCount::Notify(USkeletalMeshComponent* MeshComp, UAni
 		case EAttackType::Attack02_04: My->SpawnWeapon->HitNumber = 7; break;
 		default: My->SpawnWeapon->HitNumber = -1; break;
 		}
-		
-// 		if (NowSection == "ComboAttack_01_01")
-// 		{
-// 			My->SpawnWeapon->HitNumber = 0;
-// 		}
-// 		else if (NowSection == "ComboAttack_01_02")
-// 		{
-// 			My->SpawnWeapon->HitNumber = 1;
-// 		}
-// 		else if (NowSection == "ComboAttack_01_03")
-// 		{
-// 			My->SpawnWeapon->HitNumber = 2;
-// 		}
-// 		else if (NowSection == "ComboAttack_01_04")
-// 		{
-// 			My->SpawnWeapon->HitNumber = 3;
-// 		}
-// 		else if (NowSection == "ComboAttack_02_01")
-// 		{
-// 			My->SpawnWeapon->HitNumber = 6;
-// 		}
-// 		else if (NowSection == "ComboAttack_02_02")
-// 		{
-// 			My->SpawnWeapon->HitNumber = 7;
-// 		}
-// 		else if (NowSection == "ComboAttack_02_03")
-// 		{
-// 			My->SpawnWeapon->HitNumber = 8;
-// 		}
-// 		else if (NowSection == "ComboAttack_02_04")
-// 		{
-// 			My->SpawnWeapon->HitNumber = 9;
-// 		}
 	}
 }

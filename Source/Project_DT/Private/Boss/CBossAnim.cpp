@@ -2,13 +2,13 @@
 
 
 #include "Boss/CBossAnim.h"
-#include "GameFramework/Character.h"
+#include "Boss/CBossEnemy.h"
 
 void UCBossAnim::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
-	Owner = Cast<ACharacter>(TryGetPawnOwner());
+	Owner = Cast<ACBossEnemy>(TryGetPawnOwner());
 }
 
 void UCBossAnim::NativeUpdateAnimation(float DeltaSeconds)
@@ -25,6 +25,9 @@ void UCBossAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 	Speed = FVector::DotProduct(Velocity, ForwardVector);
 
-	FVector RightVector = Owner->GetActorRightVector();
-	Direction = FVector::DotProduct(Velocity, RightVector);
+	if (!Owner->FSMComponent->IsSideMoveSetting)
+	{
+		FVector RightVector = Owner->GetActorRightVector();
+		MoveDirection = FVector::DotProduct(Velocity, RightVector);
+	}
 }

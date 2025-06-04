@@ -28,6 +28,12 @@ public:
 	//보스 공격 종류에 따라 피격 불러오는 Hit Data가 다름
 	int32 HitNumber = 0;
 
+	//가드가 가능한 공격인지 체크하는 불
+	bool IsGuard = false;
+	
+	//가드 가능한 공격인지 전달하는 변수
+	bool CheckGuardBool();
+
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* SwordMesh;
 

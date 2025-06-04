@@ -20,7 +20,7 @@ public:
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;;
 
-	ACharacter* Owner;
+	class ACBossEnemy* Owner;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bool)
 	bool IsPlayingIdle = false;
@@ -29,7 +29,7 @@ public:
 	float Speed = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State )
-	float Direction = 0.0f;
+	float MoveDirection = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State )
 	EBossState State = EBossState::IDLE;

@@ -71,8 +71,6 @@ void ACRangeAttack::SetActive(bool Value, FVector DirectionToTarget)
 
 void ACRangeAttack::OverlapOther ( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult )
 {
-	
-	
 	//자신을 안보이게 하고 다시 오브젝트 풀로 되돌림
 	SetActive(false, FVector(0));
 }
