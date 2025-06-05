@@ -7,7 +7,7 @@
 
 FString UCBossAnimNotify_RateReturn::GetNotifyName_Implementation() const
 {
-	return "RateDown";
+	return "RateReturn";
 }
 
 void UCBossAnimNotify_RateReturn::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)

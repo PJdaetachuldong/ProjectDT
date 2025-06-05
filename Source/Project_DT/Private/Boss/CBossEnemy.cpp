@@ -291,19 +291,19 @@ void ACBossEnemy::OffSwordCollision()
 	}
 }
 
-void ACBossEnemy::OnGuardCollision ( )
+bool ACBossEnemy::OnGuardCollision ( )
 {
 	//공격이 현재 에너미가 바라보는 방향에서 어느 각도로 맞았는지 체크하게 만듦
 	//SphereTrace와 내적을 사용해서 플레이어의 공격 각도를 체크하는 방식
 	FHitResult Hit;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
-	bool bHit = GetWorld()->SweepSingleByChannel(Hit, GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel4 , FCollisionShape::MakeSphere(130.0f), Params);
+	bool bHit = GetWorld()->SweepSingleByChannel(Hit, GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel3 , FCollisionShape::MakeSphere(130.0f), Params);
 
 	DrawDebugSphere ( GetWorld ( ) , GetActorLocation ( ) , 130.0f , 21 , FColor::Green , false , 0.1f );
 
 	//일단 닿은게 플레이어 무기면 
-	if ( bHit && Hit.GetActor()->IsA(ACAttachment::StaticClass()) )
+	if ( bHit && Hit.GetActor()->IsA(/*ACAttachment*/ACPlayer::StaticClass()) )
 	{
 		//플레이어 무기와의 각도를 계산함
 		FVector ToPlayer = (Hit.GetActor()->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
@@ -319,10 +319,6 @@ void ACBossEnemy::OnGuardCollision ( )
 		/*	GEngine->AddOnScreenDebugMessage ( 111 , 1.0f , FColor::White , TEXT ( "Counter Attack!!!" ) );*/
 			
 			UAnimMontage* NowMontage = GetMesh()->GetAnimInstance ( )->GetCurrentActiveMontage ( );
-			if ( !NowMontage )
-			{
-				return;
-			}
 
 			//현재 몽타주가 재생중인 섹션 확인
 			FName NowSection = GetMesh()->GetAnimInstance ( )->Montage_GetCurrentSection ( NowMontage );
@@ -331,12 +327,10 @@ void ACBossEnemy::OnGuardCollision ( )
 			//해당 몽타주 섹션으로 이동
 			AnimInstance->Montage_JumpToSection(FName("Counter") , NowMontage);
 
-			//혹시 모르니 데미지 처리 못하게 bool을 true로 변경해줌
-			IsGuardSucssess = true;
 			//가드 조건 초기화
 			GuardGage = 0.0f;
 			//뒤에 코드 작동이 안되게 리턴
-			return;
+			return true;
 		}
 
 		//만약 각도가 100보다 크다면, 즉 후방 80도 사이에서 맞았을 경우
@@ -344,12 +338,16 @@ void ACBossEnemy::OnGuardCollision ( )
 		{
 			//자세가 흐트러지며 BREAK상태가 됨
 			FSMComponent->State = EBossState::BREAK;
+			FSMComponent->AttackState = EBossATTACKState::NONE;
+
 			//가드 조건 초기화
 			GuardGage = 0.0f;
 			//뒤에 코드 작동이 안되게 리턴
-			return;
+			return false;
 		}
 	}
+
+	return true;
 
 // 	//만약 그냥 가드 시간이 끝났을 경우
 // 	else
@@ -408,6 +406,47 @@ bool ACBossEnemy::CheckPlayer()
 			bool bLOS = GetWorld()->LineTraceSingleByChannel(LOSHit, GetActorLocation(), Hit.GetActor()->GetActorLocation(), ECC_WorldDynamic , Params);
 
 			if (bLOS && LOSHit.GetActor()->IsA( ACPlayer::StaticClass()))
+			{
+				//true로 값을 전달
+				return true;
+			}
+		}
+	}
+	//아닐 경우 false로 값을 전달
+	return false;
+}
+
+void ACBossEnemy::SetLocation()
+{
+	Attack3Location = GetActorLocation();
+}
+
+bool ACBossEnemy::CheckAttack1_3Player()
+{
+	//플레이어와의 거리와 각도를 체크, 일단은 기존 에너미가 플레이어를 탐지하는 방식으로 진행
+	//SphereTrace와 내적을 사용해서 플레이어를 감지하는 방식
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	bool bHit = GetWorld()->SweepSingleByChannel(Hit, Attack3Location, Attack3Location, FQuat::Identity, ECC_GameTraceChannel3, FCollisionShape::MakeSphere(300.0f), Params);
+
+	DrawDebugSphere(GetWorld(), Attack3Location, 300.0f, 21, FColor::Green, false, 3.0f);
+
+	if (bHit && Hit.GetActor()->IsA(ACPlayer::StaticClass()))
+	{
+		FVector ToPlayer = (Hit.GetActor()->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
+
+		float DotProduct = FVector::DotProduct(GetActorForwardVector(), ToPlayer);
+		float AngleRad = FMath::Acos(DotProduct);
+		float AngleDeg = FMath::RadiansToDegrees(AngleRad);
+
+		if (AngleDeg <= 40.0f)
+		{
+			//플레이어 탐지하는데 장애물이 있는지 확인함
+			FHitResult LOSHit;
+			bool bLOS = GetWorld()->LineTraceSingleByChannel(LOSHit, GetActorLocation(), Hit.GetActor()->GetActorLocation(), ECC_WorldDynamic, Params);
+
+			if (bLOS && LOSHit.GetActor()->IsA(ACPlayer::StaticClass()))
 			{
 				//true로 값을 전달
 				return true;
@@ -724,8 +763,15 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 
 void ACBossEnemy::Hit()
 {
-	//가드 상태에는 데미지 처리가 안되도록 막아둔다
-	if (FSMComponent->AttackState == EBossATTACKState::COUNTERATTACK) return;
+	//카운터 가드 상태일때
+	if (FSMComponent->AttackState == EBossATTACKState::COUNTERATTACK) 
+	{
+		//정면에서 맞아서 카운터 공격이 나가면 뒤에 데미지 처리가 안되게 막음
+		if (OnGuardCollision())
+		{
+			return;
+		}
+	}
 
 	//만약 현재 필살기 준비 상태이면
 	if (IsReadySPAttack)
@@ -771,7 +817,8 @@ void ACBossEnemy::Hit()
 		else
 		{
 			//쉴드가 있는 경우에는 검으로 막는 애니메이션 재생
-			if (ShieldAmount > 0 ||!AnimInstance->Montage_IsPlaying(AM_ShieldHit))
+			//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
+			if (ShieldAmount > 0 && /*!AnimInstance->Montage_IsPlaying(AM_ShieldHit) ||*/ FSMComponent->State != EBossState::BREAK)
 			{
 				AnimInstance->Montage_Play(AM_ShieldHit);
 			}
