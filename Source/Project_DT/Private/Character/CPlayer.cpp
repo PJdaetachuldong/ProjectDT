@@ -45,6 +45,7 @@ ACPlayer::ACPlayer()
 	SpringArm->SetRelativeLocation ( FVector ( 0 , 0 , 140 ) );
 	SpringArm->SetRelativeRotation ( FRotator ( 0 , 90,0 ) );
 	SpringArm->TargetArmLength = 250;
+	
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -52,6 +53,7 @@ ACPlayer::ACPlayer()
 
 	SpringArm->bDoCollisionTest = false;
 	SpringArm->bEnableCameraLag = true;
+	
 
 	GetCharacterMovement ( )->bOrientRotationToMovement = true;
 	GetCharacterMovement ( )->bUseControllerDesiredRotation = false;
@@ -75,8 +77,6 @@ ACPlayer::ACPlayer()
 	CHelpers::CreateActorComponent<UCPerfectDodgeComponent> ( this , &Dodge, "Dodge" );
 	CHelpers::CreateActorComponent<UCTargetingComponent> ( this , &TargetComp , "TargetComp" );
 	CHelpers::CreateActorComponent<UCStatusComponent> ( this , &Status , "Status" );
-
-
 
 	//인풋 받기
 	CHelpers::GetAsset ( &IMC , AssetPaths::IMC );
