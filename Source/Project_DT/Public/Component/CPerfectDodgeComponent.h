@@ -26,6 +26,7 @@ public:
 public:
     FORCEINLINE void StartPerfectDodge() { bIsDodgeActive = true; };
     FORCEINLINE void EndPerfectDodge() { bIsDodgeActive = false; };
+    FORCEINLINE bool ReturnPerfectDodge() { return bIsDodgeActive; };
 private:
     // 퍼펙트 닷지 활성화 여부
     UPROPERTY()

@@ -71,5 +71,4 @@ void UCDoAction::DoActionParry ( EParryState parryState )
 void UCDoAction::CounterAction ( )
 {
 	bBeginAction = true;
-
 }

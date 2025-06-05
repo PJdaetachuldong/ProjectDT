@@ -68,9 +68,11 @@ void UCParryComponent::DetectActor()
 	{
 		if (TemporarilyIgnoredActors.Contains(HitActor))
 			return;
-
-		//if (!IsInDetectionAngle(HitActor))
-		//	return;
+		ACBossWeapon* Enemy = Cast<ACBossWeapon>(HitActor);
+		if (Enemy)
+			if (!Enemy->CheckGuardBool()) {
+				return;
+			}
 
 		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 20.f, 12, FColor::Red, false, 1.0f);
 		DrawDebugLine(GetWorld(), Start, HitActor->GetActorLocation(), FColor::Blue, false, 1.0f, 0, 2.0f);
@@ -79,9 +81,8 @@ void UCParryComponent::DetectActor()
 
 		HandleTemporaryIgnore(HitActor);
 
-		// 가드 해제 처리 (애니메이션 없이 즉시 상태만 끊기)
-			bIsGuarding = false;
-			GetWorld()->GetTimerManager().ClearTimer(GuardTraceTimer);
+		bIsGuarding = false;
+		GetWorld()->GetTimerManager().ClearTimer(GuardTraceTimer);
 
 		Weapon->OnParry(Quadrant);
 	}
@@ -134,7 +135,7 @@ TimerDelegate.BindLambda([this]()
 GetWorld()->GetTimerManager().SetTimer(
 	TimerHandle,
 	TimerDelegate,
-	5.0f / 60.0f, // 약 0.083초
+	10.0f / 60.0f, // 약 0.083초
 	false // 반복 안 함
 );
 FTimerHandle PH;

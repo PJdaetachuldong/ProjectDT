@@ -55,6 +55,7 @@ public:
 	FORCEINLINE void SpecialAttack ( ) { ActionState = EActionState::Special; };
 	FORCEINLINE void OnGuard ( ) { ActionState = EActionState::Guard; };
 	FORCEINLINE void OnParry ( ) { ActionState = EActionState::Parry; };
+	FORCEINLINE bool RetrunParry() { return bParry; };
 
 
 public:
@@ -85,5 +86,7 @@ protected:
 	TArray<FCounterActionData> CounterActionDatas;
 	TArray<FParryActionData> ParryActionDatas;
 	TArray<FHitData> HitDatas;
+
+	bool bParry;
 
 };
