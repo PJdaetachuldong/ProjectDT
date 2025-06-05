@@ -112,6 +112,9 @@ public:
     class UCBossFSM* FSMComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
+	class UAnimMontage* AM_Die;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)
 	class UAnimMontage* AM_ComboAttack_01;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Montage)

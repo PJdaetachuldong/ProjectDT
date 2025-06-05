@@ -87,6 +87,18 @@ ACBossEnemy::ACBossEnemy()
 		AM_ShieldHit = TempShieldHit.Object;
 	}
 
+	ConstructorHelpers::FObjectFinder<UAnimMontage> TempParringInter(L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/AM_ParringInter.AM_ParringInter'");
+	if (TempParringInter.Succeeded())
+	{
+		AM_ParringInteraction = TempParringInter.Object;
+	}
+
+	ConstructorHelpers::FObjectFinder<UAnimMontage> TempDie(L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/AM_Die.AM_Die'");
+	if (TempDie.Succeeded())
+	{
+		AM_Die = TempDie.Object;
+	}
+
 	ConstructorHelpers::FObjectFinder<UHitDataAsset_BossToPlayer> TempHitData (L"/Script/Project_DT.HitDataAsset_BossToPlayer'/Game/ODH/DataAsset/DA_Hit.DA_Hit'");
 	if (TempHitData.Succeeded())
 	{
@@ -222,7 +234,7 @@ void ACBossEnemy::InitializeMontageMap()
 		TArray<FMontageRateScale> GuardRates;
 		GuardRates.Add(FMontageRateScale{ FName("Hit"), 0.7f, false});
 		GuardRates.Add(FMontageRateScale{ FName("Interaction"), 0.7f, false});
-		GuardRates.Add(FMontageRateScale{ FName("Counter"), 0.7f, false});
+		GuardRates.Add(FMontageRateScale{ FName("Counter"), 1.0f, false});
 		GuardRates.Add(FMontageRateScale{ FName("End"), 0.7f, false});
 		MontageScaleMap.Add(AM_ShieldHit, GuardRates);
 	}
@@ -717,6 +729,9 @@ void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActo
 
 void ACBossEnemy::Hitted()
 {
+	//사망 상태면 안되게 막음
+	if (FSMComponent->State == EBossState::DIE) return;
+
 	Damage.Power = 0;
 	
 	if (!!Damage.Event && !!Damage.Event->HitData) {
@@ -763,6 +778,9 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 
 void ACBossEnemy::Hit()
 {
+	//사망 상태면 안되게 막음
+	if(FSMComponent->State == EBossState::DIE) return;
+
 	//카운터 가드 상태일때
 	if (FSMComponent->AttackState == EBossATTACKState::COUNTERATTACK) 
 	{
@@ -796,6 +814,7 @@ void ACBossEnemy::Hit()
 			{
 				//보스 사망
 				FSMComponent->State = EBossState::DIE;
+				
 				return;
 			}
 
@@ -818,7 +837,7 @@ void ACBossEnemy::Hit()
 		{
 			//쉴드가 있는 경우에는 검으로 막는 애니메이션 재생
 			//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
-			if (ShieldAmount > 0 && /*!AnimInstance->Montage_IsPlaying(AM_ShieldHit) ||*/ FSMComponent->State != EBossState::BREAK)
+			if (ShieldAmount > 0 && FSMComponent->State != EBossState::BREAK || AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) == FName("Counter"))
 			{
 				AnimInstance->Montage_Play(AM_ShieldHit);
 			}
@@ -837,6 +856,14 @@ void ACBossEnemy::Hit()
 				// -가 된 쉴드 게이지만큼 체력을 깎아줌
 				CurHP += ShieldAmount;
 
+				//체력이 0이하가 됐을 경우
+				if (CurHP <= 0)
+				{
+					//보스 사망
+					FSMComponent->State = EBossState::DIE;
+					return;
+				}
+
 				if (FSMComponent->State != EBossState::BREAK)
 				{
 					//브레이크 상태로 됨
@@ -848,8 +875,14 @@ void ACBossEnemy::Hit()
 
 			if (ShieldHitCount >= ShieldHitCounter)
 			{
-				//가드 중 카운터 공격이 나오도록 섹션 점프
-				AnimInstance->Montage_JumpToSection(FName("Counter"), AM_ShieldHit);
+				//현재 몽타주가 재생중인 섹션 확인
+				FName NowSection = AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage());
+
+				if (NowSection != "Counter")
+				{	
+					//가드 중 카운터 공격이 나오도록 섹션 점프
+					AnimInstance->Montage_JumpToSection(FName("Counter"), AM_ShieldHit);
+				}
 			}
 		}
 	}
