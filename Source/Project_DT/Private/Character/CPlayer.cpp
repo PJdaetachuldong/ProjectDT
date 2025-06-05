@@ -23,6 +23,9 @@
 #include "Component/CStatusComponent.h"
 #include "Component/CPerfectDodgeComponent.h"
 #include "Weapons/CWeaponStuctures.h"
+#include "Enemy/EnemyBase/CEnemyBase.h"
+#include "Boss/CBossWeapon.h"
+#include "Weapons/CDoAction.h"
 ACPlayer::ACPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -251,6 +254,8 @@ void ACPlayer::End_BackStep() {
 
 void ACPlayer::Hitted()
 {
+	if (Weapon->GetDoAction()->RetrunParry())return;
+
 	if (Status->Damage(Damage.Power) <= 0) {
 		State->SetDeadMode();
 		return;
@@ -284,9 +289,15 @@ float ACPlayer::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& Da
 	Damage.Character = Cast<ACharacter>(EventInstigator->GetPawn());
 	Damage.Causer = DamageCauser;
 	Damage.Event = (FActionDamageEvent*)&DamageEvent;
-	CLog::Log(Damage.Power);
+	ACBossWeapon* Enemy = Cast<ACBossWeapon>(DamageCauser);
+	CLog::Log(Enemy->GetName());
+	if(Enemy)
+		if(Enemy->CheckGuardBool()){
+
 	if (Parry->GetGuardState())return 0;
-	//if (Dodge->GetGuardState())return 0;
-		Hitted();
+		}
+	if (Dodge->ReturnPerfectDodge())return 0;
+	Hitted();
+
 	return TakeDamageAmount;
 }

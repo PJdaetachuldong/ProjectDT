@@ -43,7 +43,7 @@ private:
 
 	bool bEnable;
 	bool bExist;
-	bool bParry;
+
 
 	TArray<FString> ComboArray;
 
