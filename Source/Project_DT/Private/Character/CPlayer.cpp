@@ -26,6 +26,7 @@
 #include "Enemy/EnemyBase/CEnemyBase.h"
 #include "Boss/CBossWeapon.h"
 #include "Weapons/CDoAction.h"
+#include "Components/WidgetComponent.h"
 ACPlayer::ACPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -94,6 +95,8 @@ ACPlayer::ACPlayer()
 
 	CHelpers::GetAsset ( &IA_TestBtn , AssetPaths::IA_Test );
 	CHelpers::GetAsset ( &IA_TestBtn2 , AssetPaths::IA_Test2 );
+	CHelpers::GetClass(&WidgetClass, AssetPaths::PlayerWidget);
+	//위젯
 }
 
 void ACPlayer::BeginPlay()
@@ -104,6 +107,10 @@ void ACPlayer::BeginPlay()
 	APlayerController* PC = Cast<APlayerController> ( GetController ( ) );
 	UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem> ( PC->GetLocalPlayer ( ) );
 	subSys->AddMappingContext ( IMC , 0 );
+	if(WidgetClass){
+	UUserWidget* UWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+	UWidget->AddToViewport();
+	}
 
 	State->OnStateTypeChanged.AddDynamic ( this , &ACPlayer::OnStateTypeChanged );
 	Parry->OnParryDetected.AddDynamic ( this , &ACPlayer::OnParryDetected );

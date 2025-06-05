@@ -26,6 +26,7 @@ namespace AssetPaths
     constexpr const TCHAR* IA_Test = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Test.IA_Test'" );
     constexpr const TCHAR* IA_Test2 = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Test2.IA_Test2'" );
     constexpr const TCHAR* ChostTrail = TEXT ("/Script/Engine.MaterialInstanceConstant'/Game/LHW/Material/M_GhostTrail_Inst.M_GhostTrail_Inst'" );
+    constexpr const TCHAR* PlayerWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_PlayerWidget.WBP_PlayerWidget_C'" );
 
 
 }

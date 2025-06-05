@@ -7,6 +7,7 @@
 #include "Component/CStateComponent.h"
 #include "ICharacter.h"
 #include "Component/CParryComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "CPlayer.generated.h"
 
 UCLASS()
@@ -31,6 +32,9 @@ private:
 public:
 	UPROPERTY(VisibleAnywhere)
 	class UCParryComponent* Parry;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSubclassOf<UUserWidget> WidgetClass;
+
 
 	UPROPERTY(VisibleAnywhere)
 	class UCPerfectDodgeComponent* Dodge;
