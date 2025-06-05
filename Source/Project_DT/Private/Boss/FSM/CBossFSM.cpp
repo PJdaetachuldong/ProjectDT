@@ -9,6 +9,7 @@
 #include "Character/CPlayer.h"
 #include "Boss/CBossAnim.h"
 #include "NavigationSystem.h"
+#include "Components/CapsuleComponent.h"
 
 UCBossFSM::UCBossFSM()
 {
@@ -103,7 +104,18 @@ void UCBossFSM::BREAKState()
 
 void UCBossFSM::DIEState()
 {
+	if(Cast<UCBossAnim>(MyBoss->AnimInstance)->State != EBossState::DIE)
+	{ 
+		//모든 몽타주 재생을 멈춤
+		MyBoss->AnimInstance->StopAllMontages(0.4f);
 
+		Cast<UCBossAnim>(MyBoss->AnimInstance)->State = EBossState::DIE;
+
+		
+		State = EBossState::DIE;
+		AttackState = EBossATTACKState::NONE;
+		MyBoss->GetCapsuleComponent()->SetCollisionProfileName(FName("BlockAll"));
+	}
 }
 
 void UCBossFSM::NONEState()
@@ -121,7 +133,7 @@ void UCBossFSM::NONEState()
 	else if(TargetDist >= 350.0f)
 	{
 		//움직인 거리가 300이상일 경우
-		if (TotalMoveDistance >= 300.0f)
+		if (TotalMoveDistance >= 600.0f)
 		{
 			int32 SideMoveCheckInt = 0;
 
