@@ -4,6 +4,8 @@
 #include "Component/CTargetingComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Global.h"
+#include "MotionWarpingComponent.h"
+#include "Component/CCameraActionComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Weapons/CWeaponComponent.h"
@@ -27,7 +29,10 @@ void UCTargetingComponent::BeginPlay()
 	SpringArm = CHelpers::GetComponent<USpringArmComponent> ( OwnerCharacter );
 	Weapon = CHelpers::GetComponent<UCWeaponComponent> ( OwnerCharacter );
 	Movement = CHelpers::GetComponent<UCMovementComponent> ( OwnerCharacter );
-}
+	Motion = CHelpers::GetComponent<UMotionWarpingComponent> ( OwnerCharacter );
+	CameraComp = CHelpers::GetComponent<UCCameraActionComponent> ( OwnerCharacter );
+
+}   
 
 void UCTargetingComponent::TickComponent ( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction )
 {
@@ -111,6 +116,10 @@ AActor* UCTargetingComponent::FindClosestEnemyByDirection ( float MaxDistance , 
         {
             ClosestDot = DotProduct;
             ClosestTarget = Enemy;
+            TargetEnemy=ClosestTarget;
+            FVector TargetLoc = TargetEnemy->GetActorLocation() - TargetEnemy->GetActorForwardVector()*137.f;	//137은 오차
+            FRotator TargetRot = TargetEnemy->GetActorRotation();
+            Motion->AddOrUpdateWarpTargetFromLocationAndRotation(TEXT("Target"), TargetLoc, TargetRot);
         }
     }
 
@@ -145,11 +154,7 @@ void UCTargetingComponent::OnLookOn ( )
     if ( !OwnerCharacter ) return;
 
     // UCMovementComponent에서 마지막 입력 방향 가져오기
-    if ( !Movement )
-    {
-        UE_LOG ( LogTemp , Warning , TEXT ( "[LockOn] No UCMovementComponent found." ) );
-        return;
-    }
+    if ( !Movement )return;
 
     FVector InputDirection = Movement->LastInputDirection.GetSafeNormal ( );
     if ( InputDirection.IsNearlyZero ( ) )
