@@ -10,9 +10,9 @@ FString UCBossAnimNotify_GuardableEffect::GetNotifyName_Implementation() const
 	return "EnabledEffect";
 }
 
-void UCBossAnimNotify_GuardableEffect::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+void UCBossAnimNotify_GuardableEffect::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
-	Super::Notify(MeshComp, Animation);
+	Super::NotifyBegin(MeshComp, Animation, TotalDuration);
 
 	CheckNull(MeshComp);
 	CheckNull(MeshComp->GetOwner());
@@ -20,7 +20,6 @@ void UCBossAnimNotify_GuardableEffect::Notify(USkeletalMeshComponent* MeshComp, 
 	ACBossEnemy* My = Cast<ACBossEnemy>(MeshComp->GetOwner());
 
 	CheckNull(My);
-
 
 	//현재 공격이 가드가 가능한 공격인지 체크를 함
 	//현재 진행 중인 몽타주를 알아냄
@@ -33,18 +32,40 @@ void UCBossAnimNotify_GuardableEffect::Notify(USkeletalMeshComponent* MeshComp, 
 	//현재 진행중인 몽타주의 섹션을 알아냄
 	FName NowSection = MeshComp->GetAnimInstance()->Montage_GetCurrentSection(NowMontage);
 
-	//현재 진행중인 몽타주와 섹션을 함수의 매개변수로 보내서 그에 할당된 Rate값을 받아옴
-	float RateScale = My->SetRateDown(NowMontage, NowSection);
+	// bool 값에 따라 사용할 나이아가라 시스템 선택
+	UNiagaraSystem* SelectedSystem = My->SetGuardBool(NowMontage, NowSection) ? CanGuardEffect : NotGuardEffect;
 
-
-	//가드 여부에 따라 소환하는 이펙트가 달라짐
-	if (My->SetGuardBool(NowMontage, NowSection))
+	if (SelectedSystem)
 	{
-		//가드 가능 이펙트 소환
+		// 나이아가라 이펙트를 스폰 (설정한 소켓, 위치 오프셋, 회전에 맞춤)
+		SpawnEffect = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			SelectedSystem,
+			MeshComp,
+			SocketName, // 설정한 소켓 이름
+			LocalLocation, // 로컬 위치 오프셋
+			LocalRotation, // 로컬 회전
+			EAttachLocation::KeepRelativeOffset,
+			true // Auto Destroy
+		);
 	}
+}
 
-	else
+void UCBossAnimNotify_GuardableEffect::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+{
+	Super::NotifyEnd(MeshComp, Animation);
+
+	CheckNull(MeshComp);
+	CheckNull(MeshComp->GetOwner());
+
+	ACBossEnemy* My = Cast<ACBossEnemy>(MeshComp->GetOwner());
+
+	CheckNull(My);
+
+	// 스폰된 나이아가라 컴포넌트 제거
+	if (SpawnEffect)
 	{
-		//가드 불가능 이펙트 소환
+		SpawnEffect->Deactivate();
+		SpawnEffect->DestroyComponent();
+		SpawnEffect = nullptr;
 	}
 }

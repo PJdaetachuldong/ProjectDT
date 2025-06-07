@@ -216,7 +216,7 @@ void ACBossEnemy::InitializeMontageMap()
 		GuardRates.Add(FMontageRateScale{ FName("Guard_Start"), 0.7f });
 		GuardRates.Add(FMontageRateScale{ FName("GuardStarting"), 0.7f });
 		GuardRates.Add(FMontageRateScale{ FName("Guard_End"), 0.7f });
-		GuardRates.Add(FMontageRateScale{ FName("Counter"), 0.7f, false});
+		GuardRates.Add(FMontageRateScale{ FName("Counter"), 1.0f, false});
 		MontageScaleMap.Add(AM_Guard, GuardRates);
 	}
 
@@ -232,7 +232,7 @@ void ACBossEnemy::InitializeMontageMap()
 	if (AM_ShieldHit)
 	{
 		TArray<FMontageRateScale> GuardRates;
-		GuardRates.Add(FMontageRateScale{ FName("Hit"), 0.7f, false});
+		GuardRates.Add(FMontageRateScale{ FName("Hit"), 10.0f, false});
 		GuardRates.Add(FMontageRateScale{ FName("Interaction"), 0.7f, false});
 		GuardRates.Add(FMontageRateScale{ FName("Counter"), 1.0f, false});
 		GuardRates.Add(FMontageRateScale{ FName("End"), 0.7f, false});
@@ -259,16 +259,18 @@ void ACBossEnemy::Tick(float DeltaTime)
 	}
 
 	//만약 쉴드가 있는 상태에서 공격을 맞은 상태이면
-	if (GuardingTime > 0.1f)
+	if (GuardingTime > 0.0f)
 	{
 		//맞은 횟수를 보존하는 시간이 흘러감
 		GuardingTime -= DeltaTime;
 
 		//0초 미만이면 
-		if (GuardingTime < 0.0f)
+		if (GuardingTime <= 0.0f)
 		{
 			//맞은 횟수 초기화
 			ShieldHitCount = 0;
+
+			GEngine->AddOnScreenDebugMessage(111, 5.0f, FColor::White, TEXT("ShieldHitCount Reset"));
 		}
 	}
 }
@@ -324,29 +326,8 @@ bool ACBossEnemy::OnGuardCollision ( )
 		float AngleRad = FMath::Acos(DotProduct);
 		float AngleDeg = FMath::RadiansToDegrees(AngleRad);
 
-		//만약 각도가 전방 30도 사이라면, 정면에서 맞았을 경우
-		if ( AngleDeg <= 30.0f )
-		{
-			//바로 카운터 공격이 동작하게 만듦
-		/*	GEngine->AddOnScreenDebugMessage ( 111 , 1.0f , FColor::White , TEXT ( "Counter Attack!!!" ) );*/
-			
-			UAnimMontage* NowMontage = GetMesh()->GetAnimInstance ( )->GetCurrentActiveMontage ( );
-
-			//현재 몽타주가 재생중인 섹션 확인
-			FName NowSection = GetMesh()->GetAnimInstance ( )->Montage_GetCurrentSection ( NowMontage );
-
-			//카운터 공격 애니메이션이 나오도록 재생
-			//해당 몽타주 섹션으로 이동
-			AnimInstance->Montage_JumpToSection(FName("Counter") , NowMontage);
-
-			//가드 조건 초기화
-			GuardGage = 0.0f;
-			//뒤에 코드 작동이 안되게 리턴
-			return true;
-		}
-
 		//만약 각도가 100보다 크다면, 즉 후방 80도 사이에서 맞았을 경우
-		else if ( AngleDeg >= 100.0f )
+		 if ( AngleDeg >= 100.0f )
 		{
 			//자세가 흐트러지며 BREAK상태가 됨
 			FSMComponent->State = EBossState::BREAK;
@@ -357,6 +338,28 @@ bool ACBossEnemy::OnGuardCollision ( )
 			//뒤에 코드 작동이 안되게 리턴
 			return false;
 		}
+
+		 //만약 각도가 전방 30도 사이라면, 정면에서 맞았을 경우
+		 //그 외 각도에서 맞았을 경우
+		 else
+		 {
+			 //바로 카운터 공격이 동작하게 만듦
+		 /*	GEngine->AddOnScreenDebugMessage ( 111 , 1.0f , FColor::White , TEXT ( "Counter Attack!!!" ) );*/
+
+			 UAnimMontage* NowMontage = GetMesh()->GetAnimInstance()->GetCurrentActiveMontage();
+
+			 //현재 몽타주가 재생중인 섹션 확인
+			 FName NowSection = GetMesh()->GetAnimInstance()->Montage_GetCurrentSection(NowMontage);
+
+			 //카운터 공격 애니메이션이 나오도록 재생
+			 //해당 몽타주 섹션으로 이동
+			 AnimInstance->Montage_JumpToSection(FName("Counter"), NowMontage);
+
+			 //가드 조건 초기화
+			 GuardGage = 0.0f;
+			 //뒤에 코드 작동이 안되게 리턴
+			 return true;
+		 }
 	}
 
 	return true;
@@ -489,6 +492,27 @@ void ACBossEnemy::AttackTurn()
 	// Pawn 회전 설정
 	SetActorRotation (NewRotation);
 }
+
+void ACBossEnemy::ATK2_4Turn()
+{
+	//공격이 제대로 실행되기 전에 플레이어를 바라보도록 만듦
+	// 플레이어 방향 계산
+	FVector TargetLocation = Target->GetActorLocation();
+	FVector MyLocation = GetActorLocation();
+	FVector DirectionToTarget = (TargetLocation - MyLocation).GetSafeNormal();
+
+	// Yaw 회전만 조정 (Pitch는 유지)
+	FRotator TargetRotation = FRotationMatrix::MakeFromX(DirectionToTarget).Rotator();
+	TargetRotation.Pitch = 0.0f; // Pitch를 0으로 설정해 수평 회전만 적용
+	TargetRotation.Roll = 0.0f;
+
+	// 부드러운 회전을 위해 Interp 사용 (선택 사항)
+	FRotator CurrentRotation = GetActorRotation();
+	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 4.0f);
+
+	// Pawn 회전 설정
+	SetActorRotation(NewRotation);
+}	
 
 void ACBossEnemy::PlayNextSectionAttack ( UAnimMontage* CurrentMontage , FName CurrentSection )
 {
@@ -732,6 +756,13 @@ void ACBossEnemy::Hitted()
 	//사망 상태면 안되게 막음
 	if (FSMComponent->State == EBossState::DIE) return;
 
+	//사이드 이동 중이면 해당 이동을 해제
+	if (FSMComponent->IsSideMoveSetting)
+	{
+		FSMComponent->TotalMoveDistance = 0.0f;
+		FSMComponent->IsSideMoveSetting = false;
+	}
+
 	Damage.Power = 0;
 	
 	if (!!Damage.Event && !!Damage.Event->HitData) {
@@ -837,7 +868,7 @@ void ACBossEnemy::Hit()
 		{
 			//쉴드가 있는 경우에는 검으로 막는 애니메이션 재생
 			//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
-			if (ShieldAmount > 0 && FSMComponent->State != EBossState::BREAK || AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) == FName("Counter"))
+			if (ShieldAmount > 0 && AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) != FName("Counter") && FSMComponent->State != EBossState::BREAK )
 			{
 				AnimInstance->Montage_Play(AM_ShieldHit);
 			}

@@ -95,6 +95,8 @@ public:
 
 	void AttackTurn();
 
+	void ATK2_4Turn();
+
 	void PlayNextSectionAttack( UAnimMontage* CurrentMontage , FName CurrentSection );
 
 	FName GetNextSection(FName SectionName);

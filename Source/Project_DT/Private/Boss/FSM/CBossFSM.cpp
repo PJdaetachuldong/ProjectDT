@@ -123,23 +123,16 @@ void UCBossFSM::NONEState()
 	//쉴드가 까진 상태면 밑에 실행 안함
 	if(MyBoss->ShieldAmount<=0.0f) return;
 
-	//임시로 약간 떨어트리는 코드
-	if (TargetDist <= 150.0f)
-	{
-		AI->StopMovement();
-	}
-	//임시로 약간 떨어트리는 코드
-
-	else if(TargetDist >= 350.0f)
+	if (TargetDist >= 350.0f)
 	{
 		//움직인 거리가 300이상일 경우
 		if (TotalMoveDistance >= 600.0f)
 		{
 			int32 SideMoveCheckInt = 0;
 
-			if(!IsSideMoveSetting)
+			if (!IsSideMoveSetting)
 			{
-				SideMoveCheckInt = FMath::RandRange(1,10);
+				SideMoveCheckInt = FMath::RandRange(1, 10);
 			}
 
 			//랜덤값이 4 이하
@@ -147,10 +140,11 @@ void UCBossFSM::NONEState()
 			{
 				//좌우 이동하게 만듦
 				SideMove();
+				return;
 			}
-			
+
 			//랜덤값이 5이상
-			else if(SideMoveCheckInt >= 5)
+			else if (SideMoveCheckInt >= 5)
 			{
 				//움직인 거리값 초기화
 				TotalMoveDistance = 0.0f;
@@ -176,6 +170,21 @@ void UCBossFSM::NONEState()
 			AI->MoveToLocation(MyBoss->Target->GetActorLocation());
 		}
 	}
+
+	//임시로 약간 떨어트리는 코드
+	else if (TargetDist <= 150.0f)
+	{
+		AI->StopMovement();
+
+		if (Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection >= 0.1f
+		|| Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection <= 0.1f)
+		{
+			Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection = 0;
+		}
+	}
+	//임시로 약간 떨어트리는 코드
+
+	
 
 	//피격 상태면 아래가 진행되지않게
 	if(MyBoss->AnimInstance->Montage_IsPlaying(MyBoss->AM_ShieldHit)) 
@@ -401,6 +410,9 @@ void UCBossFSM::SideMove()
 {
 	if (!IsSideMoveSetting)
 	{
+		MyBoss->bUseControllerRotationYaw = false; // AI 컨트롤러 회전 비활성화
+		MyBoss->GetCharacterMovement()->bOrientRotationToMovement = false; // 이동 방향 회전 비활성화
+
 		// 현재 Pawn의 위치
 		FVector CurrentLocation = MyBoss->GetActorLocation();
 
@@ -436,6 +448,14 @@ void UCBossFSM::SideMove()
 			//좌우 이동 셋팅이 끝났음을 알림
 			IsSideMoveSetting = true;
 		}
+
+		else
+		{
+			//좌우 이동을 안하고 초기화
+			TotalMoveDistance = 0.0f;
+
+			IsSideMoveSetting = false;
+		}
 	}
 
 	if (IsSideMoveSetting)
@@ -447,19 +467,23 @@ void UCBossFSM::SideMove()
 // 		{
 // 			MyBoss->bUseControllerRotationYaw = true;
 // 		}
-
-		// 플레이어 위치
-		FVector PlayerLocation = MyBoss->Target->GetActorLocation();
-		// 현재 AI 위치
-		FVector AILocation = MyBoss->GetActorLocation();
-		// 플레이어를 향하는 방향 벡터 계산
-		FVector DirectionToPlayer = (PlayerLocation - AILocation).GetSafeNormal();
-		// 방향 벡터를 회전으로 변환 (Yaw만 고려)
-		FRotator LookAtRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
-		// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
-		FRotator NewRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
-		// 플레이어를 바라보게 고정함
-		MyBoss->SetActorRotation(NewRotation);
+	
+		//회전 뒤집히는거 방지용 거리가 있을때만 플레이어 바라보게
+		if (TargetDist >= 150.0f)
+		{
+			// 플레이어 위치
+			FVector PlayerLocation = MyBoss->Target->GetActorLocation();
+			// 현재 AI 위치
+			FVector AILocation = MyBoss->GetActorLocation();
+			// 플레이어를 향하는 방향 벡터 계산
+			FVector DirectionToPlayer = (PlayerLocation - AILocation).GetSafeNormal();
+			// 방향 벡터를 회전으로 변환 (Yaw만 고려)
+			FRotator LookAtRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
+			// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
+			FRotator NewRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
+			// 플레이어를 바라보게 고정함
+			MyBoss->SetActorRotation(NewRotation);
+		}
 
 		//만약 이동한 위치랑 얼마 차이가 나지 않으면 다시 플레이어를 향해 움직임
 		if (FVector::Dist(TargetSideLocation, MyBoss->GetActorLocation()) <= 150.0f)
@@ -471,6 +495,9 @@ void UCBossFSM::SideMove()
 			TotalMoveDistance = 0.0f;
 
 			IsSideMoveSetting = false;
+
+			MyBoss->bUseControllerRotationYaw = true; // AI 컨트롤러 회전 비활성화
+			MyBoss->GetCharacterMovement()->bOrientRotationToMovement = true; // 이동 방향 회전 비활성화
 		}
 	}
 }
