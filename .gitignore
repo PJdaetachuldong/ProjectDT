@@ -92,4 +92,20 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
-출처: https://splayer.tistory.com/102 [S Player:티스토리]
+# Rider
+.idea/
+*.iml
+*.iws
+
+# Rider workspace file
+*.sln.iml
+
+# Rider caches
+.idea_modules/
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/dictionaries/
+.idea/httpRequests/
+
+# Rider build output
+out/

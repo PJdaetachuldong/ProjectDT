@@ -13,8 +13,8 @@ UCWeaponAsset::UCWeaponAsset ( )
 {
 	AttachmentClass = ACAttachment::StaticClass();
 	EquipmentClass = UCEquipment::StaticClass();
-	//DoActionClass = UCDoAction::StaticClass();
-	//SubActionClass = UCSubAction::StaticClass ( );
+	DoActionClass = UCDoAction::StaticClass();
+	SubActionClass = UCSubAction::StaticClass ( );
 }
 
 void UCWeaponAsset::BeginPlay ( class ACharacter* InOwner )

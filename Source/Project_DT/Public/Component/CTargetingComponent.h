@@ -36,6 +36,13 @@ private:
 	class UCWeaponComponent* Weapon;
 	UPROPERTY ( VisibleAnywhere )
 	class UCMovementComponent* Movement;
+	UPROPERTY ( VisibleAnywhere )
+	class UMotionWarpingComponent* Motion;
+	UPROPERTY ( VisibleAnywhere )
+	class UCCameraActionComponent* CameraComp;
+
+
+	
 
 
 private:
@@ -47,7 +54,6 @@ public:
 	void UpdateLockOn ( float DeltaSeconds );
 	void ResetLockOn ( );
 
-
 	bool bSearchTarget=false;
 private:
 	UPROPERTY()
@@ -57,9 +63,12 @@ private:
 
 	float currentTime = 0.0f;
 
-float TimeSinceLostTarget = 0.f;
+	float TimeSinceLostTarget = 0.f;
 
-UPROPERTY(EditAnywhere, Category = "LockOn")
-float TargetLossTimeout = 5.f;
+	UPROPERTY(EditAnywhere, Category = "LockOn")
+	float TargetLossTimeout = 5.f;
+public:
+	UPROPERTY(EditAnywhere, Category = "LockOn")
+	class AActor* TargetEnemy;
 
 };

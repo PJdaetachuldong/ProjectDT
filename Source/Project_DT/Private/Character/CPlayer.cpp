@@ -6,7 +6,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
-
 #include "Animation/AnimInstance.h"
 #include "Component/CMointageComponent.h"
 #include "Component/CMovementComponent.h"
@@ -26,24 +25,39 @@
 #include "Enemy/EnemyBase/CEnemyBase.h"
 #include "Boss/CBossWeapon.h"
 #include "Weapons/CDoAction.h"
+#include "Components/WidgetComponent.h"
+
 ACPlayer::ACPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	CHelpers::CreateComponent<USpringArmComponent> ( this , &SpringArm , "SpringArm" , GetMesh ( ) );
-	CHelpers::CreateComponent<UCameraComponent> ( this , &Camera , "Camera" , SpringArm );
-	GetMesh ( )->SetRelativeLocation ( FVector ( 0 , 0 , -90 ) );
-	GetMesh ( )->SetRelativeRotation ( FRotator( 0 , -90 , 0 ) );
+	CHelpers::CreateComponent<USpringArmComponent>(this, &SpringArm, "SpringArm", GetMesh());
+	CHelpers::CreateComponent<USpringArmComponent>(this, &SpringArmL, "SpringArmL", GetMesh());
+	CHelpers::CreateComponent<USpringArmComponent>(this, &SpringArmR, "SpringArmR", GetMesh());
+	CHelpers::CreateComponent<USpringArmComponent>(this, &CameraActionArm, "CameraActionArm",GetMesh());
+	
+	CHelpers::CreateComponent<UCameraComponent>(this, &Camera, "Camera", SpringArm);
+	GetMesh()->SetRelativeLocation(FVector(0, 0, -90));
+	GetMesh()->SetRelativeRotation(FRotator(0, -90, 0));
 	USkeletalMesh* mesh;
-	CHelpers::GetAsset<USkeletalMesh> ( &mesh , AssetPaths::CHARACTER_MESH );
-	GetMesh ( )->SetSkeletalMesh ( mesh );
+	CHelpers::GetAsset<USkeletalMesh>(&mesh, AssetPaths::CHARACTER_MESH);
+	GetMesh()->SetSkeletalMesh(mesh);
 
 	TSubclassOf<UAnimInstance> Anim;
-	CHelpers::GetClass<UAnimInstance> ( &Anim , AssetPaths::CHARACTER_ANIM );
-	GetMesh ( )->SetAnimClass ( Anim );
+	CHelpers::GetClass<UAnimInstance>(&Anim, AssetPaths::CHARACTER_ANIM);
+	GetMesh()->SetAnimClass(Anim);
 
-	SpringArm->SetRelativeLocation ( FVector ( 0 , 0 , 140 ) );
-	SpringArm->SetRelativeRotation ( FRotator ( 0 , 90,0 ) );
+	SpringArm->SetRelativeLocation(FVector(0, 0, 140));
+	SpringArm->SetRelativeRotation(FRotator(0, 90, 0));
+	
+	SpringArmL->SetRelativeLocation(FVector(60, 0, 140));
+	SpringArmL->SetRelativeRotation(FRotator(0, 90, 0));
+	
+	SpringArmR->SetRelativeLocation(FVector(-60, 0, 140));
+	SpringArmR->SetRelativeRotation(FRotator(0, 90, 0));
+	
 	SpringArm->TargetArmLength = 250;
+	SpringArmL->TargetArmLength = 250;
+	SpringArmR->TargetArmLength = 250;
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -52,8 +66,15 @@ ACPlayer::ACPlayer()
 	SpringArm->bDoCollisionTest = false;
 	SpringArm->bEnableCameraLag = true;
 
-	GetCharacterMovement ( )->bOrientRotationToMovement = true;
-	GetCharacterMovement ( )->bUseControllerDesiredRotation = false;
+	SpringArmL->bDoCollisionTest = false;
+	SpringArmL->bEnableCameraLag = true;
+
+	SpringArmR->bDoCollisionTest = false;
+	SpringArmR->bEnableCameraLag = true;
+
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 
 	SpringArm->bUsePawnControlRotation = true;
 	Camera->bUsePawnControlRotation = false;
@@ -62,104 +83,129 @@ ACPlayer::ACPlayer()
 	SpringArm->bInheritYaw = true;
 	SpringArm->bInheritRoll = false;
 
+	SpringArmL->bInheritPitch = true;
+	SpringArmL->bInheritYaw = true;
+	SpringArmL->bInheritRoll = false;
 
-	GetCharacterMovement ( )->bUseControllerDesiredRotation = false;
-
-	CHelpers::CreateActorComponent<UCWeaponComponent> ( this , &Weapon , "Weapon" );
-	CHelpers::CreateActorComponent<UCMointageComponent> ( this , &Montages , "Montages" );
-	CHelpers::CreateActorComponent<UCMovementComponent> ( this , &Movement , "Movement" );
-	CHelpers::CreateActorComponent<UCStateComponent> ( this , &State , "State" );
-	CHelpers::CreateActorComponent<UCTrajectoryComponent> ( this , &Trajectory , "Trajectory" );
-	CHelpers::CreateActorComponent<UCParryComponent> ( this , &Parry , "Parry" );
-	CHelpers::CreateActorComponent<UCPerfectDodgeComponent> ( this , &Dodge, "Dodge" );
-	CHelpers::CreateActorComponent<UCTargetingComponent> ( this , &TargetComp , "TargetComp" );
-	CHelpers::CreateActorComponent<UCStatusComponent> ( this , &Status , "Status" );
+	SpringArmR->bInheritPitch = true;
+	SpringArmR->bInheritYaw = true;
+	SpringArmR->bInheritRoll = false;
 
 
+	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+
+	CHelpers::CreateActorComponent<UCWeaponComponent>(this, &Weapon, "Weapon");
+	CHelpers::CreateActorComponent<UCMointageComponent>(this, &Montages, "Montages");
+	CHelpers::CreateActorComponent<UCMovementComponent>(this, &Movement, "Movement");
+	CHelpers::CreateActorComponent<UCStateComponent>(this, &State, "State");
+	CHelpers::CreateActorComponent<UCTrajectoryComponent>(this, &Trajectory, "Trajectory");
+	CHelpers::CreateActorComponent<UCParryComponent>(this, &Parry, "Parry");
+	CHelpers::CreateActorComponent<UCPerfectDodgeComponent>(this, &Dodge, "Dodge");
+	CHelpers::CreateActorComponent<UCTargetingComponent>(this, &TargetComp, "TargetComp");
+	CHelpers::CreateActorComponent<UCStatusComponent>(this, &Status, "Status");
+	CHelpers::CreateActorComponent<UCCameraActionComponent>(this, &CameraAction, "CameraAction");
+	CHelpers::CreateActorComponent<UMotionWarpingComponent>(this, &MotionWarping, "MotionWarping");
+	
 
 	//인풋 받기
-	CHelpers::GetAsset ( &IMC , AssetPaths::IMC );
-	CHelpers::GetAsset ( &IA_MoveForward , AssetPaths::IA_MoveForward );
-	CHelpers::GetAsset ( &IA_MoveRight , AssetPaths::IA_MoveRight );
-	CHelpers::GetAsset ( &IA_VerticalLook , AssetPaths::IA_VerticalLook );
-	CHelpers::GetAsset ( &IA_HorizontalLook , AssetPaths::IA_HorizontalLook );
-	CHelpers::GetAsset ( &IA_Dash , AssetPaths::IA_Dash );
-	CHelpers::GetAsset ( &IA_Avoid , AssetPaths::IA_Avoid );
-	CHelpers::GetAsset ( &IA_Jump , AssetPaths::IA_Jump );
-	CHelpers::GetAsset ( &IA_LeftAttack , AssetPaths::IA_LeftClick );
-	CHelpers::GetAsset ( &IA_RightAttack , AssetPaths::IA_RightClick );
-	CHelpers::GetAsset ( &IA_SpecialAttack , AssetPaths::IA_SpecialClick );
-	CHelpers::GetAsset ( &IA_Guard , AssetPaths::IA_GuardBtn );
-	CHelpers::GetAsset ( &IA_Heal , AssetPaths::IA_Heal );
+	CHelpers::GetAsset(&IMC, AssetPaths::IMC);
+	CHelpers::GetAsset(&IA_MoveForward, AssetPaths::IA_MoveForward);
+	CHelpers::GetAsset(&IA_MoveRight, AssetPaths::IA_MoveRight);
+	CHelpers::GetAsset(&IA_VerticalLook, AssetPaths::IA_VerticalLook);
+	CHelpers::GetAsset(&IA_HorizontalLook, AssetPaths::IA_HorizontalLook);
+	CHelpers::GetAsset(&IA_Dash, AssetPaths::IA_Dash);
+	CHelpers::GetAsset(&IA_Avoid, AssetPaths::IA_Avoid);
+	CHelpers::GetAsset(&IA_Jump, AssetPaths::IA_Jump);
+	CHelpers::GetAsset(&IA_LeftAttack, AssetPaths::IA_LeftClick);
+	CHelpers::GetAsset(&IA_RightAttack, AssetPaths::IA_RightClick);
+	CHelpers::GetAsset(&IA_SpecialAttack, AssetPaths::IA_SpecialClick);
+	CHelpers::GetAsset(&IA_Guard, AssetPaths::IA_GuardBtn);
+	CHelpers::GetAsset(&IA_Heal, AssetPaths::IA_Heal);
 
-	CHelpers::GetAsset ( &IA_TestBtn , AssetPaths::IA_Test );
-	CHelpers::GetAsset ( &IA_TestBtn2 , AssetPaths::IA_Test2 );
+	CHelpers::GetAsset(&IA_TestBtn, AssetPaths::IA_Test);
+	CHelpers::GetAsset(&IA_TestBtn2, AssetPaths::IA_Test2);
+	CHelpers::GetClass(&WidgetClass, AssetPaths::PlayerWidget);
+	//위젯
 }
 
 void ACPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Movement->OnRun ( );
-	APlayerController* PC = Cast<APlayerController> ( GetController ( ) );
-	UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem> ( PC->GetLocalPlayer ( ) );
-	subSys->AddMappingContext ( IMC , 0 );
+	Movement->OnRun();
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+		PC->GetLocalPlayer());
+	subSys->AddMappingContext(IMC, 0);
+	if (WidgetClass)
+	{
+		UUserWidget* UWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+		UWidget->AddToViewport();
+	}
 
-	State->OnStateTypeChanged.AddDynamic ( this , &ACPlayer::OnStateTypeChanged );
-	Parry->OnParryDetected.AddDynamic ( this , &ACPlayer::OnParryDetected );
+	State->OnStateTypeChanged.AddDynamic(this, &ACPlayer::OnStateTypeChanged);
+	Parry->OnParryDetected.AddDynamic(this, &ACPlayer::OnParryDetected);
 }
 
 void ACPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	GEngine->AddOnScreenDebugMessage ( -1 , 0.0f , FColor::Green ,
-	FString::Printf ( TEXT ( "Health: %.1f | Mana: %.1f" ) , Status->GetHealth() , Status->GetMana()) );
+	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Green,
+	                                 FString::Printf(
+		                                 TEXT("Health: %.1f | Mana: %.1f"), Status->GetHealth(), Status->GetMana()));
 }
 
 void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	auto playerInput = Cast<UEnhancedInputComponent> ( PlayerInputComponent );
-	if ( playerInput ) {
-		playerInput->BindAction ( IA_MoveForward , ETriggerEvent::Triggered , Movement , &UCMovementComponent::OnMoveForward );
-		playerInput->BindAction ( IA_MoveRight , ETriggerEvent::Triggered , Movement , &UCMovementComponent::OnMoveRight );
-		playerInput->BindAction ( IA_VerticalLook , ETriggerEvent::Triggered , Movement , &UCMovementComponent::OnVerticalLook );
-		playerInput->BindAction ( IA_HorizontalLook , ETriggerEvent::Triggered , Movement , &UCMovementComponent::OnHorizontalLook );
-		playerInput->BindAction ( IA_Dash , ETriggerEvent::Triggered , Movement , &UCMovementComponent::OnSprint);
-		playerInput->BindAction ( IA_Dash , ETriggerEvent::Completed , Movement , &UCMovementComponent::OnRun);
-		playerInput->BindAction ( IA_Avoid , ETriggerEvent::Completed , this , &ACPlayer::OnAvoid );
+	auto playerInput = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (playerInput)
+	{
+		playerInput->BindAction(IA_MoveForward, ETriggerEvent::Triggered, Movement,
+		                        &UCMovementComponent::OnMoveForward);
+		playerInput->BindAction(IA_MoveRight, ETriggerEvent::Triggered, Movement, &UCMovementComponent::OnMoveRight);
+		playerInput->BindAction(IA_VerticalLook, ETriggerEvent::Triggered, Movement,
+		                        &UCMovementComponent::OnVerticalLook);
+		playerInput->BindAction(IA_HorizontalLook, ETriggerEvent::Triggered, Movement,
+		                        &UCMovementComponent::OnHorizontalLook);
+		playerInput->BindAction(IA_Dash, ETriggerEvent::Triggered, Movement, &UCMovementComponent::OnSprint);
+		playerInput->BindAction(IA_Dash, ETriggerEvent::Completed, Movement, &UCMovementComponent::OnRun);
+		playerInput->BindAction(IA_Avoid, ETriggerEvent::Completed, this, &ACPlayer::OnAvoid);
 		//playerInput->BindAction ( IA_Avoid , ETriggerEvent::Completed , TargetComp , &UCTargetingComponent::OnLookOn );
 		//playerInput->BindAction ( IA_Jump , ETriggerEvent::Completed , this , &ACPlayer::Jump );
-		playerInput->BindAction ( IA_LeftAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoAction );
-		playerInput->BindAction ( IA_RightAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::DoHeavyAction );
-		playerInput->BindAction ( IA_SpecialAttack , ETriggerEvent::Started , Weapon , &UCWeaponComponent::SubAction_Skill_Pressed );
-		playerInput->BindAction ( IA_SpecialAttack , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SubAction_Skill_Released );
-		playerInput->BindAction ( IA_Guard , ETriggerEvent::Started , Weapon , &UCWeaponComponent::SubAction_Pressed);
-		playerInput->BindAction ( IA_Guard , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SubAction_Released);
+		playerInput->BindAction(IA_LeftAttack, ETriggerEvent::Started, Weapon, &UCWeaponComponent::DoAction);
+		playerInput->BindAction(IA_RightAttack, ETriggerEvent::Started, Weapon, &UCWeaponComponent::DoHeavyAction);
+		playerInput->BindAction(IA_SpecialAttack, ETriggerEvent::Started, Weapon,
+		                        &UCWeaponComponent::SubAction_Skill_Pressed);
+		playerInput->BindAction(IA_SpecialAttack, ETriggerEvent::Completed, Weapon,
+		                        &UCWeaponComponent::SubAction_Skill_Released);
+		playerInput->BindAction(IA_Guard, ETriggerEvent::Started, Weapon, &UCWeaponComponent::SubAction_Pressed);
+		playerInput->BindAction(IA_Guard, ETriggerEvent::Completed, Weapon, &UCWeaponComponent::SubAction_Released);
 
-		playerInput->BindAction ( IA_TestBtn , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SetKatanaMode );
-		playerInput->BindAction ( IA_TestBtn2 , ETriggerEvent::Completed , Weapon , &UCWeaponComponent::SetGreatSwordMode );
-		playerInput->BindAction ( IA_Heal , ETriggerEvent::Started , this , &ACPlayer::Healing );
+		playerInput->BindAction(IA_TestBtn, ETriggerEvent::Completed, Weapon, &UCWeaponComponent::SetKatanaMode);
+		playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Completed, Weapon, &UCWeaponComponent::SetGreatSwordMode);
+		playerInput->BindAction(IA_Heal, ETriggerEvent::Started, this, &ACPlayer::Healing);
 	}
 }
 
-void ACPlayer::OnStateTypeChanged ( EStateType InPrevType , EStateType InNewType )
+void ACPlayer::OnStateTypeChanged(EStateType InPrevType, EStateType InNewType)
 {
-	switch ( InNewType )
+	switch (InNewType)
 	{
-	case EStateType::BackStep: BackStep ( ); break;
-	case EStateType::Dead: DeadHandler(); break;
+	case EStateType::BackStep: BackStep();
+		break;
+	case EStateType::Dead: DeadHandler();
+		break;
 	}
 }
-
-void ACPlayer::OnAvoid ( )
+void ACPlayer::OnAvoid()
 {
-	if ( State->IsIdleMode ( ) or State->IsCancelMode())
-		State->SetBackStepMode ();
+	if (State->IsIdleMode() or State->IsCancelMode())
+		State->SetBackStepMode();
 }
 
-void ACPlayer::BackStep ()
+void ACPlayer::BackStep()
 {
 	FVector InputDir = GetCharacterMovement()->GetLastInputVector();
 	InputDir.Z = 0;
@@ -180,41 +226,43 @@ void ACPlayer::BackStep ()
 
 	EActState DodgeDirection = EActState::DodgeF;
 
-	if (Degree >= -22.5f && Degree < 22.5f){
+	if (Degree >= -22.5f && Degree < 22.5f)
+	{
 		DodgeDirection = EActState::DodgeF;
 		Dodge->DodgeRotate = TEXT("Back");
-
 	}
-	else if (Degree >= 22.5f && Degree < 67.5f){
+	else if (Degree >= 22.5f && Degree < 67.5f)
+	{
 		DodgeDirection = EActState::DodgeFR;
 		Dodge->DodgeRotate = TEXT("Right");
 	}
-	else if (Degree >= 67.5f && Degree < 112.5f){
+	else if (Degree >= 67.5f && Degree < 112.5f)
+	{
 		DodgeDirection = EActState::DodgeR;
 		Dodge->DodgeRotate = TEXT("Right");
-
 	}
-	else if (Degree >= 112.5f && Degree < 157.5f){
+	else if (Degree >= 112.5f && Degree < 157.5f)
+	{
 		DodgeDirection = EActState::DodgeBR;
 		Dodge->DodgeRotate = TEXT("Right");
-
 	}
-	else if (Degree >= 157.5f || Degree < -157.5f){
+	else if (Degree >= 157.5f || Degree < -157.5f)
+	{
 		DodgeDirection = EActState::DodgeB;
 		Dodge->DodgeRotate = TEXT("Back");
-
 	}
-	else if (Degree >= -157.5f && Degree < -112.5f){
+	else if (Degree >= -157.5f && Degree < -112.5f)
+	{
 		DodgeDirection = EActState::DodgeBL;
 		Dodge->DodgeRotate = TEXT("Left");
-
 	}
-	else if (Degree >= -112.5f && Degree < -67.5f){
+	else if (Degree >= -112.5f && Degree < -67.5f)
+	{
 		DodgeDirection = EActState::DodgeL;
 		Dodge->DodgeRotate = TEXT("Left");
-
 	}
-	else if (Degree >= -67.5f && Degree < -22.5f){
+	else if (Degree >= -67.5f && Degree < -22.5f)
+	{
 		Dodge->DodgeRotate = TEXT("Left");
 		DodgeDirection = EActState::DodgeFL;
 	}
@@ -231,39 +279,44 @@ void ACPlayer::DeadHandler()
 	Montages->PlayDeadMode();
 }
 
-void ACPlayer::Healing ( )
+void ACPlayer::Healing()
 {
-	Montages->PlayHealingMode ( );
-	Status->Damage ( 50 );
-	Status->UseMana ( 20 );
+	Montages->PlayHealingMode();
+	Status->Damage(50);
+	Status->UseMana(20);
 }
 
-void ACPlayer::Jump ( ){
+void ACPlayer::Jump()
+{
 	ACharacter::Jump();
 }
 
-void ACPlayer::OnParryDetected ( EParryState ParryDirection )
+void ACPlayer::OnParryDetected(EParryState ParryDirection)
 {
-	Weapon->OnParry ( ParryDirection );
+	Weapon->OnParry(ParryDirection);
 }
-void ACPlayer::End_BackStep() {
 
-	State->SetIdleMode ( );
-	CLog::Log ( "End_BackStep");
+void ACPlayer::End_BackStep()
+{
+	State->SetIdleMode();
 }
 
 void ACPlayer::Hitted()
 {
-	if (Weapon->GetDoAction()->RetrunParry())return;
+	if (Weapon->GetDoAction())
+		if (Weapon->GetDoAction()->RetrunParry())return;
+	
 
-	if (Status->Damage(Damage.Power) <= 0) {
+	if (Status->Damage(Damage.Power) <= 0)
+	{
 		State->SetDeadMode();
 		return;
 	}
 	State->SetHittedMode();
 	Damage.Power = 0;
 
-	if (!!Damage.Event && !!Damage.Event->HitData) {
+	if (!!Damage.Event && !!Damage.Event->HitData)
+	{
 		FHitData* data = Damage.Event->HitData;
 		data->PlayMontage(this);
 		data->PlayHitStop(GetWorld());
@@ -282,7 +335,8 @@ void ACPlayer::Hitted()
 	Damage.Event = nullptr;
 }
 
-float ACPlayer::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+float ACPlayer::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent,
+                           class AController* EventInstigator, AActor* DamageCauser)
 {
 	float damage = Super::TakeDamage(TakeDamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	Damage.Power = damage;
@@ -291,10 +345,10 @@ float ACPlayer::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& Da
 	Damage.Event = (FActionDamageEvent*)&DamageEvent;
 	ACBossWeapon* Enemy = Cast<ACBossWeapon>(DamageCauser);
 	CLog::Log(Enemy->GetName());
-	if(Enemy)
-		if(Enemy->CheckGuardBool()){
-
-	if (Parry->GetGuardState())return 0;
+	if (Enemy)
+		if (Enemy->CheckGuardBool())
+		{
+			if (Parry->GetGuardState())return 0;
 		}
 	if (Dodge->ReturnPerfectDodge())return 0;
 	Hitted();

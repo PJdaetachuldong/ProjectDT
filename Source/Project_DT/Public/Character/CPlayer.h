@@ -7,6 +7,7 @@
 #include "Component/CStateComponent.h"
 #include "ICharacter.h"
 #include "Component/CParryComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "CPlayer.generated.h"
 
 UCLASS()
@@ -14,10 +15,14 @@ class PROJECT_DT_API ACPlayer : public ACharacter , public IICharacter
 {
 	GENERATED_BODY()
 
-private:
-	UPROPERTY ( VisibleAnywhere )
+public:
+	UPROPERTY (VisibleAnywhere)
 	class USpringArmComponent* SpringArm;
-	UPROPERTY ( VisibleAnywhere )
+	UPROPERTY (VisibleAnywhere)
+	class USpringArmComponent* SpringArmL;
+	UPROPERTY (VisibleAnywhere)
+	class USpringArmComponent* SpringArmR;
+	UPROPERTY (VisibleAnywhere)
 	class UCameraComponent* Camera;
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -28,9 +33,21 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	class UCStateComponent* State;
+	
+	UPROPERTY(VisibleAnywhere)
+	class UCCameraActionComponent* CameraAction;
+
+	UPROPERTY(VisibleAnywhere)
+	class UMotionWarpingComponent* MotionWarping;
+	
 public:
 	UPROPERTY(VisibleAnywhere)
+	class USpringArmComponent* CameraActionArm;
+	
+	UPROPERTY(VisibleAnywhere)
 	class UCParryComponent* Parry;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSubclassOf<UUserWidget> WidgetClass;
 
 	UPROPERTY(VisibleAnywhere)
 	class UCPerfectDodgeComponent* Dodge;
