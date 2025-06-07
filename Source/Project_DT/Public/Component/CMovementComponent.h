@@ -42,6 +42,8 @@ public:
 
 	FORCEINLINE void EnableTopViewCamera() { bTopViewCamera = true; }
 	FORCEINLINE void DisableTopViewCamera() { bTopViewCamera = false; }
+	FORCEINLINE void OffLockOn() { bCancelLockOn = false; }
+	FORCEINLINE void OnLockOn() { bCancelLockOn = true; }
 
 	FORCEINLINE bool GetCancelLockOn ( ) { return bCancelLockOn; }
 

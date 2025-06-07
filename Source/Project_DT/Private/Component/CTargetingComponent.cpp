@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "Global.h"
 #include "MotionWarpingComponent.h"
+#include "Boss/CBossEnemy.h"
 #include "Component/CCameraActionComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -209,7 +210,8 @@ void UCTargetingComponent::UpdateLockOn ( float DeltaTime )
 
         // 컨트롤러 회전 보간
         FRotator NewControlRot = FMath::RInterpTo ( ControlRot , CamToTargetRot , DeltaTime , 5.f );
-        Controller->SetControlRotation ( NewControlRot );
+        if (LockedOnTarget->IsA(ACBossEnemy::StaticClass()))
+            Controller->SetControlRotation ( NewControlRot );
         FRotator lookAtRot = UKismetMathLibrary::FindLookAtRotation(OwnerCharacter->GetActorLocation(), LockedOnTarget->GetActorLocation());
     }
 

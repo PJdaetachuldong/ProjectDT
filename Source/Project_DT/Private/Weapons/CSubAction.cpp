@@ -6,6 +6,7 @@
 #include "Global.h"
 #include "Component/CStateComponent.h"
 #include "Component/CMovementComponent.h"
+#include "Weapons/CWeaponComponent.h"
 
 void UCSubAction::BeginPlay ( class ACharacter* InOwner , class ACAttachment* InAttachment , class UCDoAction* InDoAction )
 {
@@ -15,4 +16,5 @@ void UCSubAction::BeginPlay ( class ACharacter* InOwner , class ACAttachment* In
 
 	State = CHelpers::GetComponent<UCStateComponent> ( InOwner );
 	Movement = CHelpers::GetComponent<UCMovementComponent> ( InOwner );
+	Weapon = CHelpers::GetComponent<UCWeaponComponent> ( InOwner );
 }

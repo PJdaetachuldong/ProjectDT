@@ -7,11 +7,12 @@
 #include "Weapons/CAttachment.h"
 #include "Component/CMovementComponent.h"
 #include "Weapons/CDoAction.h"
+#include "Weapons/CWeaponComponent.h"
+
 void UCSubAction_Guard::Pressed ( )
 {
 	//CheckFalse ( State->IsIdleMode ( ) );
 	CheckTrue ( State->IsSubActionMode ( ) );
-
 	Super::Pressed();
 
 	State->SetActionMode ( );

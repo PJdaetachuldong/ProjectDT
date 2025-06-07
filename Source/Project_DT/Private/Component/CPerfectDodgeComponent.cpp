@@ -4,6 +4,8 @@
 #include "Component/CMointageComponent.h"
 #include "Boss/CBossEnemy.h"
 #include "Boss/CBossWeapon.h"
+#include "Component/CMovementComponent.h"
+
 UCPerfectDodgeComponent::UCPerfectDodgeComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -18,6 +20,7 @@ void UCPerfectDodgeComponent::BeginPlay()
     OwnerCharacter = Cast<ACharacter>(GetOwner());
     Dodge = CHelpers::GetComponent<UCPerfectDodgeComponent>(OwnerCharacter);
     Montage = CHelpers::GetComponent<UCMointageComponent>(OwnerCharacter);
+    Movement = CHelpers::GetComponent<UCMovementComponent>(OwnerCharacter);
 }
 
 
@@ -55,7 +58,7 @@ void UCPerfectDodgeComponent::PerformBoxTrace()
     );
 
     // 디버그용 박스 그리기 (선택사항)
-    DrawDebugBox(GetWorld(), Start, BoxExtent, FColor::Red, false, 0.1f);
+    // DrawDebugBox(GetWorld(), Start, BoxExtent, FColor::Red, false, 0.1f);
 
     // 충돌이 감지되면 방향에 따라 몽타주 재생
     if (bHit)

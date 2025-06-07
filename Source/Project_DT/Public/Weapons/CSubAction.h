@@ -44,6 +44,7 @@ protected:
 
 	class UCStateComponent* State;
 	class UCMovementComponent* Movement;
+	class UCWeaponComponent* Weapon;
 
 	class UAnimInstance* AnimInstance;
 };

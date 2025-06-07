@@ -57,11 +57,11 @@ void UCParryComponent::DetectActor()
 		Params
 	);
 
-#if WITH_EDITOR
-	// 시각화
-	DrawDebugLine(GetWorld(), Start, End, FColor::Yellow, false, 0.1f, 0, 1.5f);
-	DrawDebugSphere(GetWorld(), End, TraceRadius+10.0f, 16, FColor::Green, false, 0.1f);
-#endif
+// #if WITH_EDITOR
+// 	// 시각화
+// 	DrawDebugLine(GetWorld(), Start, End, FColor::Yellow, false, 0.1f, 0, 1.5f);
+// 	DrawDebugSphere(GetWorld(), End, TraceRadius+10.0f, 16, FColor::Green, false, 0.1f);
+// #endif
 
 	AActor* HitActor = Hit.GetActor();
 	if (bHit && HitActor && HitActor->IsA(ACBossWeapon::StaticClass()))
@@ -74,8 +74,8 @@ void UCParryComponent::DetectActor()
 				return;
 			}
 
-		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 20.f, 12, FColor::Red, false, 1.0f);
-		DrawDebugLine(GetWorld(), Start, HitActor->GetActorLocation(), FColor::Blue, false, 1.0f, 0, 2.0f);
+		// DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 20.f, 12, FColor::Red, false, 1.0f);
+		// DrawDebugLine(GetWorld(), Start, HitActor->GetActorLocation(), FColor::Blue, false, 1.0f, 0, 2.0f);
 
 		EParryState Quadrant = GetHitQuadrant(Hit.ImpactPoint);
 
@@ -83,7 +83,6 @@ void UCParryComponent::DetectActor()
 
 		bIsGuarding = false;
 		GetWorld()->GetTimerManager().ClearTimer(GuardTraceTimer);
-
 		Weapon->OnParry(Quadrant);
 	}
 }
@@ -135,7 +134,7 @@ TimerDelegate.BindLambda([this]()
 GetWorld()->GetTimerManager().SetTimer(
 	TimerHandle,
 	TimerDelegate,
-	10.0f / 60.0f, // 약 0.083초
+	5.0f / 60.0f, // 약 0.083초
 	false // 반복 안 함
 );
 FTimerHandle PH;
@@ -192,11 +191,11 @@ void UCParryComponent::PerformGuardTrace()
 		Params
 	);
 
-#if WITH_EDITOR
-	// 시각화
-	DrawDebugLine(GetWorld(), Start, End, FColor::Blue, false, 0.1f);
-	DrawDebugSphere(GetWorld(), End, TraceRadius, 16, bHit ? FColor::Green : FColor::Red, false, 0.1f);
-#endif
+// #if WITH_EDITOR
+// 	// 시각화
+// 	DrawDebugLine(GetWorld(), Start, End, FColor::Blue, false, 0.1f);
+// 	DrawDebugSphere(GetWorld(), End, TraceRadius, 16, bHit ? FColor::Green : FColor::Red, false, 0.1f);
+// #endif
 
 	if (bHit)
 	{

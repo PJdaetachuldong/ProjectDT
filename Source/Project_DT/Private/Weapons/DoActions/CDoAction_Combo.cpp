@@ -20,10 +20,10 @@ void UCDoAction_Combo::DoAction ()
 		return;
 	}
 	CheckFalse ( State->IsIdleMode ());
-	if ( bParry )return;
 
 
 	Super::DoAction ();
+	if ( bParry )return;
 	AddComboArray(DoActionDatas[0].DoAction ( OwnerCharacter ));
 	DamageIndex = 0;
 }

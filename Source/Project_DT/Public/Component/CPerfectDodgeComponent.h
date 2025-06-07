@@ -41,6 +41,9 @@ private:
     class UCPerfectDodgeComponent* Dodge;
     UPROPERTY()
     class UCMointageComponent* Montage;
+    UPROPERTY()
+    class UCMovementComponent* Movement;
+	
 
 private:
 	UPROPERTY()

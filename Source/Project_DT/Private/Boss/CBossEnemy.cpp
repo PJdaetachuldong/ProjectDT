@@ -234,7 +234,7 @@ void ACBossEnemy::InitializeMontageMap()
 		TArray<FMontageRateScale> GuardRates;
 		GuardRates.Add(FMontageRateScale{ FName("Hit"), 10.0f, false});
 		GuardRates.Add(FMontageRateScale{ FName("Interaction"), 0.7f, false});
-		GuardRates.Add(FMontageRateScale{ FName("Counter"), 1.0f, false});
+		GuardRates.Add(FMontageRateScale{ FName("Counter"), 1.0f, true});
 		GuardRates.Add(FMontageRateScale{ FName("End"), 0.7f, false});
 		MontageScaleMap.Add(AM_ShieldHit, GuardRates);
 	}

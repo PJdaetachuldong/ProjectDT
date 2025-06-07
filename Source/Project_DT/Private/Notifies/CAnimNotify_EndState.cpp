@@ -21,9 +21,10 @@ void UCAnimNotify_EndState::Notify ( USkeletalMeshComponent* Meshcomp , UAnimSeq
 	ACharacter* Owner = Cast<ACharacter> ( Meshcomp->GetOwner ( ) );
 	CheckNull ( character );
 	CheckNull ( Owner );
-	StateType=CHelpers::GetComponent<UCStateComponent> ( Owner )->GetStateType();
-	UE_LOG ( LogTemp , Warning , TEXT ( "StateType: %s" ) ,
-		*UEnum::GetValueAsString ( StateType ) );
+	UCStateComponent* State=CHelpers::GetComponent<UCStateComponent> ( Owner );
+	StateType=State->GetStateType();
+	
+	State->OffSubActionMode();
 	switch ( StateType )
 	{
 	case EStateType::Idle:
