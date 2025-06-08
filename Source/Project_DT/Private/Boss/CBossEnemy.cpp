@@ -266,6 +266,8 @@ void ACBossEnemy::Tick(float DeltaTime)
 			ShieldAmount = StatsAsset->Stats.ShieldAmount;
 
 			ShieldBreakHit = 0;
+
+			CurBreakTime = 0.0f;
 		}
 	}
 
@@ -283,6 +285,24 @@ void ACBossEnemy::Tick(float DeltaTime)
 
 			GEngine->AddOnScreenDebugMessage(111, 5.0f, FColor::White, TEXT("ShieldHitCount Reset"));
 		}
+	}
+}
+
+bool ACBossEnemy::BackstepUse()
+{
+	//불려왔을 때 랜덤값을 뽑아 값에 맞으면 백스텝을
+	int32 RandomInt = FMath::RandRange(1,100);
+
+	if (RandomInt > BackstepPercent)
+	{
+		BackstepPercent -= 10;
+		return false;
+	}
+
+	else
+	{
+		BackstepPercent = 60;
+		return true;
 	}
 }
 

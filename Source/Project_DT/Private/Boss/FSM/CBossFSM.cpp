@@ -191,6 +191,8 @@ void UCBossFSM::NONEState()
 		// 플레이어를 바라보게 고정함
 		MyBoss->SetActorRotation(SetRotation);
 
+		/*Cast<UCBossAnim>(MyBoss->AnimInstance)->IsTurnIDLE = true;*/
+
 		if (Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection >= 0.1f
 		|| Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection <= 0.1f)
 		{

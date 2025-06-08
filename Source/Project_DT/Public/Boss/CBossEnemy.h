@@ -74,6 +74,10 @@ public:
 	//쉴드가 있을때 카운터까지 횟수 체크하는 시간
 	float GuardingTime = 0.0f;
 
+	bool BackstepUse();
+
+	int32 BackstepPercent = 60;
+
 	//일단 임시로 하는 발사 위치 설정
 	UPROPERTY(EditAnywhere)
 	class USceneComponent* ThrowPosition;
