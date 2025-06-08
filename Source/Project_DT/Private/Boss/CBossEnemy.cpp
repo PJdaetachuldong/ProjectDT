@@ -840,132 +840,278 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 	return TakeDamageAmount;
 }
 
-void ACBossEnemy::Hit()
+void ACBossEnemy::Hit(FString Name)
 {
-	//사망 상태면 안되게 막음
-	if(FSMComponent->State == EBossState::DIE) return;
+	UE_LOG(LogTemp, Log, TEXT("Actor Name: %s"), *Name);
 
-	//카운터 가드 상태일때
-	if (FSMComponent->AttackState == EBossATTACKState::COUNTERATTACK) 
+	bool IsKatana = Name.Contains(TEXT("Katana"));
+
+	if (IsKatana)
 	{
-		//정면에서 맞아서 카운터 공격이 나가면 뒤에 데미지 처리가 안되게 막음
-		if (OnGuardCollision())
+		GEngine->AddOnScreenDebugMessage(80, 1.0f, FColor::Red, TEXT("Katana Hitted"));
+
+		//사망 상태면 안되게 막음
+		if (FSMComponent->State == EBossState::DIE) return;
+
+		//카운터 가드 상태일때
+		if (FSMComponent->AttackState == EBossATTACKState::COUNTERATTACK)
 		{
-			return;
-		}
-	}
-
-	//만약 현재 필살기 준비 상태이면
-	if (IsReadySPAttack)
-	{
-		//데미지 10의 비율로 체력 감소
-		CurHP -= 10;
-		FSMComponent->SetSPDamage(10); //데미지 값 임시
-	}
-
-	//현재 쉴드가 있을 경우
-	if (ShieldAmount > 0)
-	{
-		//현재 어떠한 공격 애니메이션이 재생 중이라면
-		if(AnimInstance->Montage_IsPlaying(AM_ComboAttack_01) || AnimInstance->Montage_IsPlaying(AM_ComboAttack_02) || AnimInstance->Montage_IsPlaying(AM_RangedAttack) || AnimInstance->Montage_IsPlaying(AM_DashAttack))
-		{
-			//쉴드와 체력의 감소를 7:3의 비율로 감소함
-			ShieldAmount -= 10.0f * 0.7f;
-			CurHP -= 10.0f * 0.3f;
-
-			//체력이 0이하가 됐을 경우
-			if (CurHP <= 0)
+			//정면에서 맞아서 카운터 공격이 나가면 뒤에 데미지 처리가 안되게 막음
+			if (OnGuardCollision())
 			{
-				//보스 사망
-				FSMComponent->State = EBossState::DIE;
-				
 				return;
 			}
-
-			//쉴드가 0이하가 됐을 경우
-			if (ShieldAmount <= 0)
-			{
-				// -가 된 쉴드 게이지만큼 체력을 깎아줌
-				CurHP += ShieldAmount;
-
-				if (FSMComponent->State != EBossState::BREAK)
-				{
-					//브레이크 상태로 됨
-					FSMComponent->State = EBossState::BREAK;
-				}
-			}
 		}
 
-		//공격 모션이 재생중이 아니라면
-		else
+		//만약 현재 필살기 준비 상태이면
+		if (IsReadySPAttack)
 		{
-			//쉴드가 있는 경우에는 검으로 막는 애니메이션 재생
-			//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
-			if (ShieldAmount > 0 && AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) != FName("Counter") && FSMComponent->State != EBossState::BREAK )
+			//데미지 10의 비율로 체력 감소
+			CurHP -= 10;
+			FSMComponent->SetSPDamage(10); //데미지 값 임시
+		}
+
+		//현재 쉴드가 있을 경우
+		if (ShieldAmount > 0)
+		{
+			//현재 어떠한 공격 애니메이션이 재생 중이라면
+			if (AnimInstance->Montage_IsPlaying(AM_ComboAttack_01) || AnimInstance->Montage_IsPlaying(AM_ComboAttack_02) || AnimInstance->Montage_IsPlaying(AM_RangedAttack) || AnimInstance->Montage_IsPlaying(AM_DashAttack))
 			{
-				AnimInstance->Montage_Play(AM_ShieldHit);
-			}
-
-			//쉴드는 데미지의 값 만큼 감소
-			ShieldAmount -= 10;
-
-			//쉴드 카운터 공격 조건을 체크하는 카운트를 5초로 초기화
-			GuardingTime = 5.0f;
-			//해당 상태에서 맞은 횟수를 카운트
-			ShieldHitCount++;
-
-			//쉴드가 0이하가 됐을 경우
-			if (ShieldAmount <= 0)
-			{
-				// -가 된 쉴드 게이지만큼 체력을 깎아줌
-				CurHP += ShieldAmount;
+				//쉴드와 체력의 감소를 4:2의 비율로 감소함
+				ShieldAmount -= 10.0f * 0.4f;
+				CurHP -= 10.0f * 0.2f;
 
 				//체력이 0이하가 됐을 경우
 				if (CurHP <= 0)
 				{
 					//보스 사망
 					FSMComponent->State = EBossState::DIE;
+
 					return;
 				}
 
-				if (FSMComponent->State != EBossState::BREAK)
+				//쉴드가 0이하가 됐을 경우
+				if (ShieldAmount <= 0)
 				{
-					//브레이크 상태로 됨
-					FSMComponent->State = EBossState::BREAK;
+					// -가 된 쉴드 게이지만큼 체력을 깎아줌
+					CurHP += ShieldAmount;
+
+					if (FSMComponent->State != EBossState::BREAK)
+					{
+						//브레이크 상태로 됨
+						FSMComponent->State = EBossState::BREAK;
+					}
 				}
-				//아래 코드가 실행 안되게 리턴
+			}
+
+			//공격 모션이 재생중이 아니라면
+			else
+			{
+				//쉴드가 있는 경우에는 검으로 막는 애니메이션 재생
+				//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
+				if (ShieldAmount > 0 && AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) != FName("Counter") && FSMComponent->State != EBossState::BREAK)
+				{
+					AnimInstance->Montage_Play(AM_ShieldHit);
+				}
+
+				//쉴드는 데미지의 값 만큼 감소
+				ShieldAmount -= 5;
+
+				//쉴드 카운터 공격 조건을 체크하는 카운트를 5초로 초기화
+				GuardingTime = 5.0f;
+				//해당 상태에서 맞은 횟수를 카운트
+				ShieldHitCount++;
+
+				//쉴드가 0이하가 됐을 경우
+				if (ShieldAmount <= 0)
+				{
+					// -가 된 쉴드 게이지만큼 체력을 깎아줌
+					CurHP += ShieldAmount;
+
+					//체력이 0이하가 됐을 경우
+					if (CurHP <= 0)
+					{
+						//보스 사망
+						FSMComponent->State = EBossState::DIE;
+						return;
+					}
+
+					if (FSMComponent->State != EBossState::BREAK)
+					{
+						//브레이크 상태로 됨
+						FSMComponent->State = EBossState::BREAK;
+					}
+					//아래 코드가 실행 안되게 리턴
+					return;
+				}
+
+				if (ShieldHitCount >= ShieldHitCounter)
+				{
+					//현재 몽타주가 재생중인 섹션 확인
+					FName NowSection = AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage());
+
+					if (NowSection != "Counter")
+					{
+						//가드 중 카운터 공격이 나오도록 섹션 점프
+						AnimInstance->Montage_JumpToSection(FName("Counter"), AM_ShieldHit);
+					}
+				}
+			}
+		}
+
+		//현재 쉴드가 없는 경우
+		else
+		{
+			//체력이 데미지 10의 비율로 감소
+			CurHP -= 20;
+
+			//0이하가 됐을 경우
+			if (CurHP <= 0.0f)
+			{
+				//사망 처리
+				FSMComponent->State = EBossState::DIE;
+
 				return;
 			}
+		}
+	}
 
-			if (ShieldHitCount >= ShieldHitCounter)
+	else
+	{
+		bool IsGreatSword = Name.Contains(TEXT("GreateSword"));
+
+		if (IsGreatSword)
+		{
+			GEngine->AddOnScreenDebugMessage(80, 1.0f, FColor::Red, TEXT("Greate Sword Hitted"));
+
+			//사망 상태면 안되게 막음
+			if (FSMComponent->State == EBossState::DIE) return;
+
+			//카운터 가드 상태일때
+			if (FSMComponent->AttackState == EBossATTACKState::COUNTERATTACK)
 			{
-				//현재 몽타주가 재생중인 섹션 확인
-				FName NowSection = AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage());
+				//정면에서 맞아서 카운터 공격이 나가면 뒤에 데미지 처리가 안되게 막음
+				if (OnGuardCollision())
+				{
+					return;
+				}
+			}
 
-				if (NowSection != "Counter")
-				{	
-					//가드 중 카운터 공격이 나오도록 섹션 점프
-					AnimInstance->Montage_JumpToSection(FName("Counter"), AM_ShieldHit);
+			//만약 현재 필살기 준비 상태이면
+			if (IsReadySPAttack)
+			{
+				//데미지 10의 비율로 체력 감소
+				CurHP -= 10;
+				FSMComponent->SetSPDamage(10); //데미지 값 임시
+			}
+
+			//현재 쉴드가 있을 경우
+			if (ShieldAmount > 0)
+			{
+				//현재 어떠한 공격 애니메이션이 재생 중이라면
+				if (AnimInstance->Montage_IsPlaying(AM_ComboAttack_01) || AnimInstance->Montage_IsPlaying(AM_ComboAttack_02) || AnimInstance->Montage_IsPlaying(AM_RangedAttack) || AnimInstance->Montage_IsPlaying(AM_DashAttack))
+				{
+					//쉴드와 체력의 감소를 4:2의 비율로 감소함
+					ShieldAmount -= 10.0f * 0.8f;
+					CurHP -= 10.0f * 0.2f;
+
+					//체력이 0이하가 됐을 경우
+					if (CurHP <= 0)
+					{
+						//보스 사망
+						FSMComponent->State = EBossState::DIE;
+
+						return;
+					}
+
+					//쉴드가 0이하가 됐을 경우
+					if (ShieldAmount <= 0)
+					{
+						// -가 된 쉴드 게이지만큼 체력을 깎아줌
+						CurHP += ShieldAmount;
+
+						if (FSMComponent->State != EBossState::BREAK)
+						{
+							//브레이크 상태로 됨
+							FSMComponent->State = EBossState::BREAK;
+						}
+					}
+				}
+
+				//공격 모션이 재생중이 아니라면
+				else
+				{
+					//쉴드가 있는 경우에는 검으로 막는 애니메이션 재생
+					//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
+					if (ShieldAmount > 0 && AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) != FName("Counter") && FSMComponent->State != EBossState::BREAK)
+					{
+						AnimInstance->Montage_Play(AM_ShieldHit);
+					}
+
+					//쉴드는 데미지의 값 만큼 감소
+					ShieldAmount -= 15;
+
+					//쉴드 카운터 공격 조건을 체크하는 카운트를 5초로 초기화
+					GuardingTime = 5.0f;
+					//해당 상태에서 맞은 횟수를 카운트
+					ShieldHitCount++;
+
+					//쉴드가 0이하가 됐을 경우
+					if (ShieldAmount <= 0)
+					{
+						// -가 된 쉴드 게이지만큼 체력을 깎아줌
+						CurHP += ShieldAmount;
+
+						//체력이 0이하가 됐을 경우
+						if (CurHP <= 0)
+						{
+							//보스 사망
+							FSMComponent->State = EBossState::DIE;
+							return;
+						}
+
+						if (FSMComponent->State != EBossState::BREAK)
+						{
+							//브레이크 상태로 됨
+							FSMComponent->State = EBossState::BREAK;
+						}
+						//아래 코드가 실행 안되게 리턴
+						return;
+					}
+
+					if (ShieldHitCount >= ShieldHitCounter)
+					{
+						//현재 몽타주가 재생중인 섹션 확인
+						FName NowSection = AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage());
+
+						if (NowSection != "Counter")
+						{
+							//가드 중 카운터 공격이 나오도록 섹션 점프
+							AnimInstance->Montage_JumpToSection(FName("Counter"), AM_ShieldHit);
+						}
+					}
+				}
+			}
+
+			//현재 쉴드가 없는 경우
+			else
+			{
+				//체력이 데미지 10의 비율로 감소
+				CurHP -= 5;
+
+				//0이하가 됐을 경우
+				if (CurHP <= 0.0f)
+				{
+					//사망 처리
+					FSMComponent->State = EBossState::DIE;
+
+					return;
 				}
 			}
 		}
 	}
 
-	//현재 쉴드가 없는 경우
-	else
-	{
-		//체력이 데미지 10의 비율로 감소
-		CurHP -= 10;
-
-		//0이하가 됐을 경우
-		if (CurHP <= 0.0f)
-		{
-			//사망 처리
-			FSMComponent->State = EBossState::DIE;
-
-			return;
-		}
-	}
+	
 
 
 	//구버전

@@ -88,7 +88,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnDeath();
 
-	virtual void Hit();
+	virtual void Hit(FString Name);
 
 
 };

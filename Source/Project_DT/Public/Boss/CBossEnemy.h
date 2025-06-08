@@ -203,7 +203,7 @@ protected:
 public:
     float TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-	virtual void Hit() override;
+	virtual void Hit(FString Name) override;
 
 	UFUNCTION()
     void OnPlayerHealed();
