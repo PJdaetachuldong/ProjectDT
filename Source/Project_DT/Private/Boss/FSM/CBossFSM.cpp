@@ -513,8 +513,8 @@ void UCBossFSM::SideMove()
 
 			IsSideMoveSetting = false;
 
-			MyBoss->bUseControllerRotationYaw = true; // AI 컨트롤러 회전 비활성화
-			MyBoss->GetCharacterMovement()->bOrientRotationToMovement = true; // 이동 방향 회전 비활성화
+			MyBoss->bUseControllerRotationYaw = true;
+			MyBoss->GetCharacterMovement()->bOrientRotationToMovement = true; 
 		}
 	}
 }

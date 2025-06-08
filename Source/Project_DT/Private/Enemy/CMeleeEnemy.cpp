@@ -8,6 +8,9 @@
 #include "Components/CapsuleComponent.h"
 #include "Weapons/CAttachment.h"
 #include "Enemy/AIController/CMeleeAIController.h"
+#include "Weapons/CWeaponStuctures.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Global.h"
 
 // Sets default values
 ACMeleeEnemy::ACMeleeEnemy()
@@ -19,7 +22,20 @@ ACMeleeEnemy::ACMeleeEnemy()
 	WanderSpeed = 450.0f;
 	WanderRadius = 500.0f;
 	BackStepSpeed = 50.0f;
-	
+
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempSkeletal (TEXT("/Script/Engine.SkeletalMesh'/Game/Ghoul/BaseMesh/SK_Ghoul.SK_Ghoul'"));
+	if (TempSkeletal.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(TempSkeletal.Object);
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0,0,-88),FRotator(0,-90,0));
+	}
+
+// 	ConstructorHelpers::FObjectFinder<UAnimBlueprint> TempAnim(L"/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Boss/ABP_BossAnim.ABP_BossAnim'");
+// 	if (TempAnim.Succeeded())
+// 	{
+// 		GetMesh()->SetAnimInstanceClass(TempAnim.Object->GeneratedClass);
+// 	}
+
 	GetCharacterMovement ( )->bUseRVOAvoidance = true;
 	GetCharacterMovement ( )->AvoidanceConsiderationRadius = 200.0f;
 	GetCharacterMovement ( )->AvoidanceWeight = 0.2f;
@@ -31,6 +47,7 @@ ACMeleeEnemy::ACMeleeEnemy()
 
 	FSMComponent = CreateDefaultSubobject<UCMeleeEnemyFSM> ( TEXT ( "FSMComp" ) );
 
+
 	AIControllerClass = ACMeleeAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
@@ -39,6 +56,8 @@ ACMeleeEnemy::ACMeleeEnemy()
 void ACMeleeEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	AnimInstance = GetMesh()->GetAnimInstance();
 }
 
 // Called every frame
@@ -66,6 +85,22 @@ void ACMeleeEnemy::Tick(float DeltaTime)
 			{
 				FSMComponent->State = EMeleeEnemyState::WANDER;
 			}
+		}
+	}
+
+	//쉴드가 부셔진 상태이면
+	if (ShieldAmount <= 0.0f)
+	{
+		//현재 부서진 상태를 계속 체크
+		CurBreakTime += DeltaTime;
+
+		//일정 시간 이상이 되면
+		if (CurBreakTime >= ResetShieldTime)
+		{
+			//실드를 다시 복구
+			ShieldAmount = StatsAsset->Stats.ShieldAmount;
+
+			CurBreakTime = 0.0f;
 		}
 	}
 }
@@ -184,6 +219,303 @@ bool bFromSweep, const FHitResult& SweepResult)
 
 			//피격 애니메이션이 나오게 만듦
 			GEngine->AddOnScreenDebugMessage ( 44 , 1.0f , FColor::Red , TEXT ( "Enemy Hit Damage" ) );
+		}
+	}
+}
+
+void ACMeleeEnemy::Hitted()
+{
+	//사망 상태면 안되게 막음
+	if (FSMComponent->State == EMeleeEnemyState::DIE) return;
+
+	Damage.Power = 0;
+	
+	if (!!Damage.Event && !!Damage.Event->HitData) {
+		FHitData* data = Damage.Event->HitData;
+
+		if (ShieldAmount <= 0.0f)
+		{
+			if (ShieldBreakHit < 2) ++ShieldBreakHit;
+
+			if (FSMComponent->State == EMeleeEnemyState::BREAK && ShieldBreakHit >= 2)
+			{
+				if (IsCanAttack)
+				{
+					FSMComponent->State = EMeleeEnemyState::CHASE;
+				}
+				else if (!IsCanAttack)
+				{
+					FSMComponent->State = EMeleeEnemyState::WANDER;
+				}
+			}
+
+			data->PlayMontage(this);
+		}
+
+		data->PlayHitStop(GetWorld());
+		{
+			FVector start = GetActorLocation();
+			FVector target = Damage.Character->GetActorLocation();
+			FVector direction = target - start;
+			direction.Normalize();
+
+			LaunchCharacter(-direction * data->Launch, false, false);
+			SetActorRotation(UKismetMathLibrary::FindLookAtRotation(start, target));
+		}
+	}
+	Damage.Character = nullptr;
+	Damage.Causer = nullptr;
+	Damage.Event = nullptr;
+}
+
+float ACMeleeEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	float damage = Super::TakeDamage(TakeDamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	Damage.Power = damage;
+	Damage.Character = Cast<ACharacter>(EventInstigator->GetPawn());
+	Damage.Causer = DamageCauser;
+	Damage.Event = (FActionDamageEvent*)&DamageEvent;
+	CLog::Log(Damage.Power);
+	Hitted();
+	return TakeDamageAmount;
+}
+
+void ACMeleeEnemy::Hit(FString Name)
+{
+	UE_LOG(LogTemp, Log, TEXT("Actor Name: %s"), *Name);
+
+	bool IsKatana = Name.Contains(TEXT("Katana"));
+
+	if (IsKatana)
+	{
+		GEngine->AddOnScreenDebugMessage(80, 1.0f, FColor::Red, TEXT("Katana Hitted"));
+
+		//사망 상태면 안되게 막음
+		if (FSMComponent->State == EMeleeEnemyState::DIE) return;
+
+		//현재 쉴드가 있을 경우
+		if (ShieldAmount > 0)
+		{
+			//현재 어떠한 공격 애니메이션이 재생 중이라면
+			if (AnimInstance->Montage_IsPlaying(AM_Attack))
+			{
+				//쉴드와 체력의 감소를 4:2의 비율로 감소함
+				ShieldAmount -= 10.0f * 0.4f;
+				CurHP -= 10.0f * 0.2f;
+
+				//체력이 0이하가 됐을 경우
+				if (CurHP <= 0)
+				{
+					//보스 사망
+					FSMComponent->State = EMeleeEnemyState::DIE;
+
+					//만약 에너미 매니저가 있다면
+					if (Manager)
+					{
+						Manager->RemoveEnemiesList(MyUniqeID, IsCanAttack);
+					}
+
+					return;
+				}
+
+				//쉴드가 0이하가 됐을 경우
+				if (ShieldAmount <= 0)
+				{
+					// -가 된 쉴드 게이지만큼 체력을 깎아줌
+					CurHP += ShieldAmount;
+
+					if (FSMComponent->State != EMeleeEnemyState::BREAK)
+					{
+						//브레이크 상태로 됨
+						FSMComponent->State = EMeleeEnemyState::BREAK;
+					}
+				}
+			}
+
+			//공격 모션이 재생중이 아니라면
+			else
+			{
+				//쉴드가 있는 경우에는 검으로 막는 애니메이션 재생
+				//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
+				if (ShieldAmount > 0 && FSMComponent->State != EMeleeEnemyState::BREAK)
+				{
+					AnimInstance->Montage_Play(AM_ShieldHit);
+				}
+
+				//쉴드는 데미지의 값 만큼 감소
+				ShieldAmount -= 5;
+
+				//쉴드가 0이하가 됐을 경우
+				if (ShieldAmount <= 0)
+				{
+					// -가 된 쉴드 게이지만큼 체력을 깎아줌
+					CurHP += ShieldAmount;
+
+					//체력이 0이하가 됐을 경우
+					if (CurHP <= 0)
+					{
+						//보스 사망
+						FSMComponent->State = EMeleeEnemyState::DIE;
+
+						//만약 에너미 매니저가 있다면
+						if (Manager)
+						{
+							Manager->RemoveEnemiesList(MyUniqeID, IsCanAttack);
+						}
+
+						return;
+					}
+
+					if (FSMComponent->State != EMeleeEnemyState::BREAK)
+					{
+						//브레이크 상태로 됨
+						FSMComponent->State = EMeleeEnemyState::BREAK;
+					}
+					//아래 코드가 실행 안되게 리턴
+					return;
+				}
+			}
+		}
+
+		//현재 쉴드가 없는 경우
+		else
+		{
+			//체력이 데미지 10의 비율로 감소
+			CurHP -= 20;
+
+			//0이하가 됐을 경우
+			if (CurHP <= 0.0f)
+			{
+				//사망 처리
+				FSMComponent->State = EMeleeEnemyState::DIE;
+
+				//만약 에너미 매니저가 있다면
+				if (Manager)
+				{
+					Manager->RemoveEnemiesList(MyUniqeID, IsCanAttack);
+				}
+
+				return;
+			}
+		}
+	}
+
+	else
+	{
+		bool IsGreatSword = Name.Contains(TEXT("GreateSword"));
+
+		if (IsGreatSword)
+		{
+			GEngine->AddOnScreenDebugMessage(80, 1.0f, FColor::Red, TEXT("Greate Sword Hitted"));
+
+			//사망 상태면 안되게 막음
+			if (FSMComponent->State == EMeleeEnemyState::DIE) return;
+
+			//현재 쉴드가 있을 경우
+			if (ShieldAmount > 0)
+			{
+				//현재 어떠한 공격 애니메이션이 재생 중이라면
+				if (AnimInstance->Montage_IsPlaying(AM_Attack))
+				{
+					//쉴드와 체력의 감소를 4:2의 비율로 감소함
+					ShieldAmount -= 10.0f * 0.8f;
+					CurHP -= 10.0f * 0.2f;
+
+					//체력이 0이하가 됐을 경우
+					if (CurHP <= 0)
+					{
+						//보스 사망
+						FSMComponent->State = EMeleeEnemyState::DIE;
+
+						//만약 에너미 매니저가 있다면
+						if (Manager)
+						{
+							Manager->RemoveEnemiesList(MyUniqeID, IsCanAttack);
+						}
+
+						return;
+					}
+
+					//쉴드가 0이하가 됐을 경우
+					if (ShieldAmount <= 0)
+					{
+						// -가 된 쉴드 게이지만큼 체력을 깎아줌
+						CurHP += ShieldAmount;
+
+						if (FSMComponent->State != EMeleeEnemyState::BREAK)
+						{
+							//브레이크 상태로 됨
+							FSMComponent->State = EMeleeEnemyState::BREAK;
+						}
+					}
+				}
+
+				//공격 모션이 재생중이 아니라면
+				else
+				{
+					//쉴드가 있는 경우에는 검으로 막는 애니메이션 재생
+					//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
+					if (ShieldAmount > 0 && FSMComponent->State != EMeleeEnemyState::BREAK)
+					{
+						AnimInstance->Montage_Play(AM_ShieldHit);
+					}
+
+					//쉴드는 데미지의 값 만큼 감소
+					ShieldAmount -= 15;
+
+					//쉴드가 0이하가 됐을 경우
+					if (ShieldAmount <= 0)
+					{
+						// -가 된 쉴드 게이지만큼 체력을 깎아줌
+						CurHP += ShieldAmount;
+
+						//체력이 0이하가 됐을 경우
+						if (CurHP <= 0)
+						{
+							//보스 사망
+							FSMComponent->State = EMeleeEnemyState::DIE;
+
+							//만약 에너미 매니저가 있다면
+							if (Manager)
+							{
+								Manager->RemoveEnemiesList(MyUniqeID, IsCanAttack);
+							}
+
+							return;
+						}
+
+						if (FSMComponent->State != EMeleeEnemyState::BREAK)
+						{
+							//브레이크 상태로 됨
+							FSMComponent->State = EMeleeEnemyState::BREAK;
+						}
+						//아래 코드가 실행 안되게 리턴
+						return;
+					}
+				}
+			}
+
+			//현재 쉴드가 없는 경우
+			else
+			{
+				//체력이 데미지 10의 비율로 감소
+				CurHP -= 5;
+
+				//0이하가 됐을 경우
+				if (CurHP <= 0.0f)
+				{
+					//사망 처리
+					FSMComponent->State = EMeleeEnemyState::DIE;
+
+					//만약 에너미 매니저가 있다면
+					if (Manager)
+					{
+						Manager->RemoveEnemiesList(MyUniqeID, IsCanAttack);
+					}
+
+					return;
+				}
+			}
 		}
 	}
 }

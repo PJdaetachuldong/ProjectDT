@@ -24,6 +24,13 @@ ACBossEnemy::ACBossEnemy()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempSkeletal (TEXT("/Script/Engine.SkeletalMesh'/Game/ODH/Asset/Boss/ElfArden/BaseMesh/SK_ElfArden.SK_ElfArden'"));
+	if (TempSkeletal.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(TempSkeletal.Object);
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
+	}
+
 	GetCapsuleComponent()->SetCollisionProfileName(FName("TestEnemy"));
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ACBossEnemy::EnemyHitDamage);
 

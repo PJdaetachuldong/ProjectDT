@@ -15,6 +15,7 @@ enum class EMeleeEnemyState : uint8
 	WANDER UMETA(DisplayName = "WANDER"),
 	ATTACK UMETA(DisplayName = "ATTACK"),
 	DAMAGE UMETA(DisplayName = "DAMAGE"),
+	BREAK UMETA(DisplayName = "BREAK"),
 	DIE UMETA(DisplayName = "DIE"),
 };
 
@@ -79,5 +80,6 @@ public:
 	void WANDERState();
 	void ATTACKState();
 	void DMAGEState();
+	void BREAKState();
 	void DIEState();
 };
