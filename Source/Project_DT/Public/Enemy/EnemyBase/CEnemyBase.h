@@ -89,4 +89,6 @@ public:
 	void OnDeath();
 
 	virtual void Hit();
+
+
 };

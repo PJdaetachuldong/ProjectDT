@@ -30,6 +30,7 @@ void UCStatusComponent::Heal ( float InAmount )
 {
 	Health += InAmount;
 	Health = FMath::Clamp ( Health , 0.0f , MaxHealth );
+	OnHeal.Broadcast();
 }
 
 void UCStatusComponent::UseMana ( float InAmount )

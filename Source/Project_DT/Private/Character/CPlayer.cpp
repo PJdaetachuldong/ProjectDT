@@ -282,8 +282,9 @@ void ACPlayer::DeadHandler()
 void ACPlayer::Healing()
 {
 	Montages->PlayHealingMode();
-	Status->Damage(50);
-	Status->UseMana(20);
+	//Status->Damage(50);
+	Status->Heal(50);
+	//Status->UseMana(20);
 }
 
 void ACPlayer::Jump()

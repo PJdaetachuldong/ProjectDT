@@ -18,6 +18,7 @@
 #include "Boss/CBossWeapon.h"
 #include "Boss/DataAsset/HitDataAsset_BossToPlayer.h"
 #include "Boss/SPAttackCollision/SPAttackCheckCollision.h"
+#include "Component/CStatusComponent.h"
 
 ACBossEnemy::ACBossEnemy()
 {
@@ -113,6 +114,12 @@ void ACBossEnemy::BeginPlay()
 	//임시로 타겟을 그냥 플레이어로 지정
 	Target = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	//임시로 타겟을 그냥 플레이어로 지정
+	if(Target){
+		UCStatusComponent* Status=CHelpers::GetComponent<UCStatusComponent>(Target);
+	if (Status) {
+		Status->OnHeal.AddDynamic(this, &ACBossEnemy::OnPlayerHealed);
+		}
+	}
 
 	//무기 생성
 	if (MyWeapon)
@@ -185,7 +192,7 @@ void ACBossEnemy::InitializeMontageMap()
 	if (AM_ComboAttack_02)
 	{
 		TArray<FMontageRateScale> ComboAttack02Rates;
-		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_01"), 0.7f, true });
+		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_01"), 0.5f, true });
 		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_02"), 0.7f, false});
 		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_03"), 0.7f,false});
 		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_04"), 0.7f, true });
@@ -223,6 +230,8 @@ void ACBossEnemy::InitializeMontageMap()
 	if (AM_SPAttack)
 	{
 		TArray<FMontageRateScale> SPAttackRates;
+		SPAttackRates.Add(FMontageRateScale{ FName("Alram"), 0.7f, false });
+		SPAttackRates.Add(FMontageRateScale{ FName("SPFirstATK"), 0.7f, false });
 		SPAttackRates.Add(FMontageRateScale{ FName("SPAttackStart"), 0.7f, false });
 		SPAttackRates.Add(FMontageRateScale{ FName("SPAttackLoop"), 0.7f, false });
 		SPAttackRates.Add(FMontageRateScale{ FName("SPAttack"), 0.7f ,false});
@@ -255,6 +264,8 @@ void ACBossEnemy::Tick(float DeltaTime)
 		{
 			//실드를 다시 복구
 			ShieldAmount = StatsAsset->Stats.ShieldAmount;
+
+			ShieldBreakHit = 0;
 		}
 	}
 
@@ -770,7 +781,9 @@ void ACBossEnemy::Hitted()
 
 		if (ShieldAmount <= 0.0f)
 		{
-			if(FSMComponent->State == EBossState::BREAK)
+			if(ShieldBreakHit < 2) ++ShieldBreakHit;
+
+			if(FSMComponent->State == EBossState::BREAK && ShieldBreakHit >= 2)
 			{
 				FSMComponent->State = EBossState::ATTACK;
 				FSMComponent->AttackState = EBossATTACKState::NONE;
@@ -1023,6 +1036,18 @@ void ACBossEnemy::Hit()
 // 			}
 // 		}
 // 	/*}*/
+}
+
+void ACBossEnemy::OnPlayerHealed()
+{
+	CLog::Log("OnPlayerHealed");
+
+	//다른 공격 모션을 하고 있다면 실행 안되게 막아주기
+	if(FSMComponent->AttackState == EBossATTACKState::NONE)
+	{ 
+		FSMComponent->State = EBossState::ATTACK;
+		FSMComponent->AttackState = EBossATTACKState::RANGEDATTACK;
+	}
 }
 
 void ACBossEnemy::LoadStatsFromAsset ( )

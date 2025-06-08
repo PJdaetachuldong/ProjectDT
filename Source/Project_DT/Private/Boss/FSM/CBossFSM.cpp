@@ -123,7 +123,7 @@ void UCBossFSM::NONEState()
 	//쉴드가 까진 상태면 밑에 실행 안함
 	if(MyBoss->ShieldAmount<=0.0f) return;
 
-	if (TargetDist >= 350.0f)
+	if (TargetDist >= 200.0f)
 	{
 		//움직인 거리가 300이상일 경우
 		if (TotalMoveDistance >= 600.0f)
@@ -176,6 +176,21 @@ void UCBossFSM::NONEState()
 	{
 		AI->StopMovement();
 
+		// 플레이어 위치
+		FVector PlayerLocation = MyBoss->Target->GetActorLocation();
+		// 현재 AI 위치
+		FVector AILocation = MyBoss->GetActorLocation();
+		// 플레이어를 향하는 방향 벡터 계산
+		FVector DirectionToPlayer = (PlayerLocation - AILocation).GetSafeNormal();
+		// 방향 벡터를 회전으로 변환 (Yaw만 고려)
+		FRotator LookAtRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
+		// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
+		FRotator NewRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
+		FRotator CurrentRotation = MyBoss->GetActorRotation();
+		FRotator SetRotation = FMath::RInterpTo(CurrentRotation, NewRotation, GetWorld()->GetDeltaSeconds(), 3.0f);
+		// 플레이어를 바라보게 고정함
+		MyBoss->SetActorRotation(SetRotation);
+
 		if (Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection >= 0.1f
 		|| Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection <= 0.1f)
 		{
@@ -203,7 +218,7 @@ void UCBossFSM::NONEState()
 
 	//필살기 사용 부분
 	//체력이 반 이하로 내려갔을 경우, 필살기를 한번 안하였거나 일정 횟수 공격을 했을 경우
-	if ( MyBoss->CurHP<= MyBoss->CurHP / 2 && !IsFirstSPAttack || CurAttackStack >= SPAttackStack)
+	if ( MyBoss->CurHP<= MyBoss->MaxHP / 2 && !IsFirstSPAttack || CurAttackStack >= SPAttackStack)
 	{
 		if (!IsFirstSPAttack)
 		{
@@ -741,6 +756,50 @@ void UCBossFSM::SPATTACKState()
 	if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->AM_SPAttack ) )
 	{
 		MyBoss->AnimInstance->Montage_Play(MyBoss->AM_SPAttack);
+	}
+
+	//필살기 달리기 상태면 달리는거 따로 동작하게 만듦
+	if (MyBoss->IsSPRun)
+	{
+		// 플레이어 위치
+		FVector PlayerLocation = MyBoss->Target->GetActorLocation();
+		// 현재 AI 위치
+		FVector AILocation = MyBoss->GetActorLocation();
+		// 플레이어를 향하는 방향 벡터 계산
+		FVector DirectionToPlayer = (PlayerLocation - AILocation).GetSafeNormal();
+		// 방향 벡터를 회전으로 변환 (Yaw만 고려)
+		FRotator LookAtRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
+		// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
+		FRotator NewRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
+		// 플레이어를 바라보게 고정함
+		MyBoss->SetActorRotation(NewRotation);
+
+		//플레이어를 향해서 움직이게 만듦
+		AI->MoveToLocation(MyBoss->Target->GetActorLocation());
+
+		if (TargetDist <= 200.0f)
+		{
+			//현재 재생중인 애니메이션 몽타주 확인
+			UAnimMontage* NowMontage = MyBoss->AnimInstance->GetCurrentActiveMontage();
+			if (!NowMontage)
+			{
+				return;
+			}
+
+			//현재 몽타주가 재생중인 섹션 확인
+			FName NowSection = MyBoss->AnimInstance->Montage_GetCurrentSection(NowMontage);
+
+			MyBoss->AnimInstance->Montage_JumpToSection(FName("SPFirstATK"), NowMontage);
+
+			MyBoss->IsSPRun = false;
+
+			MyBoss->bUseControllerRotationYaw = true;
+			MyBoss->GetCharacterMovement()->bOrientRotationToMovement = true;
+
+			return;
+		}
+
+		return;
 	}
 
 // 	CurSPReadyTime += GetWorld()->GetDeltaSeconds();

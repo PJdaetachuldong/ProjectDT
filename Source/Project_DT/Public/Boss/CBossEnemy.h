@@ -65,6 +65,12 @@ public:
 	//쉴드 상태에서 일정 횟수 이상 공격을 맞았을 경우 반격 공격이 실행되는 조건 변수
 	int32 ShieldHitCounter = 2;
 
+	int32 ShieldBreakHit = 0;
+
+	bool IsSPRun = false;
+
+	bool IsSPFirstATKHit = false;
+
 	//쉴드가 있을때 카운터까지 횟수 체크하는 시간
 	float GuardingTime = 0.0f;
 
@@ -194,6 +200,9 @@ public:
     float TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	virtual void Hit() override;
+
+	UFUNCTION()
+    void OnPlayerHealed();
 };
 
 USTRUCT(BlueprintType)
