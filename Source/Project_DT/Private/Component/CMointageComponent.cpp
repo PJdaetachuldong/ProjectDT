@@ -126,6 +126,7 @@ void UCMointageComponent::Respawn()
 	OwnerCharacter->EnableInput(nullptr);
 	State->SetIdleMode();
 	Status->Heal(100);
+	Status->UseMana(100);
 	}
 }
 

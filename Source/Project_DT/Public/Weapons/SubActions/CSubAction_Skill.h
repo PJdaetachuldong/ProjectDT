@@ -41,5 +41,6 @@ protected:
 
 	class UCStateComponent* State;
 	class UCMovementComponent* Movement;
+	class UCStatusComponent* Status;
 
 };

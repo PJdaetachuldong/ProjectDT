@@ -13,5 +13,88 @@ UCLASS()
 class PROJECT_DT_API UCPlayerWidget : public UUserWidget
 {
 	GENERATED_BODY()
+	FWidgetAnimationDynamicEvent KatanaEndDelegate;
+	FWidgetAnimationDynamicEvent GreatSwordEndDelegate;
+	FWidgetAnimationDynamicEvent KatanaStartDelegate;
+	FWidgetAnimationDynamicEvent GreatSwordStartDelegate;
+public:
+	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float DeltaTime) override;
+public:
+	UFUNCTION()
+	void FadeInSelectWindow();
+	UFUNCTION()
+	void FadeOutSelectWindow();
+
+	FORCEINLINE bool GetIsAllowChangeWeapon(){return IsAllowChangeWeapon;};
+	FORCEINLINE bool GetIsCancelWidget(){return IsCancelWidget;};
+
+	void SelectKatana();
+	void SelectGreatSword();
+	UFUNCTION()
+	void KatanaEndSelect();
+	UFUNCTION()
+	void GreatSwordEndSelect();
+	UFUNCTION()
+	void CancelHandler();
+
+private:
+	UPROPERTY()
+	class ACharacter* OwnerCharacter;
+	UPROPERTY()
+	class UCStatusComponent* Status;
+	UPROPERTY()
+	class UCWeaponComponent* Weapon;
+
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
+	class UProgressBar* Player_HP_Dark;
 	
+	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
+	class UProgressBar* Player_HP_Red;
+
+	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
+	class UProgressBar* Sword_Energy;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
+	class UCanvasPanel* WeaponSelect;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
+	class UWidgetAnimation* ArrowAnimation;
+	
+	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
+	class UWidgetAnimation* SelectSecondAnimation;
+	
+	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
+	class UWidgetAnimation* SelectThirdAnimation;
+	
+	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
+	class UWidgetAnimation* WeaponSelectPadeAnimation;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
+	class UWidgetAnimation* WeaponGageRotationKatana;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
+	class UWidgetAnimation* WeaponGageRotationGreatSword;
+
+private:
+	UFUNCTION()
+	void SetHpProgessBar(float HP);
+	UFUNCTION()
+	void SetManaProgessBar(float Mana);
+
+
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "UI")
+	float Dark_Hp=1.0;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "UI")
+	float Red_Hp=1.0;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "UI")
+	float Sword_Mana=1.0;
+
+private:
+	bool IsAllowChangeWeapon=false;
+	bool IsCancelWidget=false;
+
 };

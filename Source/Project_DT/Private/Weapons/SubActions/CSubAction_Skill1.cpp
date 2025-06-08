@@ -6,13 +6,14 @@
 #include "Component/CStateComponent.h"
 #include "Weapons/CAttachment.h"
 #include "Component/CMovementComponent.h"
+#include "Component/CStatusComponent.h"
 #include "Weapons/CDoAction.h"
 void UCSubAction_Skill1::Pressed ( )
 {
+
 	CheckFalse ( State->IsIdleMode ( ) );
-	CLog::Log ( "Pressed1" );
-	//CheckTrue ( State->IsSubActionMode ( ) );
-	CLog::Log ( "Pressed2" );
+	if (Status->GetMana()<20)return;
+	Status->UseMana(20);
 	Super::Pressed ( );
 
 	State->SetActionMode ( );

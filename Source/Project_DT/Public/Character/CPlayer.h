@@ -48,6 +48,9 @@ public:
 	class UCParryComponent* Parry;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TSubclassOf<UUserWidget> WidgetClass;
+public:
+	UPROPERTY(EditAnywhere,Blueprintable)
+	class UCPlayerWidget* UWidget;
 
 	UPROPERTY(VisibleAnywhere)
 	class UCPerfectDodgeComponent* Dodge;
@@ -92,6 +95,8 @@ public:
 	class UInputAction* IA_Guard;
 	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
 	class UInputAction* IA_Heal;
+	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
+	class UInputAction* IA_Select;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -146,7 +151,13 @@ public:
 		} Damage;
 protected:
 	virtual void Hitted();
-
 public:
 	float TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+private:
+	void SelectWidgetOff();
+	void SelectWidgetOn();
+	void SelectKatana();
+	void SelectGreatSword();
+	
 };

@@ -51,6 +51,7 @@ public:
 	void SetUnarmedMode ( );
 	void SetFistMode ( );
 	void SetKatanaMode ( );
+	
 	void SetSwordMode ( );
 	void SetGreatSwordMode ( );
 
@@ -83,6 +84,8 @@ public:
 private:
 	class ACharacter* OwnerCharacter;
 	class UCStateComponent* State;
+	class UCPlayerWidget* Widget;
+	
 
 	EWeaponType Type = EWeaponType::Max;
 

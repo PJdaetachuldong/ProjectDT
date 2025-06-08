@@ -5,6 +5,7 @@
 #include "Weapons/CAttachment.h"
 #include "Global.h"
 #include "Component/CStateComponent.h"
+#include "Component/CStatusComponent.h"
 #include "Component/CMovementComponent.h"
 void UCSubAction_Skill::BeginPlay ( class ACharacter* InOwner , class ACAttachment* InAttachment , class UCDoAction* InDoAction )
 {
@@ -13,9 +14,11 @@ void UCSubAction_Skill::BeginPlay ( class ACharacter* InOwner , class ACAttachme
 
 	State = CHelpers::GetComponent<UCStateComponent> ( InOwner );
 	Movement = CHelpers::GetComponent<UCMovementComponent> ( InOwner );
+	Status = CHelpers::GetComponent<UCStatusComponent> ( InOwner );
 }
 
 void UCSubAction_Skill::Pressed ( )
 {
+
 	State->OnSubActionMode ( );
 }

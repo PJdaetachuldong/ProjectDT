@@ -11,6 +11,7 @@
 #include "Weapons/CDoAction.h"
 #include "Weapons/CSubAction.h"
 #include "Weapons/SubActions/CSubAction_Skill.h"
+#include "Widget/CPlayerWidget.h"
 
 // Sets default values for this component's properties
 UCWeaponComponent::UCWeaponComponent()
@@ -43,10 +44,6 @@ void UCWeaponComponent::TickComponent ( float DeltaTime , ELevelTick TickType , 
 
 	if (State->GetStateType()==EStateType::Idle){
 		CombatStateTime = +DeltaTime;
-		if ( CombatStateTime>=10 )
-		{
-
-		}
 	}
 }
 
@@ -118,20 +115,21 @@ void UCWeaponComponent::SetFistMode ( )
 
 void UCWeaponComponent::SetKatanaMode ( )
 {
-	CheckFalse ( IsIdleMode ( ) );
-	SetMode ( EWeaponType::Katana );
+		CheckFalse ( IsIdleMode ( ) );
+		SetMode ( EWeaponType::Katana );
 }
 
 void UCWeaponComponent::SetSwordMode ( )
 {
-	CheckFalse ( IsIdleMode ( ) );
-	SetMode ( EWeaponType::Sword );
+		CheckFalse ( IsIdleMode ( ) );
+		SetMode ( EWeaponType::Sword );
 }
 
 void UCWeaponComponent::SetGreatSwordMode ( )
 {
-	CheckFalse ( IsIdleMode ( ) );
-	SetMode ( EWeaponType::GreatSword );
+
+		CheckFalse ( IsIdleMode ( ) );
+		SetMode ( EWeaponType::GreatSword );
 }
 
 void UCWeaponComponent::DoAction ( )

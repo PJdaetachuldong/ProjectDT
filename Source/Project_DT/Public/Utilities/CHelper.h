@@ -8,6 +8,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/ACGhostTrail.h"
+#include "Character/CPlayer.h"
 
 #define CheckTrue(x) { if(x == true) return; }
 #define CheckTrueResult(x, y) { if(x == true) return y; }
@@ -47,6 +48,15 @@ public:
 		}
 
 		InActor->SetRootComponent(*OutComponent);
+	}
+	template<typename T>
+static T* GetWidget(AActor* InActor)
+	{
+		if (ACPlayer* Player = Cast<ACPlayer>(InActor))
+		{
+			return Cast<T>(Player->UWidget);
+		}
+		return nullptr;
 	}
 
 	template<typename T>

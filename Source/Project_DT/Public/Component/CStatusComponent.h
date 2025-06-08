@@ -6,12 +6,17 @@
 #include "Components/ActorComponent.h"
 #include "CStatusComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHpSettingDelegate, float, HP);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FManaSettingDelegate, float, Mana);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECT_DT_API UCStatusComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+public:
+	FHpSettingDelegate OnDelegateHP;
+	FHpSettingDelegate OnDelegateMana;
 private:
 	UPROPERTY(EditAnywhere, Category = "Health")
 	float MaxHealth = 100;
@@ -40,6 +45,10 @@ public:
 	void Heal ( float InAmount );
 	void UseMana ( float InAmount );
 	void RecoverMana ( float InAmount );
+
+private:
+	void SetHP(float HP);
+	void SetMana(float SetMana);
 
 private:
 	class ACharacter* OwnerCharacter;

@@ -61,6 +61,9 @@ protected:
 
 	UPROPERTY ( BlueprintReadOnly , Category = "Game" )
 	class ACharacter* OwnerCharacter;
+	
+	UPROPERTY ( BlueprintReadOnly , Category = "Game" )
+	class UCStatusComponent* Status;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class USkeletalMeshComponent* SkeletalMesh;

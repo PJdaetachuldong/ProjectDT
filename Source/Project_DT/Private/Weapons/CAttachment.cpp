@@ -8,6 +8,7 @@
 #include "Components/SceneComponent.h"
 #include "Enemy/EnemyBase/CEnemyBase.h"
 #include "../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraComponent.h"
+#include "Component/CStatusComponent.h"
 // Sets default values
 ACAttachment::ACAttachment()
 {
@@ -116,7 +117,8 @@ void ACAttachment::Tick(float DeltaTime)
 			EnemyActor = Enemy;
 			Enemy->Hit();
 			GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Yellow, FString::Printf(TEXT("Hit: %s"), *Hit.GetActor()->GetName()));
-
+			Status=CHelpers::GetComponent<UCStatusComponent>(OwnerCharacter);
+			Status->RecoverMana(5);
 			if (OnAttachmentBeginOverlap.IsBound())
 				OnAttachmentBeginOverlap.Broadcast(OwnerCharacter, this, Cast<ACharacter>(Hit.GetActor()));
 		}
