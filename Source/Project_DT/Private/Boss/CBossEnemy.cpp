@@ -19,6 +19,7 @@
 #include "Boss/DataAsset/HitDataAsset_BossToPlayer.h"
 #include "Boss/SPAttackCollision/SPAttackCheckCollision.h"
 #include "Component/CStatusComponent.h"
+#include "Widget/BossWidget.h"
 
 ACBossEnemy::ACBossEnemy()
 {
@@ -112,6 +113,7 @@ ACBossEnemy::ACBossEnemy()
 	{
 		HitData = TempHitData.Object;
 	}
+	CHelpers::GetClass(&BossUIClass,AssetPaths::BossUI);
 }
 
 void ACBossEnemy::BeginPlay()
@@ -182,6 +184,12 @@ void ACBossEnemy::BeginPlay()
 
 	//공격 섹션 이름 초기화
 	InitAttackTMap();
+
+	//위젯 추가
+	if (!BossUIClass)return;
+	BossUI=CreateWidget<UBossWidget>(GetWorld(),BossUIClass);
+	BossUI->AddToViewport();
+	BossUI->SetOwner(this);
 }
 
 void ACBossEnemy::InitializeMontageMap()
@@ -856,7 +864,8 @@ void ACBossEnemy::Hit(FString Name)
 	if (IsKatana)
 	{
 		GEngine->AddOnScreenDebugMessage(80, 1.0f, FColor::Red, TEXT("Katana Hitted"));
-
+		OnDelegateHP.Broadcast(CurHP);
+		OnDelegateShield.Broadcast(ShieldAmount);
 		//사망 상태면 안되게 막음
 		if (FSMComponent->State == EBossState::DIE) return;
 

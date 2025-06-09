@@ -10,10 +10,17 @@
 /**
  * 
  */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHpBossSettingDelegate, float, HP);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FShieldSettingDelegate, float, Mana);
+
+
 UCLASS()
 class PROJECT_DT_API ACBossEnemy : public ACEnemyBase
 {
 	GENERATED_BODY()
+public:
+	FHpBossSettingDelegate OnDelegateHP;
+	FShieldSettingDelegate OnDelegateShield;
 	
 public:
 	ACBossEnemy();
@@ -207,6 +214,10 @@ public:
 
 	UFUNCTION()
     void OnPlayerHealed();
+
+	UPROPERTY()
+	TSubclassOf<UUserWidget>BossUIClass;
+	class UBossWidget* BossUI;
 };
 
 USTRUCT(BlueprintType)
