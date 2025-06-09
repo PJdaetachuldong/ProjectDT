@@ -24,4 +24,6 @@ void UCBossAnimNotify_EndSP::Notify ( USkeletalMeshComponent* MeshComp , UAnimSe
 	
 	My->IsReadySPAttack = false;
 	My->FSMComponent->OnSpDamageAmount = 0.0f;
+	My->IsSPRun = false;
+	My-> IsSPFirstATKHit = false;
 }

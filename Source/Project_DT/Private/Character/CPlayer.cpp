@@ -26,7 +26,6 @@
 #include "Boss/CBossWeapon.h"
 #include "Weapons/CDoAction.h"
 #include "Components/WidgetComponent.h"
-#include "Widget/CPlayerWidget.h"
 
 ACPlayer::ACPlayer()
 {
@@ -125,9 +124,8 @@ ACPlayer::ACPlayer()
 
 	CHelpers::GetAsset(&IA_TestBtn, AssetPaths::IA_Test);
 	CHelpers::GetAsset(&IA_TestBtn2, AssetPaths::IA_Test2);
-	CHelpers::GetAsset(&IA_Select, AssetPaths::Select);
-	//위젯
 	CHelpers::GetClass(&WidgetClass, AssetPaths::PlayerWidget);
+	//위젯
 }
 
 void ACPlayer::BeginPlay()
@@ -141,7 +139,7 @@ void ACPlayer::BeginPlay()
 	subSys->AddMappingContext(IMC, 0);
 	if (WidgetClass)
 	{
-		UWidget = CreateWidget<UCPlayerWidget>(GetWorld(), WidgetClass);
+		UUserWidget* UWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
 		UWidget->AddToViewport();
 	}
 
@@ -174,6 +172,8 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction(IA_Dash, ETriggerEvent::Triggered, Movement, &UCMovementComponent::OnSprint);
 		playerInput->BindAction(IA_Dash, ETriggerEvent::Completed, Movement, &UCMovementComponent::OnRun);
 		playerInput->BindAction(IA_Avoid, ETriggerEvent::Completed, this, &ACPlayer::OnAvoid);
+		//playerInput->BindAction ( IA_Avoid , ETriggerEvent::Completed , TargetComp , &UCTargetingComponent::OnLookOn );
+		//playerInput->BindAction ( IA_Jump , ETriggerEvent::Completed , this , &ACPlayer::Jump );
 		playerInput->BindAction(IA_LeftAttack, ETriggerEvent::Started, Weapon, &UCWeaponComponent::DoAction);
 		playerInput->BindAction(IA_RightAttack, ETriggerEvent::Started, Weapon, &UCWeaponComponent::DoHeavyAction);
 		playerInput->BindAction(IA_SpecialAttack, ETriggerEvent::Started, Weapon,
@@ -183,11 +183,9 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction(IA_Guard, ETriggerEvent::Started, Weapon, &UCWeaponComponent::SubAction_Pressed);
 		playerInput->BindAction(IA_Guard, ETriggerEvent::Completed, Weapon, &UCWeaponComponent::SubAction_Released);
 
-		playerInput->BindAction(IA_TestBtn, ETriggerEvent::Completed, this, &ACPlayer::SelectKatana);
-		playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Completed, this, &ACPlayer::SelectGreatSword);
+		playerInput->BindAction(IA_TestBtn, ETriggerEvent::Completed, Weapon, &UCWeaponComponent::SetKatanaMode);
+		playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Completed, Weapon, &UCWeaponComponent::SetGreatSwordMode);
 		playerInput->BindAction(IA_Heal, ETriggerEvent::Started, this, &ACPlayer::Healing);
-		playerInput->BindAction(IA_Select, ETriggerEvent::Started, this, &ACPlayer::SelectWidgetOn);
-		playerInput->BindAction(IA_Select, ETriggerEvent::Completed, this, &ACPlayer::SelectWidgetOff);
 	}
 }
 
@@ -212,6 +210,8 @@ void ACPlayer::BackStep()
 	FVector InputDir = GetCharacterMovement()->GetLastInputVector();
 	InputDir.Z = 0;
 	InputDir.Normalize();
+
+	//if (InputDir.IsNearlyZero())return;
 
 	// 현재 캐릭터의 바라보는 방향 기준으로 입력 벡터를 로컬 방향으로 변환
 	FVector Forward = GetActorForwardVector();
@@ -281,10 +281,10 @@ void ACPlayer::DeadHandler()
 
 void ACPlayer::Healing()
 {
-	if (Status->GetMana()<40)return;
 	Montages->PlayHealingMode();
+	//Status->Damage(50);
 	Status->Heal(50);
-	Status->UseMana(40);
+	//Status->UseMana(20);
 }
 
 void ACPlayer::Jump()
@@ -335,6 +335,7 @@ void ACPlayer::Hitted()
 	Damage.Causer = nullptr;
 	Damage.Event = nullptr;
 }
+
 float ACPlayer::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent,
                            class AController* EventInstigator, AActor* DamageCauser)
 {
@@ -354,28 +355,4 @@ float ACPlayer::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& Da
 	Hitted();
 
 	return TakeDamageAmount;
-}
-
-void ACPlayer::SelectWidgetOn()
-{
-	CheckFalse(State->IsIdleMode());
-	UWidget->FadeInSelectWindow();
-	UGameplayStatics::SetGlobalTimeDilation(GetOwner(), 0.2f);
-}
-
-void ACPlayer::SelectWidgetOff()
-{
-	if (UWidget->GetIsCancelWidget())return;
-	UWidget->FadeOutSelectWindow();
-	UGameplayStatics::SetGlobalTimeDilation(GetOwner(), 1.0f);
-}
-
-void ACPlayer::SelectKatana()
-{
-	UWidget->SelectKatana();
-}
-
-void ACPlayer::SelectGreatSword()
-{
-	UWidget->SelectGreatSword();
 }

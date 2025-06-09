@@ -108,6 +108,6 @@ void ACEnemyBase::OnDeath()
 
 }
 
-void ACEnemyBase::Hit()
+void ACEnemyBase::Hit(FString Name)
 {
 }

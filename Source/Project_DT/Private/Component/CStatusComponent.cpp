@@ -21,35 +21,26 @@ void UCStatusComponent::BeginPlay ( )
 
 float UCStatusComponent::Damage ( float InAmount )
 {
-	SetHP(-InAmount);
+	Health += ( InAmount * -1.0f );
+	Health = FMath::Clamp ( Health , 0.0f , MaxHealth );
 	return Health;
 }
 
 void UCStatusComponent::Heal ( float InAmount )
 {
-	SetHP(InAmount);
+	Health += InAmount;
+	Health = FMath::Clamp ( Health , 0.0f , MaxHealth );
+	OnHeal.Broadcast();
 }
 
 void UCStatusComponent::UseMana ( float InAmount )
 {
-	SetMana(-InAmount);
+	Mana -= InAmount;
+	Mana = FMath::Clamp ( Mana , 0.0f , MaxMana );
 }
 
 void UCStatusComponent::RecoverMana ( float InAmount )
 {
-	SetMana(InAmount);
-}
-
-void UCStatusComponent::SetHP(float HP)
-{
-	Health += HP;
-	Health = FMath::Clamp ( Health , 0.0f , MaxHealth );
-	OnDelegateHP.Broadcast(Health);
-}
-
-void UCStatusComponent::SetMana(float SetMana)
-{
-	Mana+=SetMana;
+	Mana += InAmount;
 	Mana = FMath::Clamp ( Mana , 0.0f , MaxMana );
-	OnDelegateMana.Broadcast(Mana);
 }

@@ -4,26 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "CCameraActionComponent.h"
+#include "../../../../Plugins/Animation/MotionWarping/Source/MotionWarping/Public/MotionWarpingComponent.h"
 #include "CStatusComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHpSettingDelegate, float, HP);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FManaSettingDelegate, float, Mana);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHealDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECT_DT_API UCStatusComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:
-	FHpSettingDelegate OnDelegateHP;
-	FHpSettingDelegate OnDelegateMana;
 private:
 	UPROPERTY(EditAnywhere, Category = "Health")
 	float MaxHealth = 100;
 	UPROPERTY(EditAnywhere, Category = "Mana")
 	float MaxMana = 100;
-
-
 
 public:
 	FORCEINLINE float GetMaxHealth() { return MaxHealth; }
@@ -42,13 +38,10 @@ protected:
 
 public:
 	float Damage(float InAmount);
+	UFUNCTION(BlueprintCallable, Category = "Healing")
 	void Heal ( float InAmount );
 	void UseMana ( float InAmount );
 	void RecoverMana ( float InAmount );
-
-private:
-	void SetHP(float HP);
-	void SetMana(float SetMana);
 
 private:
 	class ACharacter* OwnerCharacter;
@@ -56,4 +49,7 @@ private:
 private:
 	float Health;
 	float Mana;
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Healing")
+    FOnHealDelegate OnHeal;
 };
