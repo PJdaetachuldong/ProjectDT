@@ -142,7 +142,7 @@ void ACPlayer::BeginPlay()
 	if (WidgetClass)
 	{
 		UWidget = CreateWidget<UCPlayerWidget>(GetWorld(), WidgetClass);
-		UWidget->AddToViewport();
+		// UWidget->AddToViewport();
 	}
 
 	State->OnStateTypeChanged.AddDynamic(this, &ACPlayer::OnStateTypeChanged);
