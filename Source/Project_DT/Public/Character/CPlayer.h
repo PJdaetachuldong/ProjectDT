@@ -60,6 +60,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	class UCStatusComponent* Status;
+	
 
 public:
 	UPROPERTY(VisibleAnywhere)

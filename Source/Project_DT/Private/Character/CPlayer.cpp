@@ -26,6 +26,7 @@
 #include "Boss/CBossWeapon.h"
 #include "Weapons/CDoAction.h"
 #include "Components/WidgetComponent.h"
+#include "Widget/CPlayerWidget.h"
 
 ACPlayer::ACPlayer()
 {
@@ -139,7 +140,7 @@ void ACPlayer::BeginPlay()
 	subSys->AddMappingContext(IMC, 0);
 	if (WidgetClass)
 	{
-		UUserWidget* UWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+		UWidget = CreateWidget<UCPlayerWidget>(GetWorld(), WidgetClass);
 		UWidget->AddToViewport();
 	}
 

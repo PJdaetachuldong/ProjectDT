@@ -10,10 +10,17 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHealDelegate);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHpSettingDelegate, float, HP);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FManaSettingDelegate, float, Mana);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECT_DT_API UCStatusComponent : public UActorComponent
 {
 	GENERATED_BODY()
+
+public:
+	FHpSettingDelegate OnDelegateHP;
+	FHpSettingDelegate OnDelegateMana;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Health")
