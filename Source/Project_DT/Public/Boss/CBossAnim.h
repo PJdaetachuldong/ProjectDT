@@ -25,6 +25,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bool)
 	bool IsPlayingIdle = false;
 
+// 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State )
+// 	float TargetYaw = 0.0f;
+// 
+// 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State )
+// 	float DeltaYaw = 0.0f;
+// 
+// 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bool)
+// 	bool IsTurnIDLE = false;
+// 
+// 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State )
+// 	float TurnIdleDirection = 0.0f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State )
 	float Speed = 0.0f;
 

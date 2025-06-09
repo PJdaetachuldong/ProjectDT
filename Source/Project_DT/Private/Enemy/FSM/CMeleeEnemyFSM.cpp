@@ -5,6 +5,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NavigationSystem.h"
 #include "Enemy/AIController/CMeleeAIController.h"
+#include "Components/CapsuleComponent.h"
+#include "Enemy/CEnemyAnim.h"
 
 // Sets default values for this component's properties
 UCMeleeEnemyFSM::UCMeleeEnemyFSM()
@@ -38,6 +40,7 @@ void UCMeleeEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		case EMeleeEnemyState::WANDER: { WANDERState(); } break;
 		case EMeleeEnemyState::ATTACK: { ATTACKState(); } break;
 		case EMeleeEnemyState::DAMAGE: { DMAGEState(); } break;
+		case EMeleeEnemyState::BREAK: { BREAKState(); } break;
 		case EMeleeEnemyState::DIE: { DIEState(); } break;
 	}
 }
@@ -66,16 +69,18 @@ void UCMeleeEnemyFSM::CHASEState()
 	{
 		/*IsSetRandomLocation = false;*/
 		AI->MoveToLocation(MyEnemy->Target->GetActorLocation());
+
+		Cast<UCEnemyAnim>(MyEnemy->AnimInstance)->State = EMeleeEnemyState::CHASE;
 	}
 }
 
 void UCMeleeEnemyFSM::WANDERState()
 {
-	if ( MyEnemy->GetCharacterMovement ( )->bOrientRotationToMovement == true )
-	{
-		MyEnemy->GetCharacterMovement ( )->bOrientRotationToMovement = false;
-		MyEnemy->GetCharacterMovement ( )->bUseControllerDesiredRotation = false;
-	}
+// 	if (MyEnemy->GetCharacterMovement()->bOrientRotationToMovement == true)
+// 	{
+// 		MyEnemy->GetCharacterMovement()->bOrientRotationToMovement = false;
+// 		MyEnemy->GetCharacterMovement()->bUseControllerDesiredRotation = false;
+// 	}
 
 	if ( !IsWanderMoveSet )
 	{
@@ -128,6 +133,11 @@ void UCMeleeEnemyFSM::WANDERState()
 			if ( FVector::Dist(WanderMoveLocation, MyEnemy->GetActorLocation()) <= 100.0f)
 			{
 				IsWanderMoveSet = false;
+
+				MyEnemy->bUseControllerRotationYaw = true; 
+				MyEnemy->GetCharacterMovement()->bOrientRotationToMovement = true;
+
+				Cast<UCEnemyAnim>(MyEnemy->AnimInstance)->State = EMeleeEnemyState::IDLE;
 			}
 		}
 		else
@@ -136,18 +146,18 @@ void UCMeleeEnemyFSM::WANDERState()
 		}
 	}
 
-	/*LookAtTarget();*/
+	LookAtTarget();
 
 	AI->SetRotation(MyEnemy->Target, MyEnemy);
 }
 
 void UCMeleeEnemyFSM::ATTACKState()
 {
-	if (MyEnemy->GetCharacterMovement()->bOrientRotationToMovement == true)
-	{
-		MyEnemy->GetCharacterMovement()->bOrientRotationToMovement = false;
-		MyEnemy->GetCharacterMovement()->bUseControllerDesiredRotation = false;
-	}
+// 	if (MyEnemy->GetCharacterMovement()->bOrientRotationToMovement == true)
+// 	{
+// 		MyEnemy->GetCharacterMovement()->bOrientRotationToMovement = false;
+// 		MyEnemy->GetCharacterMovement()->bUseControllerDesiredRotation = false;
+// 	}
 
 	if (IsSetAttackRandomLocation)
 	{
@@ -166,6 +176,12 @@ void UCMeleeEnemyFSM::ATTACKState()
 					//플레이어를 공격, 공격후 공격 상태는 유지
 					GEngine->AddOnScreenDebugMessage( 2 , 1.0f , FColor::Red , TEXT ( "Attack!" ) );
 
+					//만약 공격 애니메이션이 재생중이지 않으면 재생하게 만듦
+					if (!MyEnemy->AnimInstance->Montage_IsPlaying(MyEnemy->AM_Attack))
+					{
+						MyEnemy->AnimInstance->Montage_Play(MyEnemy->AM_Attack);
+					}
+
 					IsSetAttackRandomLocation = false;
 					CurAttackMoveTime = 0.0f;
 
@@ -182,6 +198,8 @@ void UCMeleeEnemyFSM::ATTACKState()
 					//초기화만 해준다
 					IsSetAttackRandomLocation = false;
 					CurAttackMoveTime = 0.0f;
+
+					Cast<UCEnemyAnim>(MyEnemy->AnimInstance)->State = EMeleeEnemyState::IDLE;
 				}
 			}
 		}
@@ -219,6 +237,8 @@ void UCMeleeEnemyFSM::ATTACKState()
 		{
 			AttackRandomLocation = NavPoint.Location;
 			IsSetAttackRandomLocation = true;
+
+			Cast<UCEnemyAnim>(MyEnemy->AnimInstance)->State = EMeleeEnemyState::CHASE;
 		}
 		else
 		{
@@ -235,13 +255,35 @@ void UCMeleeEnemyFSM::DMAGEState()
 
 }
 
+void UCMeleeEnemyFSM::BREAKState()
+{
+	//AI 움직임 멈춤
+	AI->StopMovement();
+
+	//만약 브레이크 애니메이션이 재생중이지 않으면 재생하게 만듦
+	if (!MyEnemy->AnimInstance->Montage_IsPlaying(MyEnemy->AM_Break))
+	{
+		MyEnemy->AnimInstance->Montage_Play(MyEnemy->AM_Break);
+	}
+}
+
 void UCMeleeEnemyFSM::DIEState()
 {
+	if (Cast<UCEnemyAnim>(MyEnemy->AnimInstance)->State != EMeleeEnemyState::DIE)
+	{
+		//모든 몽타주 재생을 멈춤
+		MyEnemy->AnimInstance->StopAllMontages(0.4f);
 
+		Cast<UCEnemyAnim>(MyEnemy->AnimInstance)->State = EMeleeEnemyState::DIE;
+		MyEnemy->GetCapsuleComponent()->SetCollisionProfileName(FName("BlockAll"));
+	}
 }
 
 void UCMeleeEnemyFSM::SetWanderMoveLocation()
 {
+	MyEnemy->bUseControllerRotationYaw = false;
+	MyEnemy->GetCharacterMovement()->bOrientRotationToMovement = false;
+
 	FVector PlayerLocation = MyEnemy->Target->GetActorLocation();
 	FVector EnemyLocation = MyEnemy->GetActorLocation();
 	FVector DirectionToPlayer = (EnemyLocation - PlayerLocation).GetSafeNormal2D();
@@ -262,6 +304,8 @@ void UCMeleeEnemyFSM::SetWanderMoveLocation()
 // 	{
 		IsWanderMoveSet = true;
 		CurWanderDelayTime = 0.0f;
+
+		Cast<UCEnemyAnim>(MyEnemy->AnimInstance)->State = EMeleeEnemyState::WANDER;
 // 	}
 // 
 // 	else
@@ -283,6 +327,19 @@ void UCMeleeEnemyFSM::GetOwnerEnemy()
 
 void UCMeleeEnemyFSM::LookAtTarget()
 {
+	// 플레이어 위치
+	FVector PlayerLocation = MyEnemy->Target->GetActorLocation();
+	// 현재 AI 위치
+	FVector AILocation = MyEnemy->GetActorLocation();
+	// 플레이어를 향하는 방향 벡터 계산
+	FVector DirectionToPlayer = (PlayerLocation - AILocation).GetSafeNormal();
+	// 방향 벡터를 회전으로 변환 (Yaw만 고려)
+	FRotator LookAtRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
+	// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
+	FRotator NewRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
+	// 플레이어를 바라보게 고정함
+	MyEnemy->SetActorRotation(NewRotation);
+
 // 	FVector DirectionToPlayer = (MyEnemy->Target->GetActorLocation() - MyEnemy->GetActorLocation()).GetSafeNormal2D();
 // 	FRotator TargetRotation = DirectionToPlayer.Rotation();
 // 	FRotator CurrentRotation = MyEnemy->GetActorRotation();
@@ -290,7 +347,7 @@ void UCMeleeEnemyFSM::LookAtTarget()
 // 	TargetRotation.Yaw = CurrentRotation.Yaw + DeltaYaw;
 // 
 // 	MyEnemy->SetActorRotation(FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 10.0f));
-
+// 
 // 	// 플레이어 방향 계산
 // 	FVector PlayerLocation = MyEnemy->Target->GetActorLocation ( );
 // 	FVector PawnLocation = MyEnemy->GetActorLocation ( );

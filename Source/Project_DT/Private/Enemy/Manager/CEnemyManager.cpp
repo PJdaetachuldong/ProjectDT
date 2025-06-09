@@ -87,15 +87,15 @@ void ACEnemyManager::RemoveEnemiesList(int32 ID, bool CanAttack)
 		//만약 공격권을 갖고 있다면
 		if (CanAttack)
 		{
+			//리스트와 맵에서 삭제
+			Enemies.RemoveAt(EnemyIndex);
+			EnemyMap.Remove(ID);
+
 			//남은 에너미 중 랜덤하게 하나를 고름
 			int32 RandomIndex = FMath::RandRange(0,Enemies.Num() - 1);
 
 			//공격권을 해당 에너미에게 넘겨주게 만들어줌
 			Enemies[RandomIndex]->IsCanAttack = true;
-
-			//리스트와 맵에서 삭제
-			Enemies.RemoveAt(EnemyIndex);
-			EnemyMap.Remove(ID);
 		}
 
 		//공격권을 갖고 있지 않을 경우

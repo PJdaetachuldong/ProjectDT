@@ -40,6 +40,12 @@ public:
     UPROPERTY(EditAnywhere , BlueprintReadWrite , Category = Stats)
     float BackStepSpeed; //플레이어가 붙어서 뒤로 물러날때 이동속도
 
+    float CurBreakTime = 0.0f;
+
+    float ResetShieldTime = 8.0f;
+
+    int32 ShieldBreakHit = 0;
+
 	virtual void LoadStatsFromAsset() override;
 
 	virtual void CheckPlayerInRange() override;
@@ -47,4 +53,33 @@ public:
 	virtual void SetStateCHASE(ACharacter* Player) override;
 
 	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+
+    UAnimInstance* AnimInstance;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage)
+    class UAnimMontage* AM_ShieldHit;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage)
+    class UAnimMontage* AM_Attack;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage)
+    class UAnimMontage* AM_Break;
+
+    ////////플레이어 데미지 부분////////////
+private:
+    struct FEnemyDamageData
+    {
+        float Power;
+        class ACharacter* Character;
+        class AActor* Causer;
+
+        struct FActionDamageEvent* Event;
+    } Damage;
+
+protected:
+    virtual void Hitted();
+public:
+    float TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+    virtual void Hit(FString Name) override;
 };

@@ -28,7 +28,7 @@ ACBossWeapon::ACBossWeapon()
 		SwordCollComp->OnComponentBeginOverlap.AddDynamic(this, &ACBossWeapon::WeaponOverlap);
 		SwordCollComp->SetCollisionProfileName(FName("BossWeapon"));
 		SwordCollComp->AttachToComponent(SwordMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Collision_Socket"));
-		SwordCollComp->SetBoxExtent(FVector(10, 48, 3));
+		SwordCollComp->SetBoxExtent(FVector(10, 48, 10));
 		//공격 판정 콜리전 비활성화
 		SwordCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
@@ -88,6 +88,12 @@ void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		//가드 불가능 공격일 경우
 		else
 		{
+			//필살기 첫번째 공격일 경우
+			if (MyBoss->AnimInstance->Montage_IsPlaying(MyBoss->AM_SPAttack))
+			{
+				MyBoss->IsSPFirstATKHit = true;
+			}
+
 			//경직 애니메이션 재생
 			GEngine->AddOnScreenDebugMessage(130, 1.0f, FColor::Red, TEXT("This Don't Guard"));
 

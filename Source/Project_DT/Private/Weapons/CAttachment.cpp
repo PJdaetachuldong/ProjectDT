@@ -115,7 +115,7 @@ void ACAttachment::Tick(float DeltaTime)
 			ACEnemyBase* Enemy = Cast<ACEnemyBase>(Hit.GetActor());
 			if (EnemyActor == Enemy)return;
 			EnemyActor = Enemy;
-			Enemy->Hit();
+			Enemy->Hit(GetName());
 			GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Yellow, FString::Printf(TEXT("Hit: %s"), *Hit.GetActor()->GetName()));
 			Status=CHelpers::GetComponent<UCStatusComponent>(OwnerCharacter);
 			Status->RecoverMana(5);
