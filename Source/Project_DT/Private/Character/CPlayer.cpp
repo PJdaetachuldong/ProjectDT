@@ -150,7 +150,7 @@ void ACPlayer::BeginPlay()
 }
 
 void ACPlayer::Tick(float DeltaTime)
-{
+{ 
 	Super::Tick(DeltaTime);
 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Green,
 	                                 FString::Printf(
@@ -283,14 +283,9 @@ void ACPlayer::Healing()
 {
 	if (Status->GetMana()<40)return;
 	Montages->PlayHealingMode();
-<<<<<<< HEAD
 	Status->Heal(50);
-	Status->UseMana(40);
-=======
 	//Status->Damage(50);
-	Status->Heal(50);
 	//Status->UseMana(20);
->>>>>>> ODH/250609_MergeBefore
 }
 
 void ACPlayer::Jump()

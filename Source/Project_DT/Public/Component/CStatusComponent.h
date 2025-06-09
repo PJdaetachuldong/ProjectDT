@@ -8,12 +8,12 @@
 #include "../../../../Plugins/Animation/MotionWarping/Source/MotionWarping/Public/MotionWarpingComponent.h"
 #include "CStatusComponent.generated.h"
 
-<<<<<<< HEAD
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHpSettingDelegate, float, HP);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FManaSettingDelegate, float, Mana);
-=======
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHealDelegate);
->>>>>>> ODH/250609_MergeBefore
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECT_DT_API UCStatusComponent : public UActorComponent

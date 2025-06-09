@@ -27,13 +27,10 @@ float UCStatusComponent::Damage ( float InAmount )
 
 void UCStatusComponent::Heal ( float InAmount )
 {
-<<<<<<< HEAD
 	SetHP(InAmount);
-=======
 	Health += InAmount;
 	Health = FMath::Clamp ( Health , 0.0f , MaxHealth );
 	OnHeal.Broadcast();
->>>>>>> ODH/250609_MergeBefore
 }
 
 void UCStatusComponent::UseMana ( float InAmount )
