@@ -176,6 +176,12 @@ void UCMeleeEnemyFSM::ATTACKState()
 					//플레이어를 공격, 공격후 공격 상태는 유지
 					GEngine->AddOnScreenDebugMessage( 2 , 1.0f , FColor::Red , TEXT ( "Attack!" ) );
 
+					//만약 공격 애니메이션이 재생중이지 않으면 재생하게 만듦
+					if (!MyEnemy->AnimInstance->Montage_IsPlaying(MyEnemy->AM_Attack))
+					{
+						MyEnemy->AnimInstance->Montage_Play(MyEnemy->AM_Attack);
+					}
+
 					IsSetAttackRandomLocation = false;
 					CurAttackMoveTime = 0.0f;
 
