@@ -46,7 +46,15 @@ void UCBossAnimNotify_AttackCount::Notify(USkeletalMeshComponent* MeshComp, UAni
 		}
 		else if (NowMontage == My->AM_SPAttack)
 		{
-			My->SpawnWeapon->HitNumber = 11;
+			if (FName("SPAttackLoop") == My->AnimInstance->Montage_GetCurrentSection(NowMontage))
+			{
+				My->SpawnWeapon->HitNumber = 11;
+			}
+
+			else if (FName("SPAttack") == My->AnimInstance->Montage_GetCurrentSection(NowMontage))
+			{
+				My->SpawnWeapon->HitNumber = 12;
+			}
 		}
 	}
 

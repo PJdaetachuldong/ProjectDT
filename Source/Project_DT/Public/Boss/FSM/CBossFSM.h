@@ -18,6 +18,7 @@ UENUM ()
 enum class EBossATTACKState : uint8
 {
 	NONE UMETA(DisplayName = "NONE"),
+	SETATK UMETA(DisplayName = "SETATK"),
 	RANGEDATTACK UMETA(DisplayName = "RANGEDATTACK"),
 	DASHATTACK UMETA(DisplayName = "DASHATTACK"),
 	COMBOATTACK UMETA(DisplayName = "COMBOATTACK"),
@@ -46,7 +47,7 @@ public:
 	float TargetDist = 0.0f;
 
 	//어느 거리가 먼 거리인지 설정하는 변수
-	float LongDist = 700.0f;
+	float LongDist = 550.0f;
 
 	//거리가 먼 상태에서 시간이 얼마나 지났는지 저장하는 변수
 	float CurChaseTime = 0.0f;
@@ -73,9 +74,6 @@ public:
 
 	//원거리 공격 몇번했는지 체크함
 	int32 RangedAttackCount = 0;
-
-	//임의로 던지는 공격이 두번 일어나게 만드는 타이머
-	float CurRandgedTime = 0.0f;
 
 	//대쉬 공격이 실행되는 쿨타임 변수
 	float DashAttackCooltime = 5.0f;
@@ -181,6 +179,7 @@ public:
 	EBossATTACKState AttackState = EBossATTACKState::NONE;
 
 	void NONEState();
+	void SETATKState();
 	void RANGEDATTACKState();
 	void DASHATTACKState();
 	void COMBOATTACKState();

@@ -207,6 +207,14 @@ public:
 
 	UFUNCTION()
     void OnPlayerHealed();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Start)
+	class UBoxComponent* StartCollision;
+
+	bool BossStart = false;
+
+	UFUNCTION()
+	void Start(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };
 
 USTRUCT(BlueprintType)

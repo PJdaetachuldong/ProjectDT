@@ -28,6 +28,8 @@ void UCBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if(!MyBoss->BossStart) return;
+
 	//플레이어와의 거리 체크는 후 공격을 정하던가, 후속타 여부를 위해 체크가 지속적으로 일어나야함
 	//아니면 함수로 빼서 특정 상황일때만 체크를 해서 여부를 체크하는 것도 나쁘지 않을것 같음
 
@@ -65,6 +67,7 @@ void UCBossFSM::ATTACKState()
 	switch ( AttackState )
 	{
 	case EBossATTACKState::NONE: { NONEState ( ); } break;
+	case EBossATTACKState::SETATK: { SETATKState(); } break;
 	case EBossATTACKState::RANGEDATTACK: { RANGEDATTACKState ( ); } break;
 	case EBossATTACKState::DASHATTACK: { DASHATTACKState ( ); } break;
 	case EBossATTACKState::COMBOATTACK: { COMBOATTACKState ( ); } break;
@@ -123,9 +126,38 @@ void UCBossFSM::NONEState()
 	//쉴드가 까진 상태면 밑에 실행 안함
 	if(MyBoss->ShieldAmount<=0.0f) return;
 
+// 	//일정 거리까지는 플레이어를 향해 움직이게 만듦
+// 	if (TargetDist >= 350.0f)
+// 	{
+// 		//플레이어를 향해서 움직이게 만듦
+// 		AI->MoveToLocation(MyBoss->Target->GetActorLocation());
+// 	}
+// 
+// 	else if (TargetDist > 200.0f && TargetDist < 350.0f)
+// 	{
+// 
+// 	}
+// 
+// 	//플레이어가 가까우면 뒤로 움직이게 만듦
+// 	else if (TargetDist <= 200.0f)
+// 	{
+// 		FVector RetreatPosition = BackstepPosition();
+// 
+// 		UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(GetWorld());
+// 		if (NavSys)
+// 		{
+// 			FNavLocation ProjectedLocation;
+// 			// NavMesh에 목표 위치 투영
+// 			if (NavSys->ProjectPointToNavigation(RetreatPosition, ProjectedLocation))
+// 			{
+// 				AI->MoveToLocation(RetreatPosition, 10.0f);
+// 			}
+// 		}
+// 	}
+
 	if (TargetDist >= 200.0f)
 	{
-		//움직인 거리가 300이상일 경우
+		//움직인 거리가 600이상일 경우
 		if (TotalMoveDistance >= 600.0f)
 		{
 			int32 SideMoveCheckInt = 0;
@@ -172,32 +204,36 @@ void UCBossFSM::NONEState()
 	}
 
 	//임시로 약간 떨어트리는 코드
-	else if (TargetDist <= 150.0f)
+	else if (TargetDist <= 300.0f)
 	{
+		//이동을 멈추고 
 		AI->StopMovement();
 
-		// 플레이어 위치
-		FVector PlayerLocation = MyBoss->Target->GetActorLocation();
-		// 현재 AI 위치
-		FVector AILocation = MyBoss->GetActorLocation();
-		// 플레이어를 향하는 방향 벡터 계산
-		FVector DirectionToPlayer = (PlayerLocation - AILocation).GetSafeNormal();
-		// 방향 벡터를 회전으로 변환 (Yaw만 고려)
-		FRotator LookAtRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
-		// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
-		FRotator NewRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
-		FRotator CurrentRotation = MyBoss->GetActorRotation();
-		FRotator SetRotation = FMath::RInterpTo(CurrentRotation, NewRotation, GetWorld()->GetDeltaSeconds(), 3.0f);
-		// 플레이어를 바라보게 고정함
-		MyBoss->SetActorRotation(SetRotation);
+		//좌우 이동이나 뒷 걸음질, 그리고 공격 조건을 만족하는지 체크한다
+		AttackState = EBossATTACKState::SETATK;
 
-		/*Cast<UCBossAnim>(MyBoss->AnimInstance)->IsTurnIDLE = true;*/
-
-		if (Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection >= 0.1f
-		|| Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection <= 0.1f)
-		{
-			Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection = 0;
-		}
+// 		// 플레이어 위치
+// 		FVector PlayerLocation = MyBoss->Target->GetActorLocation();
+// 		// 현재 AI 위치
+// 		FVector AILocation = MyBoss->GetActorLocation();
+// 		// 플레이어를 향하는 방향 벡터 계산
+// 		FVector DirectionToPlayer = (PlayerLocation - AILocation).GetSafeNormal();
+// 		// 방향 벡터를 회전으로 변환 (Yaw만 고려)
+// 		FRotator LookAtRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
+// 		// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
+// 		FRotator NewRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
+// 		FRotator CurrentRotation = MyBoss->GetActorRotation();
+// 		FRotator SetRotation = FMath::RInterpTo(CurrentRotation, NewRotation, GetWorld()->GetDeltaSeconds(), 3.0f);
+// 		// 플레이어를 바라보게 고정함
+// 		MyBoss->SetActorRotation(SetRotation);
+// 
+// 		/*Cast<UCBossAnim>(MyBoss->AnimInstance)->IsTurnIDLE = true;*/
+// 
+// 		if (Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection >= 0.1f
+// 		|| Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection <= 0.1f)
+// 		{
+// 			Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection = 0;
+// 		}
 	}
 	//임시로 약간 떨어트리는 코드
 
@@ -228,6 +264,8 @@ void UCBossFSM::NONEState()
 		}
 		//필살기 상태로 전환
 		AttackState = EBossATTACKState::SPATTACK;
+
+		CurAttackStack = 0;
 
 		//공격 스택 랜덤으로 해줌
 		SPAttackStack = FMath::RandRange(17, 23);
@@ -264,7 +302,7 @@ void UCBossFSM::NONEState()
 
 		//거리가 먼 상태가 일정 시간 누적될 경우
 		//좌우 이동은 안 하고 있어야함
-		if (!IsSideMoveSetting && CurChaseTime >= 10.0f)
+		if (!IsSideMoveSetting && CurChaseTime >= DashAttackCooltime)
 		{
 			//현재 체력이 50퍼 이하면
 			if (IsFirstSPAttack)
@@ -389,6 +427,204 @@ void UCBossFSM::NONEState()
 // 			SetCOMBOATTACKState(FMath::RandRange(0, 1));
 // 		}
 // 	}
+}
+
+void UCBossFSM::SETATKState()
+{
+
+	//피격 상태면 아래가 진행되지않게
+	if (MyBoss->AnimInstance->Montage_IsPlaying(MyBoss->AM_ShieldHit))
+	{
+		AI->StopMovement();
+		return;
+	}
+
+	//플레이어와 거리가 가까워지면 뒤로 물러나게 만듦
+	if (TargetDist <= 300.0f /*&& TargetDist >= 150.0f*/)
+	{
+		//이동 값을 억지로 -값으로 변경
+		if(!Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping)
+		{
+			Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping = true;
+		}
+
+		//현재 에너미와 플레이어 간에 방향을 구함
+		FVector PlayerLocation = MyBoss->Target->GetActorLocation();
+		FVector PawnLocation = MyBoss->GetActorLocation();
+		FVector ToPlayerDirection = (PlayerLocation - PawnLocation).GetSafeNormal();
+
+		// 플레이어로부터 멀어지는 방향 계산
+        FVector DirectionAwayFromPlayer = (PawnLocation - PlayerLocation).GetSafeNormal();
+        FVector RetreatLocation = MyBoss->GetActorLocation() + DirectionAwayFromPlayer * 200.0f; // 200 유닛 후퇴
+
+        // NavMesh 상의 유효한 위치로 이동
+        FNavLocation ProjectedLocation;
+        UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(GetWorld());
+        if (NavSystem && NavSystem->ProjectPointToNavigation(RetreatLocation, ProjectedLocation))
+        {
+            AI->MoveToLocation(ProjectedLocation.Location, 150.0f);
+        }
+
+// 		// 이동할 거리
+// 		float BackstepDistance = 300.0f;
+// 
+// 		// Pawn의 앞 방향 벡터를 기준으로 좌/우 방향 계산
+// 		FVector BackVector = MyBoss->GetActorForwardVector() * ToPlayerDirection * BackstepDistance;
+// 
+// 		// 목표 위치 계산
+// 		FVector BackstepLocation = MyBoss->GetActorLocation() + BackVector;
+// 
+// 		//구한 전방 방향을 사용해서 뒤로 해당 구간동안 뒤로 물러나게 만듦
+// /*		MyBoss->SetActorLocation(MyBoss->GetActorLocation() + -ToPlayerDirection * 400.0f * GetWorld()->GetDeltaSeconds());*/
+// 
+// 		AI->MoveToLocation(BackstepLocation);
+
+		// 플레이어를 향하는 방향 벡터 계산
+		FVector DirectionToPlayer = (PlayerLocation - PawnLocation).GetSafeNormal();
+		// 방향 벡터를 회전으로 변환 (Yaw만 고려)
+		FRotator LookAtRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
+		// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
+		FRotator NewRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
+		// 플레이어를 바라보게 고정함
+		MyBoss->SetActorRotation(NewRotation);
+	}
+
+	else
+	{
+		if (Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping)
+		{
+			Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping = false;
+
+			// 플레이어를 향하는 방향 벡터 계산
+			FVector DirectionToPlayer = (MyBoss->Target->GetActorLocation() - MyBoss->GetActorLocation()).GetSafeNormal();
+			// 방향 벡터를 회전으로 변환 (Yaw만 고려)
+			FRotator LookAtRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
+			// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
+			FRotator NewRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
+			// 플레이어를 바라보게 고정함
+			MyBoss->SetActorRotation(NewRotation);
+		}
+	}
+
+
+
+	//공격 패턴 우선 순위
+	//SPATTACK(필살기) > RANGEDATTACK(원거리 공격) > DASHATTACK(대쉬 공격)
+	//COUNTERATTACK(가드 공격) > COMBOATTACK (콤보 공격)
+
+	//임의로 되는 필살기 패턴 테스트
+	/*TestCurSPTime += GetWorld()->GetDeltaSeconds();*/
+	//임의로 되는 필살기 패턴 테스트
+
+	//필살기 사용 부분
+	//체력이 반 이하로 내려갔을 경우, 필살기를 한번 안하였거나 일정 횟수 공격을 했을 경우
+	if (MyBoss->CurHP <= MyBoss->MaxHP / 2 && !IsFirstSPAttack || CurAttackStack >= SPAttackStack)
+	{
+		if (!IsFirstSPAttack)
+		{
+			IsFirstSPAttack = true;
+		}
+		//필살기 상태로 전환
+		AttackState = EBossATTACKState::SPATTACK;
+
+		CurAttackStack = 0;
+
+		//공격 스택 랜덤으로 해줌
+		SPAttackStack = FMath::RandRange(17, 23);
+
+		//뒤에 코드 실행 안되게 막음
+		return;
+	}
+	//필살기 사용 부분
+
+	//공격 NONE상태에서 거리를 체크해서 거리가 멀 경우
+	if (TargetDist >= LongDist)
+	{
+		//거리가 먼 상태가 얼마나 지속되었는지 체크
+		CurChaseTime += GetWorld()->GetDeltaSeconds();
+
+		//거리가 먼 상태에서 플레이어가 물약을 마시는 모션을 할 경우
+		//좌우 이동은 안 하고 있어야함
+		if (!IsSideMoveSetting && CurChaseTime >= 25.0f)
+		{
+			//현재 체력이 50퍼 이하면
+			if (IsFirstSPAttack)
+			{
+				//공격 스택을 하나 더 추가
+				CurAttackStack++;
+			}
+
+			//바로 원거리 공격하게 변환
+			AttackState = EBossATTACKState::RANGEDATTACK;
+			//원거리 공격이 바로 실행되게 이곳에서 한번 실행
+			/*SpawnRangedActor();*/
+			//뒤에 코드 안불리게 리턴
+			return;
+		}
+
+		//거리가 먼 상태가 일정 시간 누적될 경우
+		//좌우 이동은 안 하고 있어야함
+		if (!IsSideMoveSetting && CurChaseTime >= DashAttackCooltime)
+		{
+			//현재 체력이 50퍼 이하면
+			if (IsFirstSPAttack)
+			{
+				//공격 스택을 하나 더 추가
+				CurAttackStack++;
+			}
+
+			//그리고 대쉬 공격이 이루어지도록 공격상태도 변환
+			AttackState = EBossATTACKState::DASHATTACK;
+
+			//빠르게 달리는 느낌을 주기 위하여 이동속도 바꾸기
+			MyBoss->GetCharacterMovement()->MaxWalkSpeed = 1100.0f;
+
+			//뒤에 코드 실행 안되게 리턴
+			return;
+		}
+	}
+
+	//타겟과의 거리가 공격 범위 보다 적을 경우
+	else if (TargetDist <= MyBoss->AttackRange)
+	{
+		//가드 게이지를 채워줌
+		MyBoss->GuardGage += GetWorld()->GetDeltaSeconds();
+		//가드 게이지를 채워줌
+
+		//콤보 공격 타임을 더함
+		CurComboAttackTime += GetWorld()->GetDeltaSeconds();
+
+		//만약 가드 조건이 충족되었을 경우
+		if (MyBoss->GuardGage >= MyBoss->GuardPlaying /*4.0f*/)
+		{
+			//현재 체력이 50퍼 이하면
+			if (IsFirstSPAttack)
+			{
+				//공격 스택을 하나 더 추가
+				CurAttackStack++;
+			}
+
+			//가드 상태로 변화
+			AttackState = EBossATTACKState::COUNTERATTACK;
+
+			//밑에 코드 안 일어나게 리턴
+			return;
+		}
+
+		//콤보 공격 쿨타임이 되었을 경우
+		else if (CurComboAttackTime >= ComboCooltime)
+		{
+			//현재 체력이 50퍼 이하면
+			if (IsFirstSPAttack)
+			{
+				//공격 스택을 하나 더 추가
+				CurAttackStack++;
+			}
+
+			//랜덤 공격이 실행
+			SetCOMBOATTACKState(FMath::RandRange(0, 1));
+		}
+	}
 }
 
 void UCBossFSM::RANGEDATTACKState()
@@ -524,7 +760,6 @@ void UCBossFSM::SpawnRangedActor()
 	//원거리 엑터 소환을 2번했으면 더 이상 못하도록 초기화
 	if (RangedAttackCount == 2)
 	{
-		CurRandgedTime = 0.0f;
 		RangedAttackCount = 0;
 
 		return;

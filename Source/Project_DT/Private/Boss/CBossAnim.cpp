@@ -25,6 +25,11 @@ void UCBossAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 	Speed = FVector::DotProduct(Velocity, ForwardVector);
 
+	if(IsBacksteping)
+	Speed = -(Speed);
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Speed: %f"), Speed));
+
 	if (!Owner->FSMComponent->IsSideMoveSetting)
 	{
 		FVector RightVector = Owner->GetActorRightVector();

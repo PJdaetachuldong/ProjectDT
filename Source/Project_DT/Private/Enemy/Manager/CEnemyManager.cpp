@@ -3,6 +3,8 @@
 
 #include "Enemy/Manager/CEnemyManager.h"
 #include "Enemy/EnemyBase/CEnemyBase.h"
+#include "Enemy/CMeleeEnemy.h"
+#include "Enemy/FSM/CMeleeEnemyFSM.h"
 
 // Sets default values
 ACEnemyManager::ACEnemyManager()
@@ -96,6 +98,7 @@ void ACEnemyManager::RemoveEnemiesList(int32 ID, bool CanAttack)
 
 			//공격권을 해당 에너미에게 넘겨주게 만들어줌
 			Enemies[RandomIndex]->IsCanAttack = true;
+			Cast<ACMeleeEnemy>(Enemies[RandomIndex])->FSMComponent->State = EMeleeEnemyState::CHASE;
 		}
 
 		//공격권을 갖고 있지 않을 경우

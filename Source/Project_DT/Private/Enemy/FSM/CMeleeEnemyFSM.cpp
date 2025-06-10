@@ -87,22 +87,22 @@ void UCMeleeEnemyFSM::WANDERState()
 		/*LookAtTarget();*/
 
 		//만약 플레이어가 자신에게 다가오면 뒤로 물러나게 만듦
-// 		if (FVector::Dist(MyEnemy->GetActorLocation(), MyEnemy->Target->GetActorLocation()) <= WanderRadius)
-// 		{
-// 			FVector RetreatPosition = BackstepPosition();
-// 
-// 			UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(GetWorld());
-// 			if ( NavSys )
-// 			{
-// 				FNavLocation ProjectedLocation;
-// 				// NavMesh에 목표 위치 투영
-// 				if (NavSys->ProjectPointToNavigation(RetreatPosition, ProjectedLocation))
-// 				{
-// 					AI->MoveToLocation( RetreatPosition , 10.0f);
-// 					IsWanderMoveSet = true;
-// 				}
-// 			}
-// 		}
+		if (FVector::Dist(MyEnemy->GetActorLocation(), MyEnemy->Target->GetActorLocation()) <= WanderRadius)
+		{
+			FVector RetreatPosition = BackstepPosition();
+
+			UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(GetWorld());
+			if ( NavSys )
+			{
+				FNavLocation ProjectedLocation;
+				// NavMesh에 목표 위치 투영
+				if (NavSys->ProjectPointToNavigation(RetreatPosition, ProjectedLocation))
+				{
+					AI->MoveToLocation( RetreatPosition , 10.0f);
+					IsWanderMoveSet = true;
+				}
+			}
+		}
 
 		//특정 시간 안에 불리도록 설정
 		//이동해야하는 곳 위치 선정

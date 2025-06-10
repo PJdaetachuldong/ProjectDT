@@ -25,6 +25,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bool)
 	bool IsPlayingIdle = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bool)
+	bool IsStartBoss = false;
+
+	bool IsBacksteping = false;
+
 // 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State )
 // 	float TargetYaw = 0.0f;
 // 

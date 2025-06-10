@@ -112,6 +112,11 @@ ACBossEnemy::ACBossEnemy()
 	{
 		HitData = TempHitData.Object;
 	}
+
+	StartCollision = CreateDefaultSubobject<UBoxComponent>(L"StartColli");
+	StartCollision->SetupAttachment(GetMesh());
+	StartCollision->SetCollisionProfileName(L"BossWeapon");
+	StartCollision->OnComponentBeginOverlap.AddDynamic(this, &ACBossEnemy::Start);
 }
 
 void ACBossEnemy::BeginPlay()
@@ -259,6 +264,8 @@ void ACBossEnemy::InitializeMontageMap()
 void ACBossEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if(!BossStart) return;
 
 	//쉴드가 부셔진 상태이면
 	if (ShieldAmount <= 0.0f)
@@ -882,7 +889,7 @@ void ACBossEnemy::Hit(FString Name)
 		if (ShieldAmount > 0)
 		{
 			//현재 어떠한 공격 애니메이션이 재생 중이라면
-			if (AnimInstance->Montage_IsPlaying(AM_ComboAttack_01) || AnimInstance->Montage_IsPlaying(AM_ComboAttack_02) || AnimInstance->Montage_IsPlaying(AM_RangedAttack) || AnimInstance->Montage_IsPlaying(AM_DashAttack))
+			if (AnimInstance->Montage_IsPlaying(AM_ComboAttack_01) || AnimInstance->Montage_IsPlaying(AM_ComboAttack_02) || AnimInstance->Montage_IsPlaying(AM_RangedAttack) || AnimInstance->Montage_IsPlaying(AM_DashAttack) || AnimInstance->Montage_IsPlaying(AM_SPAttack))
 			{
 				//쉴드와 체력의 감소를 4:2의 비율로 감소함
 				ShieldAmount -= 10.0f * 0.4f;
@@ -1220,6 +1227,17 @@ void ACBossEnemy::OnPlayerHealed()
 	{ 
 		FSMComponent->State = EBossState::ATTACK;
 		FSMComponent->AttackState = EBossATTACKState::RANGEDATTACK;
+	}
+}
+
+void ACBossEnemy::Start(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ACPlayer* Player = Cast<ACPlayer>(OtherActor);
+	
+	if(Player) 
+	{
+		BossStart = true;;
+		Cast<UCBossAnim>(AnimInstance)->IsStartBoss = true;
 	}
 }
 
