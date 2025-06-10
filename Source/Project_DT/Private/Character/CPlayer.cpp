@@ -224,9 +224,13 @@ void ACPlayer::BackStep()
 	float Angle = FMath::Atan2(RightDot, ForwardDot);
 	float Degree = FMath::RadiansToDegrees(Angle);
 
-	EActState DodgeDirection = EActState::DodgeF;
-
-	if (Degree >= -22.5f && Degree < 22.5f)
+	EActState DodgeDirection = EActState::DodgeB; 
+	if (!TargetComp->IsLockedOn())
+	{
+		DodgeDirection = EActState::DodgeF;
+		Dodge->DodgeRotate = TEXT("Back");
+	}
+	else if (Degree >= -22.5f && Degree < 22.5f)
 	{
 		DodgeDirection = EActState::DodgeF;
 		Dodge->DodgeRotate = TEXT("Back");
@@ -380,3 +384,4 @@ void ACPlayer::SelectGreatSword()
 {
 	UWidget->SelectGreatSword();
 }
+ 
