@@ -10,7 +10,6 @@
 #include "Components/ProgressBar.h"
 #include "Weapons/CWeaponComponent.h"
 
-
 void UCPlayerWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -19,6 +18,7 @@ void UCPlayerWidget::NativeConstruct()
 	if (OwnerCharacter)
 		Status=CHelpers::GetComponent<UCStatusComponent>(OwnerCharacter);
 		Weapon=CHelpers::GetComponent<UCWeaponComponent>(OwnerCharacter);
+	
 	Status->OnDelegateHP.AddDynamic(this,&UCPlayerWidget::SetHpProgessBar);
 	Status->OnDelegateMana.AddDynamic(this,&UCPlayerWidget::SetManaProgessBar);
 	
@@ -35,6 +35,7 @@ void UCPlayerWidget::NativeConstruct()
 	BindToAnimationStarted(SelectThirdAnimation, GreatSwordStartDelegate);
 	if (ArrowAnimation)
 		PlayAnimation(ArrowAnimation, 0.f, 0, EUMGSequencePlayMode::Forward, 1.0f);
+	ShowStatusUI();
 }
 
 void UCPlayerWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
@@ -44,9 +45,7 @@ void UCPlayerWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 		IsAllowChangeWeapon=true;
 	else
 		IsAllowChangeWeapon=false;
-
 }
-
 
 void UCPlayerWidget::SetHpProgessBar(float HP)
 {
@@ -74,12 +73,14 @@ void UCPlayerWidget::FadeOutSelectWindow()
 
 void UCPlayerWidget::SelectKatana()
 {
+	CheckTrue(Weapon->IsKatanaMode());
 	if (GetIsAllowChangeWeapon())
 		PlayAnimation(SelectSecondAnimation);
 }
 
 void UCPlayerWidget::SelectGreatSword()
 {
+	CheckTrue(Weapon->IsGreatSwordMode());
 	if (GetIsAllowChangeWeapon())
 		PlayAnimation(SelectThirdAnimation);
 }
@@ -100,10 +101,19 @@ void UCPlayerWidget::GreatSwordEndSelect()
 	IsCancelWidget=false;
 	UGameplayStatics::SetGlobalTimeDilation(OwnerCharacter, 1.0f);
 	PlayAnimation(WeaponGageRotationGreatSword);
-	
 }
 
 void UCPlayerWidget::CancelHandler()
 {
 	IsCancelWidget=true;
+}
+
+void UCPlayerWidget::ShowStatusUI()
+{
+	PlayAnimation(StatusFadeIn, 0.f, 1, EUMGSequencePlayMode::Forward, 1.0f);
+}
+
+void UCPlayerWidget::ShowQuestUI()
+{
+		PlayAnimation(QuestFadeIn, 0.f, 1, EUMGSequencePlayMode::Forward, 1.0f);
 }

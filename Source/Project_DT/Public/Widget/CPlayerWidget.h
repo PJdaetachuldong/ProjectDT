@@ -38,6 +38,9 @@ public:
 	UFUNCTION()
 	void CancelHandler();
 
+	void ShowStatusUI();
+	void ShowQuestUI();
+
 private:
 	UPROPERTY()
 	class ACharacter* OwnerCharacter;
@@ -76,6 +79,12 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
 	class UWidgetAnimation* WeaponGageRotationGreatSword;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
+	class UWidgetAnimation* StatusFadeIn;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
+	class UWidgetAnimation* QuestFadeIn;
 
 private:
 	UFUNCTION()

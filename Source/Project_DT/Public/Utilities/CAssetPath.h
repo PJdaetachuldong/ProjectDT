@@ -28,6 +28,12 @@ namespace AssetPaths
     constexpr const TCHAR* ChostTrail = TEXT ("/Script/Engine.MaterialInstanceConstant'/Game/LHW/Material/M_GhostTrail_Inst.M_GhostTrail_Inst'" );
     constexpr const TCHAR* PlayerWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_PlayerWidget.WBP_PlayerWidget_C'" );
     constexpr const TCHAR* Select = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Select.IA_Select'" );
+    
+    constexpr const TCHAR* BossUI = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_BossWidget.WBP_BossWidget_C'" );
+    constexpr const TCHAR* LoadingUI = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_Loading.WBP_Loading_C'" );
+    constexpr const TCHAR* IntroUI = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_Intro.WBP_Intro_C'" );
+    constexpr const TCHAR* ScriptUI = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_Script.WBP_Script_C'" );
+    constexpr const TCHAR* MapWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_MapWidget.WBP_MapWidget_C'" );
 
 
 }
