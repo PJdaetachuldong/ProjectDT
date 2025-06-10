@@ -1265,6 +1265,7 @@ void ACBossEnemy::Start(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 		BossStart = true;;
 		Cast<UCBossAnim>(AnimInstance)->IsStartBoss = true;
 
+		if(BossUI)
 		BossUI->AddToViewport();
 		
 		if(StartCollision)

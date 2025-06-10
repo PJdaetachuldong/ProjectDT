@@ -343,7 +343,7 @@ void ACMeleeEnemy::Hit(FString Name)
 				}
 
 				//쉴드는 데미지의 값 만큼 감소
-				CurShieldAmount -= 5;
+				CurShieldAmount -= /*5*/10;
 
 				//쉴드가 0이하가 됐을 경우
 				if (CurShieldAmount <= 0)
@@ -381,7 +381,7 @@ void ACMeleeEnemy::Hit(FString Name)
 		else
 		{
 			//체력이 데미지 10의 비율로 감소
-			CurHP -= 20;
+			CurHP -= /*20*/10;
 
 			//0이하가 됐을 경우
 			if (CurHP <= 0.0f)
@@ -461,7 +461,7 @@ void ACMeleeEnemy::Hit(FString Name)
 					}
 
 					//쉴드는 데미지의 값 만큼 감소
-					CurShieldAmount -= 15;
+					CurShieldAmount -= /*15*/10;
 
 					//쉴드가 0이하가 됐을 경우
 					if (CurShieldAmount <= 0)
@@ -499,7 +499,7 @@ void ACMeleeEnemy::Hit(FString Name)
 			else
 			{
 				//체력이 데미지 10의 비율로 감소
-				CurHP -= 5;
+				CurHP -= /*5*/10;
 
 				//0이하가 됐을 경우
 				if (CurHP <= 0.0f)
