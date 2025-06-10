@@ -114,6 +114,8 @@ void UCBossFSM::DIEState()
 
 		Cast<UCBossAnim>(MyBoss->AnimInstance)->State = EBossState::DIE;
 
+		//AI 움직임 멈춤
+		AI->StopMovement();
 		
 		State = EBossState::DIE;
 		AttackState = EBossATTACKState::NONE;

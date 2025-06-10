@@ -274,6 +274,8 @@ void UCMeleeEnemyFSM::DIEState()
 		//모든 몽타주 재생을 멈춤
 		MyEnemy->AnimInstance->StopAllMontages(0.4f);
 
+		AI->StopMovement();
+
 		Cast<UCEnemyAnim>(MyEnemy->AnimInstance)->State = EMeleeEnemyState::DIE;
 		MyEnemy->GetCapsuleComponent()->SetCollisionProfileName(FName("BlockAll"));
 	}
