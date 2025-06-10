@@ -28,7 +28,7 @@ void UCBossAnim::NativeUpdateAnimation(float DeltaSeconds)
 	if(IsBacksteping)
 	Speed = -(Speed);
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Speed: %f"), Speed));
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Speed: %f"), Speed));*/
 
 	if (!Owner->FSMComponent->IsSideMoveSetting)
 	{
