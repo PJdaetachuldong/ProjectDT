@@ -154,9 +154,7 @@ void ACPlayer::BeginPlay()
 void ACPlayer::Tick(float DeltaTime)
 { 
 	Super::Tick(DeltaTime);
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Green,
-	                                 FString::Printf(
-		                                 TEXT("Health: %.1f | Mana: %.1f"), Status->GetHealth(), Status->GetMana()));
+
 }
 
 void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

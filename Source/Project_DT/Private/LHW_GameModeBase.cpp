@@ -62,7 +62,9 @@ void ALHW_GameModeBase::CreateCharacterUI()
 	PlayerWidget->AddToViewport();
 	
 	//이부분 원할때 변경
-	CreateScriptUI();
+	FTimerHandle Handler;
+	GetWorld()->GetTimerManager().SetTimer(Handler,[this](){CreateScriptUI();},20,false,false);
+	
 }
 
 void ALHW_GameModeBase::CreateScriptUI()

@@ -134,7 +134,7 @@ TimerDelegate.BindLambda([this]()
 GetWorld()->GetTimerManager().SetTimer(
 	TimerHandle,
 	TimerDelegate,
-	5.0f / 60.0f, // 약 0.083초
+	10.0f / 60.0f, // 약 0.083초
 	false // 반복 안 함
 );
 FTimerHandle PH;

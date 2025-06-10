@@ -191,9 +191,7 @@ void ACBossEnemy::BeginPlay()
 	InitAttackTMap();
 
 	//위젯 추가
-	if (!BossUIClass)return;
-	BossUI=CreateWidget<UBossWidget>(GetWorld(),BossUIClass);
-	BossUI->SetOwner(this);
+
 }
 
 void ACBossEnemy::InitializeMontageMap()
@@ -1264,12 +1262,15 @@ void ACBossEnemy::Start(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 	{
 		BossStart = true;;
 		Cast<UCBossAnim>(AnimInstance)->IsStartBoss = true;
-
+		
+		if (!BossUIClass)return;
+		BossUI=CreateWidget<UBossWidget>(GetWorld(),BossUIClass);
+		BossUI->SetOwner(this);
 		if(BossUI)
 		BossUI->AddToViewport();
 		
-		if(StartCollision)
-		StartCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		// if(StartCollision)
+		// StartCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
