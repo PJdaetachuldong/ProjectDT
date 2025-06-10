@@ -67,6 +67,8 @@ protected:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class USkeletalMeshComponent* SkeletalMesh;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class UNiagaraSystem* HitEffect;
 
 private:
 	bool bCollisionTraceEnabled = false;

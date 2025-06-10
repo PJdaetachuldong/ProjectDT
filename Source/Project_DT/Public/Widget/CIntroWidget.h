@@ -38,4 +38,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
 	class UButton* Button;
 
+public:
+	bool IsClick=true;
+
 };

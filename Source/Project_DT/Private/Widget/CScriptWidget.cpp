@@ -14,12 +14,16 @@ void UCScriptWidget::NativeConstruct()
 
 void UCScriptWidget::EndFadeOut()
 {
+	APlayerController* C=Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	C->bShowMouseCursor=false;
 	PlayAnimation(FadeOut, 0.f, 1, EUMGSequencePlayMode::Forward, 1.0f);
 
 }
 
 void UCScriptWidget::StartFadeInAnimation()
 {
+	APlayerController* C=Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	C->bShowMouseCursor=true;
 	PlayAnimation(FadeIn, 0.f, 1, EUMGSequencePlayMode::Forward, 1.0f);
 }
 

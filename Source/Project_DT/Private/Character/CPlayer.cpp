@@ -147,6 +147,8 @@ void ACPlayer::BeginPlay()
 
 	State->OnStateTypeChanged.AddDynamic(this, &ACPlayer::OnStateTypeChanged);
 	Parry->OnParryDetected.AddDynamic(this, &ACPlayer::OnParryDetected);
+	Montages->PlayBackStepMode(EActState::DodgeB);
+	
 }
 
 void ACPlayer::Tick(float DeltaTime)
@@ -377,11 +379,13 @@ void ACPlayer::SelectWidgetOff()
 
 void ACPlayer::SelectKatana()
 {
+	CheckNull(UWidget);
 	UWidget->SelectKatana();
 }
 
 void ACPlayer::SelectGreatSword()
 {
+	CheckNull(UWidget);
 	UWidget->SelectGreatSword();
 }
  
