@@ -121,12 +121,24 @@ void ACAttachment::Tick(float DeltaTime)
 			Status->RecoverMana(5);
 			if (OnAttachmentBeginOverlap.IsBound())
 				OnAttachmentBeginOverlap.Broadcast(OwnerCharacter, this, Cast<ACharacter>(Hit.GetActor()));
+			if (HitEffect) // HitEffect가 블루프린트에서 설정되었는지 확인
+			{
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+					GetWorld(),
+					HitEffect,
+					Hit.ImpactPoint, // 충돌 지점
+					Hit.ImpactNormal.Rotation(), // 충돌 노멀 기반 회전
+					FVector(1.0f), // 스케일
+					true, // AutoDestroy
+					true  // AutoActivate
+				);
+			}
 		}
 	}
-	DrawDebugBox(GetWorld(), CurrentStartLocation, FVector(2.f), FColor::Blue, false, 0.1f);
-	DrawDebugBox(GetWorld(), CurrentEndLocation, FVector(2.f), FColor::Red, false, 0.1f);
-	DrawDebugBox(GetWorld(), PrevStartLocation, FVector(2.f), FColor::Cyan, false, 0.1f);
-	DrawDebugBox(GetWorld(), PrevEndLocation, FVector(2.f), FColor::Magenta, false, 0.1f);
+	// DrawDebugBox(GetWorld(), CurrentStartLocation, FVector(2.f), FColor::Blue, false, 0.1f);
+	// DrawDebugBox(GetWorld(), CurrentEndLocation, FVector(2.f), FColor::Red, false, 0.1f);
+	// DrawDebugBox(GetWorld(), PrevStartLocation, FVector(2.f), FColor::Cyan, false, 0.1f);
+	// DrawDebugBox(GetWorld(), PrevEndLocation, FVector(2.f), FColor::Magenta, false, 0.1f);
 }
 
 void ACAttachment::AttachTo ( FName InSocketName )
@@ -193,11 +205,11 @@ void ACAttachment::PerformTriangleTrace(
 	if (World->LineTraceSingleByChannel(Hit1, A, B, ECC_EngineTraceChannel5, Params))
 	{
 		OutHits.Add(Hit1);
-		DrawDebugLine(World, A, B, FColor::Red, false, 0.1f, 0, 2.f);
+		// DrawDebugLine(World, A, B, FColor::Red, false, 0.1f, 0, 2.f);
 	}
 	else
 	{
-		DrawDebugLine(World, A, B, FColor::Green, false, 0.1f, 0, 1.f);
+		// DrawDebugLine(World, A, B, FColor::Green, false, 0.1f, 0, 1.f);
 	}
 
 	// B to C
@@ -205,11 +217,11 @@ void ACAttachment::PerformTriangleTrace(
 	if (World->LineTraceSingleByChannel(Hit2, B, C, ECC_EngineTraceChannel5, Params))
 	{
 		OutHits.Add(Hit2);
-		DrawDebugLine(World, B, C, FColor::Red, false, 0.1f, 0, 2.f);
+		// DrawDebugLine(World, B, C, FColor::Red, false, 0.1f, 0, 2.f);
 	}
 	else
 	{
-		DrawDebugLine(World, B, C, FColor::Green, false, 0.1f, 0, 1.f);
+		// DrawDebugLine(World, B, C, FColor::Green, false, 0.1f, 0, 1.f);
 	}
 
 	// C to A
@@ -217,11 +229,11 @@ void ACAttachment::PerformTriangleTrace(
 	if (World->LineTraceSingleByChannel(Hit3, C, A, ECC_EngineTraceChannel5, Params))
 	{
 		OutHits.Add(Hit3);
-		DrawDebugLine(World, C, A, FColor::Red, false, 0.1f, 0, 2.f);
+		// DrawDebugLine(World, C, A, FColor::Red, false, 0.1f, 0, 2.f);
 	}
 	else
 	{
-		DrawDebugLine(World, C, A, FColor::Green, false, 0.1f, 0, 1.f);
+		// DrawDebugLine(World, C, A, FColor::Green, false, 0.1f, 0, 1.f);
 	}
 }
 FVector ACAttachment::BezierCurve(const FVector& P0, const FVector& P1, const FVector& P2, float T)

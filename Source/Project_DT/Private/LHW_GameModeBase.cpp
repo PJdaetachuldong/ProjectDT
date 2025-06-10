@@ -46,6 +46,7 @@ void ALHW_GameModeBase::Tick(float DeltaTime)
 void ALHW_GameModeBase::CreateLoadingUI()
 {
 	IntroWidget->RemoveFromParent();
+	IntroWidget->IsClick=true;
 	LoadingWidget->AddToViewport();
 }
 

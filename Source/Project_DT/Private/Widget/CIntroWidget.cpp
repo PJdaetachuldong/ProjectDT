@@ -27,6 +27,8 @@ FReply UCIntroWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEve
 
 void UCIntroWidget::PlayButtonAnimation()
 {
+	if (!IsClick)return;
+	IsClick=false;
 	StopAnimation(ButtonTextFadeIn);
 	PlayAnimation(ButtonClickEvent, 0.f, 1, EUMGSequencePlayMode::Forward, 1.22f);
 	
