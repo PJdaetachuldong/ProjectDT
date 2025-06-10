@@ -89,7 +89,7 @@ void ACMeleeEnemy::Tick(float DeltaTime)
 	}
 
 	//쉴드가 부셔진 상태이면
-	if (ShieldAmount <= 0.0f)
+	if (CurShieldAmount <= 0.0f)
 	{
 		//현재 부서진 상태를 계속 체크
 		CurBreakTime += DeltaTime;
@@ -98,7 +98,7 @@ void ACMeleeEnemy::Tick(float DeltaTime)
 		if (CurBreakTime >= ResetShieldTime)
 		{
 			//실드를 다시 복구
-			ShieldAmount = StatsAsset->Stats.ShieldAmount;
+			CurShieldAmount = MaxShieldAmount;
 
 			CurBreakTime = 0.0f;
 		}
@@ -175,19 +175,19 @@ bool bFromSweep, const FHitResult& SweepResult)
 		GEngine->AddOnScreenDebugMessage ( 40 , 1.0f , FColor::Red , TEXT ( "Hit Enemy" ) );
 
 		//공격을 맞았을 때 쉴드 게이지가 있다면
-		if ( ShieldAmount > 0.0f )
+		if (CurShieldAmount > 0.0f )
 		{
 			//쉴드게이지가 감소하도록 설정
-			ShieldAmount -= /*Damage*/10.0f;
+			CurShieldAmount -= /*Damage*/10.0f;
 
 			//만약 쉴드게이지 감소되어서 0이 된다면
-			if ( ShieldAmount <= 0.0f )
+			if (CurShieldAmount <= 0.0f )
 			{
 				//에너미가 휘청거리는 애니메이션 출력?
 				GEngine->AddOnScreenDebugMessage ( 41 , 1.0f , FColor::Red , TEXT ( "Shield Break!!" ) );
 
 				//쉴드 게이지가 -의 값이 되면 해당 값 만큼 체력을 깎게 만듦
-				CurHP += ShieldAmount;
+				CurHP += CurShieldAmount;
 
 				return;
 			}
@@ -233,7 +233,7 @@ void ACMeleeEnemy::Hitted()
 	if (!!Damage.Event && !!Damage.Event->HitData) {
 		FHitData* data = Damage.Event->HitData;
 
-		if (ShieldAmount <= 0.0f)
+		if (CurShieldAmount <= 0.0f)
 		{
 			if (ShieldBreakHit < 2) ++ShieldBreakHit;
 
@@ -294,13 +294,13 @@ void ACMeleeEnemy::Hit(FString Name)
 		if (FSMComponent->State == EMeleeEnemyState::DIE) return;
 
 		//현재 쉴드가 있을 경우
-		if (ShieldAmount > 0)
+		if (CurShieldAmount > 0)
 		{
 			//현재 어떠한 공격 애니메이션이 재생 중이라면
 			if (AnimInstance->Montage_IsPlaying(AM_Attack))
 			{
 				//쉴드와 체력의 감소를 4:2의 비율로 감소함
-				ShieldAmount -= 10.0f * 0.4f;
+				CurShieldAmount -= 10.0f * 0.4f;
 				CurHP -= 10.0f * 0.2f;
 
 				//체력이 0이하가 됐을 경우
@@ -319,10 +319,10 @@ void ACMeleeEnemy::Hit(FString Name)
 				}
 
 				//쉴드가 0이하가 됐을 경우
-				if (ShieldAmount <= 0)
+				if (CurShieldAmount <= 0)
 				{
 					// -가 된 쉴드 게이지만큼 체력을 깎아줌
-					CurHP += ShieldAmount;
+					CurHP += CurShieldAmount;
 
 					if (FSMComponent->State != EMeleeEnemyState::BREAK)
 					{
@@ -337,19 +337,19 @@ void ACMeleeEnemy::Hit(FString Name)
 			{
 				//쉴드가 있는 경우에는 검으로 막는 애니메이션 재생
 				//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
-				if (ShieldAmount > 0 && FSMComponent->State != EMeleeEnemyState::BREAK)
+				if (CurShieldAmount > 0 && FSMComponent->State != EMeleeEnemyState::BREAK)
 				{
 					AnimInstance->Montage_Play(AM_ShieldHit);
 				}
 
 				//쉴드는 데미지의 값 만큼 감소
-				ShieldAmount -= 5;
+				CurShieldAmount -= 5;
 
 				//쉴드가 0이하가 됐을 경우
-				if (ShieldAmount <= 0)
+				if (CurShieldAmount <= 0)
 				{
 					// -가 된 쉴드 게이지만큼 체력을 깎아줌
-					CurHP += ShieldAmount;
+					CurHP += CurShieldAmount;
 
 					//체력이 0이하가 됐을 경우
 					if (CurHP <= 0)
@@ -412,13 +412,13 @@ void ACMeleeEnemy::Hit(FString Name)
 			if (FSMComponent->State == EMeleeEnemyState::DIE) return;
 
 			//현재 쉴드가 있을 경우
-			if (ShieldAmount > 0)
+			if (CurShieldAmount > 0)
 			{
 				//현재 어떠한 공격 애니메이션이 재생 중이라면
 				if (AnimInstance->Montage_IsPlaying(AM_Attack))
 				{
 					//쉴드와 체력의 감소를 4:2의 비율로 감소함
-					ShieldAmount -= 10.0f * 0.8f;
+					CurShieldAmount -= 10.0f * 0.8f;
 					CurHP -= 10.0f * 0.2f;
 
 					//체력이 0이하가 됐을 경우
@@ -437,10 +437,10 @@ void ACMeleeEnemy::Hit(FString Name)
 					}
 
 					//쉴드가 0이하가 됐을 경우
-					if (ShieldAmount <= 0)
+					if (CurShieldAmount <= 0)
 					{
 						// -가 된 쉴드 게이지만큼 체력을 깎아줌
-						CurHP += ShieldAmount;
+						CurHP += CurShieldAmount;
 
 						if (FSMComponent->State != EMeleeEnemyState::BREAK)
 						{
@@ -455,19 +455,19 @@ void ACMeleeEnemy::Hit(FString Name)
 				{
 					//쉴드가 있는 경우에는 검으로 막는 애니메이션 재생
 					//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
-					if (ShieldAmount > 0 && FSMComponent->State != EMeleeEnemyState::BREAK)
+					if (CurShieldAmount > 0 && FSMComponent->State != EMeleeEnemyState::BREAK)
 					{
 						AnimInstance->Montage_Play(AM_ShieldHit);
 					}
 
 					//쉴드는 데미지의 값 만큼 감소
-					ShieldAmount -= 15;
+					CurShieldAmount -= 15;
 
 					//쉴드가 0이하가 됐을 경우
-					if (ShieldAmount <= 0)
+					if (CurShieldAmount <= 0)
 					{
 						// -가 된 쉴드 게이지만큼 체력을 깎아줌
-						CurHP += ShieldAmount;
+						CurHP += CurShieldAmount;
 
 						//체력이 0이하가 됐을 경우
 						if (CurHP <= 0)

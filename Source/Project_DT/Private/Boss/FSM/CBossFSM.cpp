@@ -10,6 +10,7 @@
 #include "Boss/CBossAnim.h"
 #include "NavigationSystem.h"
 #include "Components/CapsuleComponent.h"
+#include "Widget/BossWidget.h"
 
 UCBossFSM::UCBossFSM()
 {
@@ -109,6 +110,11 @@ void UCBossFSM::DIEState()
 {
 	if(Cast<UCBossAnim>(MyBoss->AnimInstance)->State != EBossState::DIE)
 	{ 
+		if (MyBoss->BossUI->IsInViewport())
+		{
+			MyBoss->BossUI->RemoveFromParent();
+		}
+
 		//모든 몽타주 재생을 멈춤
 		MyBoss->AnimInstance->StopAllMontages(0.4f);
 
@@ -126,7 +132,7 @@ void UCBossFSM::DIEState()
 void UCBossFSM::NONEState()
 {
 	//쉴드가 까진 상태면 밑에 실행 안함
-	if(MyBoss->ShieldAmount<=0.0f) return;
+	if(MyBoss->CurShieldAmount <=0.0f) return;
 
 // 	//일정 거리까지는 플레이어를 향해 움직이게 만듦
 // 	if (TargetDist >= 350.0f)
@@ -433,7 +439,6 @@ void UCBossFSM::NONEState()
 
 void UCBossFSM::SETATKState()
 {
-
 	//피격 상태면 아래가 진행되지않게
 	if (MyBoss->AnimInstance->Montage_IsPlaying(MyBoss->AM_ShieldHit))
 	{
@@ -441,74 +446,17 @@ void UCBossFSM::SETATKState()
 		return;
 	}
 
-	//플레이어와 거리가 가까워지면 뒤로 물러나게 만듦
-	if (TargetDist <= 300.0f /*&& TargetDist >= 150.0f*/)
+	if (TargetDist <= 300.0f)
 	{
-		//이동 값을 억지로 -값으로 변경
-		if(!Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping)
-		{
-			Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping = true;
-		}
-
-		//현재 에너미와 플레이어 간에 방향을 구함
-		FVector PlayerLocation = MyBoss->Target->GetActorLocation();
-		FVector PawnLocation = MyBoss->GetActorLocation();
-		FVector ToPlayerDirection = (PlayerLocation - PawnLocation).GetSafeNormal();
-
-		// 플레이어로부터 멀어지는 방향 계산
-        FVector DirectionAwayFromPlayer = (PawnLocation - PlayerLocation).GetSafeNormal();
-        FVector RetreatLocation = MyBoss->GetActorLocation() + DirectionAwayFromPlayer * 200.0f; // 200 유닛 후퇴
-
-        // NavMesh 상의 유효한 위치로 이동
-        FNavLocation ProjectedLocation;
-        UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(GetWorld());
-        if (NavSystem && NavSystem->ProjectPointToNavigation(RetreatLocation, ProjectedLocation))
-        {
-            AI->MoveToLocation(ProjectedLocation.Location, 150.0f);
-        }
-
-// 		// 이동할 거리
-// 		float BackstepDistance = 300.0f;
-// 
-// 		// Pawn의 앞 방향 벡터를 기준으로 좌/우 방향 계산
-// 		FVector BackVector = MyBoss->GetActorForwardVector() * ToPlayerDirection * BackstepDistance;
-// 
-// 		// 목표 위치 계산
-// 		FVector BackstepLocation = MyBoss->GetActorLocation() + BackVector;
-// 
-// 		//구한 전방 방향을 사용해서 뒤로 해당 구간동안 뒤로 물러나게 만듦
-// /*		MyBoss->SetActorLocation(MyBoss->GetActorLocation() + -ToPlayerDirection * 400.0f * GetWorld()->GetDeltaSeconds());*/
-// 
-// 		AI->MoveToLocation(BackstepLocation);
-
-		// 플레이어를 향하는 방향 벡터 계산
-		FVector DirectionToPlayer = (PlayerLocation - PawnLocation).GetSafeNormal();
-		// 방향 벡터를 회전으로 변환 (Yaw만 고려)
-		FRotator LookAtRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
-		// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
-		FRotator NewRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
-		// 플레이어를 바라보게 고정함
-		MyBoss->SetActorRotation(NewRotation);
+		SetATKState = ESetATKState::BACKSTEP;
 	}
 
-	else
+	switch (SetATKState)
 	{
-		if (Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping)
-		{
-			Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping = false;
-
-			// 플레이어를 향하는 방향 벡터 계산
-			FVector DirectionToPlayer = (MyBoss->Target->GetActorLocation() - MyBoss->GetActorLocation()).GetSafeNormal();
-			// 방향 벡터를 회전으로 변환 (Yaw만 고려)
-			FRotator LookAtRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
-			// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
-			FRotator NewRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
-			// 플레이어를 바라보게 고정함
-			MyBoss->SetActorRotation(NewRotation);
-		}
+	case ESetATKState::SETATKNONE: { SETATKNONEState(); } break;
+	case ESetATKState::BACKSTEP: { BACKSTEPState(); } break;
+	case ESetATKState::SIDEMOVE: { SIDEMOVEState(); } break;
 	}
-
-
 
 	//공격 패턴 우선 순위
 	//SPATTACK(필살기) > RANGEDATTACK(원거리 공격) > DASHATTACK(대쉬 공격)
@@ -1063,6 +1011,86 @@ void UCBossFSM::SPATTACKState()
 // 		//공격 상태를 NONE으로 되돌려줌
 // 		AttackState = EBossATTACKState::NONE;
 // 	}
+}
+
+void UCBossFSM::SETATKNONEState()
+{
+	// 플레이어를 향하는 방향 벡터 계산
+	FVector DirectionToPlayer = (MyBoss->Target->GetActorLocation() - MyBoss->GetActorLocation()).GetSafeNormal();
+	// 방향 벡터를 회전으로 변환 (Yaw만 고려)
+	FRotator LookAtRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
+	// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
+	FRotator NewRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
+	// 플레이어를 바라보게 고정함
+	MyBoss->SetActorRotation(NewRotation);
+}
+
+void UCBossFSM::BACKSTEPState()
+{
+	//플레이어와 거리가 가까워지면 뒤로 물러나게 만듦
+// 	if (TargetDist <= 300.0f /*&& TargetDist >= 150.0f*/)
+// 	{
+		//이동 값을 억지로 -값으로 변경
+		if (!Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping)
+		{
+			Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping = true;
+		}
+
+		//현재 에너미와 플레이어 간에 방향을 구함
+		FVector PlayerLocation = MyBoss->Target->GetActorLocation();
+		FVector PawnLocation = MyBoss->GetActorLocation();
+		FVector ToPlayerDirection = (PlayerLocation - PawnLocation).GetSafeNormal();
+
+		// 플레이어로부터 멀어지는 방향 계산
+		FVector DirectionAwayFromPlayer = (PawnLocation - PlayerLocation).GetSafeNormal();
+		FVector RetreatLocation = MyBoss->GetActorLocation() + DirectionAwayFromPlayer * 200.0f; // 200 유닛 후퇴
+
+		// NavMesh 상의 유효한 위치로 이동
+		FNavLocation ProjectedLocation;
+		UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(GetWorld());
+		if (NavSystem && NavSystem->ProjectPointToNavigation(RetreatLocation, ProjectedLocation))
+		{
+			AI->MoveToLocation(ProjectedLocation.Location, 150.0f);
+		}
+
+		// 		// 이동할 거리
+		// 		float BackstepDistance = 300.0f;
+		// 
+		// 		// Pawn의 앞 방향 벡터를 기준으로 좌/우 방향 계산
+		// 		FVector BackVector = MyBoss->GetActorForwardVector() * ToPlayerDirection * BackstepDistance;
+		// 
+		// 		// 목표 위치 계산
+		// 		FVector BackstepLocation = MyBoss->GetActorLocation() + BackVector;
+		// 
+		// 		//구한 전방 방향을 사용해서 뒤로 해당 구간동안 뒤로 물러나게 만듦
+		// /*		MyBoss->SetActorLocation(MyBoss->GetActorLocation() + -ToPlayerDirection * 400.0f * GetWorld()->GetDeltaSeconds());*/
+		// 
+		// 		AI->MoveToLocation(BackstepLocation);
+
+				// 플레이어를 향하는 방향 벡터 계산
+		FVector DirectionToPlayer = (PlayerLocation - PawnLocation).GetSafeNormal();
+		// 방향 벡터를 회전으로 변환 (Yaw만 고려)
+		FRotator LookAtRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
+		// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
+		FRotator NewRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
+		// 플레이어를 바라보게 고정함
+		MyBoss->SetActorRotation(NewRotation);
+/*	}*/
+
+	if(TargetDist >= 550.0f)
+	{
+		if (Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping)
+		{
+			Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping = false;
+
+			SetATKState = ESetATKState::SETATKNONE;
+		}
+	}
+}
+
+void UCBossFSM::SIDEMOVEState()
+{
+
 }
 
 void UCBossFSM::SetSPDamage(float Damage)

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Widget/BossWidget.h"
@@ -24,7 +24,7 @@ void UBossWidget::SetBossHpProgessBar(float HP)
 
 void UBossWidget::SetBossShieldProgessBar(float S)
 {
-	float shield = FMath::Clamp(Shield / 100, 0.0f, 1.0f);
+	float shield = FMath::Clamp(S / BossOwner->MaxShieldAmount, 0.0f, 1.0f);
 	Shield=shield;
 }
 void UBossWidget::SetOwner(AActor* Owner)

@@ -225,6 +225,10 @@ public:
 	UPROPERTY()
 	TSubclassOf<UUserWidget>BossUIClass;
 	class UBossWidget* BossUI;
+
+	virtual void SetHP(float value) override;
+
+	virtual void SetShieldAmount(float value) override;
 };
 
 USTRUCT(BlueprintType)

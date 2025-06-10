@@ -33,7 +33,10 @@ public:
 	float CurHP;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	float ShieldAmount;
+	float MaxShieldAmount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	float CurShieldAmount;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	float DamageAmount;
@@ -90,5 +93,7 @@ public:
 
 	virtual void Hit(FString Name);
 
+	virtual void SetHP(float value);
 
+	virtual void SetShieldAmount(float value);
 };

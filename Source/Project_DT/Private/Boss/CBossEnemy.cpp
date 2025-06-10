@@ -193,7 +193,6 @@ void ACBossEnemy::BeginPlay()
 	//위젯 추가
 	if (!BossUIClass)return;
 	BossUI=CreateWidget<UBossWidget>(GetWorld(),BossUIClass);
-	BossUI->AddToViewport();
 	BossUI->SetOwner(this);
 }
 
@@ -276,7 +275,7 @@ void ACBossEnemy::Tick(float DeltaTime)
 	if(!BossStart) return;
 
 	//쉴드가 부셔진 상태이면
-	if (ShieldAmount <= 0.0f)
+	if (CurShieldAmount <= 0.0f)
 	{
 		//현재 부서진 상태를 계속 체크
 		CurBreakTime += DeltaTime;
@@ -285,7 +284,7 @@ void ACBossEnemy::Tick(float DeltaTime)
 		if (CurBreakTime >= ResetShieldTime)
 		{
 			//실드를 다시 복구
-			ShieldAmount = StatsAsset->Stats.ShieldAmount;
+			CurShieldAmount = MaxShieldAmount;
 
 			ShieldBreakHit = 0;
 
@@ -821,7 +820,7 @@ void ACBossEnemy::Hitted()
 	if (!!Damage.Event && !!Damage.Event->HitData) {
 		FHitData* data = Damage.Event->HitData;
 
-		if (ShieldAmount <= 0.0f)
+		if (CurShieldAmount <= 0.0f)
 		{
 			if(ShieldBreakHit < 2) ++ShieldBreakHit;
 
@@ -871,8 +870,8 @@ void ACBossEnemy::Hit(FString Name)
 	if (IsKatana)
 	{
 		GEngine->AddOnScreenDebugMessage(80, 1.0f, FColor::Red, TEXT("Katana Hitted"));
-		OnDelegateHP.Broadcast(CurHP);
-		OnDelegateShield.Broadcast(ShieldAmount);
+		/*OnDelegateHP.Broadcast(CurHP);*/
+		/*OnDelegateShield.Broadcast(ShieldAmount);*/
 		//사망 상태면 안되게 막음
 		if (FSMComponent->State == EBossState::DIE) return;
 
@@ -890,19 +889,22 @@ void ACBossEnemy::Hit(FString Name)
 		if (IsReadySPAttack)
 		{
 			//데미지 10의 비율로 체력 감소
-			CurHP -= 10;
+			/*CurHP -= 10;*/
+			SetHP(10);
 			FSMComponent->SetSPDamage(10); //데미지 값 임시
 		}
 
 		//현재 쉴드가 있을 경우
-		if (ShieldAmount > 0)
+		if (CurShieldAmount > 0)
 		{
 			//현재 어떠한 공격 애니메이션이 재생 중이라면
 			if (AnimInstance->Montage_IsPlaying(AM_ComboAttack_01) || AnimInstance->Montage_IsPlaying(AM_ComboAttack_02) || AnimInstance->Montage_IsPlaying(AM_RangedAttack) || AnimInstance->Montage_IsPlaying(AM_DashAttack) || AnimInstance->Montage_IsPlaying(AM_SPAttack))
 			{
 				//쉴드와 체력의 감소를 4:2의 비율로 감소함
-				ShieldAmount -= 10.0f * 0.4f;
-				CurHP -= 10.0f * 0.2f;
+				/*ShieldAmount -= 10.0f * 0.4f;*/
+				SetShieldAmount(10.0f * 0.4f);
+				/*CurHP -= 10.0f * 0.2f;*/
+				SetHP(10.0f * 0.2f);
 
 				//체력이 0이하가 됐을 경우
 				if (CurHP <= 0)
@@ -914,10 +916,11 @@ void ACBossEnemy::Hit(FString Name)
 				}
 
 				//쉴드가 0이하가 됐을 경우
-				if (ShieldAmount <= 0)
+				if (CurShieldAmount <= 0)
 				{
 					// -가 된 쉴드 게이지만큼 체력을 깎아줌
-					CurHP += ShieldAmount;
+					/*CurHP += ShieldAmount;*/
+					SetHP(-CurShieldAmount);
 
 					if (FSMComponent->State != EBossState::BREAK)
 					{
@@ -932,24 +935,31 @@ void ACBossEnemy::Hit(FString Name)
 			{
 				//쉴드가 있는 경우에는 검으로 막는 애니메이션 재생
 				//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
-				if (ShieldAmount > 0 && AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) != FName("Counter") && FSMComponent->State != EBossState::BREAK)
+				if (CurShieldAmount > 0 && AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) != FName("Counter") && FSMComponent->State != EBossState::BREAK)
 				{
 					AnimInstance->Montage_Play(AM_ShieldHit);
 				}
 
 				//쉴드는 데미지의 값 만큼 감소
-				ShieldAmount -= 5;
+				/*ShieldAmount -= 5;*/
+				SetShieldAmount(5.0f);
 
 				//쉴드 카운터 공격 조건을 체크하는 카운트를 5초로 초기화
 				GuardingTime = 5.0f;
-				//해당 상태에서 맞은 횟수를 카운트
-				ShieldHitCount++;
+
+				//가드 애니메이션이 재생 중이 아니라면 
+				if (!AnimInstance->Montage_IsPlaying(AM_Guard))
+				{
+					//해당 상태에서 맞은 횟수를 카운트
+					ShieldHitCount++;
+				}
 
 				//쉴드가 0이하가 됐을 경우
-				if (ShieldAmount <= 0)
+				if (CurShieldAmount <= 0)
 				{
 					// -가 된 쉴드 게이지만큼 체력을 깎아줌
-					CurHP += ShieldAmount;
+					/*CurHP += ShieldAmount;*/
+					SetHP(-CurShieldAmount);
 
 					//체력이 0이하가 됐을 경우
 					if (CurHP <= 0)
@@ -986,7 +996,8 @@ void ACBossEnemy::Hit(FString Name)
 		else
 		{
 			//체력이 데미지 10의 비율로 감소
-			CurHP -= 20;
+			/*CurHP -= 20;*/
+			SetHP(20);
 
 			//0이하가 됐을 경우
 			if (CurHP <= 0.0f)
@@ -1024,19 +1035,22 @@ void ACBossEnemy::Hit(FString Name)
 			if (IsReadySPAttack)
 			{
 				//데미지 10의 비율로 체력 감소
-				CurHP -= 10;
+				/*CurHP -= 10;*/
+				SetHP(10);
 				FSMComponent->SetSPDamage(10); //데미지 값 임시
 			}
 
 			//현재 쉴드가 있을 경우
-			if (ShieldAmount > 0)
+			if (CurShieldAmount > 0)
 			{
 				//현재 어떠한 공격 애니메이션이 재생 중이라면
 				if (AnimInstance->Montage_IsPlaying(AM_ComboAttack_01) || AnimInstance->Montage_IsPlaying(AM_ComboAttack_02) || AnimInstance->Montage_IsPlaying(AM_RangedAttack) || AnimInstance->Montage_IsPlaying(AM_DashAttack))
 				{
 					//쉴드와 체력의 감소를 4:2의 비율로 감소함
-					ShieldAmount -= 10.0f * 0.8f;
-					CurHP -= 10.0f * 0.2f;
+					/*ShieldAmount -= 10.0f * 0.8f;*/
+					SetShieldAmount(10.0f * 0.8f);
+					/*CurHP -= 10.0f * 0.2f;*/
+					SetHP(10.0f * 0.2f);
 
 					//체력이 0이하가 됐을 경우
 					if (CurHP <= 0)
@@ -1048,10 +1062,11 @@ void ACBossEnemy::Hit(FString Name)
 					}
 
 					//쉴드가 0이하가 됐을 경우
-					if (ShieldAmount <= 0)
+					if (CurShieldAmount <= 0)
 					{
 						// -가 된 쉴드 게이지만큼 체력을 깎아줌
-						CurHP += ShieldAmount;
+						/*CurHP += ShieldAmount;*/
+						SetHP(-CurShieldAmount);
 
 						if (FSMComponent->State != EBossState::BREAK)
 						{
@@ -1066,13 +1081,13 @@ void ACBossEnemy::Hit(FString Name)
 				{
 					//쉴드가 있는 경우에는 검으로 막는 애니메이션 재생
 					//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
-					if (ShieldAmount > 0 && AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) != FName("Counter") && FSMComponent->State != EBossState::BREAK)
+					if (CurShieldAmount > 0 && AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) != FName("Counter") && FSMComponent->State != EBossState::BREAK)
 					{
 						AnimInstance->Montage_Play(AM_ShieldHit);
 					}
 
 					//쉴드는 데미지의 값 만큼 감소
-					ShieldAmount -= 15;
+					SetShieldAmount(15.0f);
 
 					//쉴드 카운터 공격 조건을 체크하는 카운트를 5초로 초기화
 					GuardingTime = 5.0f;
@@ -1080,10 +1095,11 @@ void ACBossEnemy::Hit(FString Name)
 					ShieldHitCount++;
 
 					//쉴드가 0이하가 됐을 경우
-					if (ShieldAmount <= 0)
+					if (CurShieldAmount <= 0)
 					{
 						// -가 된 쉴드 게이지만큼 체력을 깎아줌
-						CurHP += ShieldAmount;
+						/*CurHP += ShieldAmount;*/
+						SetHP(-CurShieldAmount);
 
 						//체력이 0이하가 됐을 경우
 						if (CurHP <= 0)
@@ -1120,7 +1136,8 @@ void ACBossEnemy::Hit(FString Name)
 			else
 			{
 				//체력이 데미지 10의 비율로 감소
-				CurHP -= 5;
+				/*CurHP -= 5;*/
+				SetHP(5);
 
 				//0이하가 됐을 경우
 				if (CurHP <= 0.0f)
@@ -1248,8 +1265,25 @@ void ACBossEnemy::Start(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 		BossStart = true;;
 		Cast<UCBossAnim>(AnimInstance)->IsStartBoss = true;
 
+		BossUI->AddToViewport();
+		
+		if(StartCollision)
 		StartCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+}
+
+void ACBossEnemy::SetHP(float value)
+{
+	CurHP = CurHP - value;
+
+	OnDelegateHP.Broadcast(CurHP);
+}
+
+void ACBossEnemy::SetShieldAmount(float value)
+{
+	CurShieldAmount = CurShieldAmount - value;
+
+	OnDelegateShield.Broadcast(CurShieldAmount);
 }
 
 void ACBossEnemy::LoadStatsFromAsset ( )

@@ -26,6 +26,14 @@ enum class EBossATTACKState : uint8
 	SPATTACK UMETA(DisplayName = "SPATTACK")
 };
 
+UENUM()
+enum class ESetATKState : uint8
+{
+	SETATKNONE UMETA(DisplayName = "SETATKNONE"),
+	BACKSTEP UMETA(DisplayName = "BACKSTEP"),
+	SIDEMOVE UMETA(DisplayName = "SIDEMOVE")
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECT_DT_API UCBossFSM : public UActorComponent
 {
@@ -185,6 +193,13 @@ public:
 	void COMBOATTACKState();
 	void COUNTERATTACKState();
 	void SPATTACKState();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category =FSM)
+	ESetATKState SetATKState = ESetATKState::SETATKNONE;
+
+	void SETATKNONEState();
+	void BACKSTEPState();
+	void SIDEMOVEState();
 
 	//임의로 하는 IDLE에서 CHASE로 넘어가는 타이머
 	float CurIDLETime = 0.0f;

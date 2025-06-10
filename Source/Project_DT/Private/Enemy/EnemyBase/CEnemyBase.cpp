@@ -13,7 +13,8 @@ ACEnemyBase::ACEnemyBase()
 	//기본 값 설정
 	MaxHP = 100.0f;
 	CurHP = MaxHP;
-	ShieldAmount = 0.0f;
+	MaxShieldAmount = 0.0f;
+	CurShieldAmount = MaxShieldAmount;
 	DamageAmount = 10.0f;
 	SphereRadius = 300.0f;
 	AttackRange = 250.0f;
@@ -86,7 +87,8 @@ void ACEnemyBase::LoadStatsFromAsset()
 		const FCEnemyStats& Stats = StatsAsset->Stats;
 		MaxHP = Stats.MaxHP;
 		CurHP = MaxHP;
-		ShieldAmount = Stats.ShieldAmount;
+		MaxShieldAmount = Stats.ShieldAmount;
+		CurShieldAmount = MaxShieldAmount;
 		DamageAmount = Stats.DamageAmount;
 		SphereRadius = Stats.SphereRadius;
 		AttackRange = Stats.AttackRange;
@@ -110,4 +112,14 @@ void ACEnemyBase::OnDeath()
 
 void ACEnemyBase::Hit(FString Name)
 {
+}
+
+void ACEnemyBase::SetHP(float value)
+{
+	
+}
+
+void ACEnemyBase::SetShieldAmount(float value)
+{
+
 }
