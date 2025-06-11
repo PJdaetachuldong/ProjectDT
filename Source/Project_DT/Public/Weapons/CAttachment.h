@@ -40,6 +40,9 @@ protected:
 	UFUNCTION(BlueprintCallable,Category="Attach")
 	void AttachTo(FName InSocketName);
 
+	UFUNCTION(BlueprintCallable,Category="Attach")
+	void SpawnWeapon(FName InSocketName);
+
 public:
 	void OnCollisions ( );
 	void OffCollisions ( );
@@ -67,6 +70,9 @@ protected:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class USkeletalMeshComponent* SkeletalMesh;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class USkeletalMeshComponent* ColorMesh;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class UNiagaraSystem* HitEffect;
 
@@ -89,4 +95,7 @@ private:
 	bool bInitialized = false;
 
 	class AActor* EnemyActor;
+
+	FTimerHandle ScaleTimerHandle;
+	float ScaleTime;
 };
