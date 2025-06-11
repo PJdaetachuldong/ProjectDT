@@ -1084,6 +1084,8 @@ void UCBossFSM::BACKSTEPState()
 			Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping = false;
 
 			SetATKState = ESetATKState::SETATKNONE;
+			//타이머 써서 일정 시간 지나면 NONE으로 바뀌게
+			//AttackState = EBossATTACKState::NONE;
 		}
 	}
 }

@@ -69,9 +69,6 @@ void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 			//만약 플레이어가 패링 감지중이면
 			if (Player->Parry->bIsParrying)
 			{
-				//경직 애니메이션 재생
-				GEngine->AddOnScreenDebugMessage(130, 1.0f, FColor::Red, TEXT("Player Parrying"));
-
 				//현재 재생중인 몽타주 멈춤
 				MyBoss->AnimInstance->StopAllMontages(0.0f);
 				MyBoss->FSMComponent->AttackState = EBossATTACKState::NONE;
@@ -93,9 +90,6 @@ void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 			{
 				MyBoss->IsSPFirstATKHit = true;
 			}
-
-			//경직 애니메이션 재생
-			GEngine->AddOnScreenDebugMessage(130, 1.0f, FColor::Red, TEXT("This Don't Guard"));
 
 			//무조건 사용자 정의 데미지 이벤트 생성
 			MyBoss->HitData->HitDatas[HitNumber].SendDamage(MyBoss, this, Player);
