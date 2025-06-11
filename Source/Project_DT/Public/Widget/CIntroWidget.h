@@ -37,7 +37,6 @@ public:
 	class UWidgetAnimation* PadeIn;
 	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
 	class UButton* Button;
-
 public:
 	bool IsClick=true;
 

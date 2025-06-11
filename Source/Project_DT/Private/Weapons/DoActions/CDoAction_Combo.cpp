@@ -125,7 +125,6 @@ void UCDoAction_Combo::End_Parry ( )
 {
 	Super::End_Parry ( );
 	bParry = false;
-
 }
 
 void UCDoAction_Combo::CounterAction ( )
