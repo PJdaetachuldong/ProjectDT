@@ -134,6 +134,11 @@ void UCBossFSM::NONEState()
 	//쉴드가 까진 상태면 밑에 실행 안함
 	if(MyBoss->CurShieldAmount <=0.0f) return;
 
+	if (Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection == 100.0f || Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection == -100.0f)
+	{
+		Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection = 0.0f;
+	}
+
 // 	//일정 거리까지는 플레이어를 향해 움직이게 만듦
 // 	if (TargetDist >= 350.0f)
 // 	{
@@ -208,6 +213,8 @@ void UCBossFSM::NONEState()
 
 			//플레이어를 향해서 움직이게 만듦
 			AI->MoveToLocation(MyBoss->Target->GetActorLocation());
+
+			GEngine->AddOnScreenDebugMessage(160, 1.0f, FColor::White, TEXT("State: NONE, TargetDIst >= 200"));
 		}
 	}
 
@@ -216,6 +223,8 @@ void UCBossFSM::NONEState()
 	{
 		//이동을 멈추고 
 		AI->StopMovement();
+
+		GEngine->AddOnScreenDebugMessage(165, 1.0f, FColor::White, TEXT("State: NONE, TargetDIst <= 300"));
 
 		//좌우 이동이나 뒷 걸음질, 그리고 공격 조건을 만족하는지 체크한다
 		AttackState = EBossATTACKState::SETATK;
@@ -1085,6 +1094,9 @@ void UCBossFSM::BACKSTEPState()
 
 			SetATKState = ESetATKState::SETATKNONE;
 			//타이머 써서 일정 시간 지나면 NONE으로 바뀌게
+			
+			GetWorld()->GetTimerManager().SetTimer(SetNONEStateTimerHandle, this, &UCBossFSM::SetNONEState, 2.5f, false);
+
 			//AttackState = EBossATTACKState::NONE;
 		}
 	}
@@ -1093,6 +1105,11 @@ void UCBossFSM::BACKSTEPState()
 void UCBossFSM::SIDEMOVEState()
 {
 
+}
+
+void UCBossFSM::SetNONEState()
+{
+	AttackState = EBossATTACKState::NONE;
 }
 
 void UCBossFSM::SetSPDamage(float Damage)

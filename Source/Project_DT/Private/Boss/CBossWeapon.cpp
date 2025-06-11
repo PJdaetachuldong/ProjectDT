@@ -7,7 +7,10 @@
 #include "Weapons/CWeaponStuctures.h"
 #include "Boss/CBossEnemy.h"
 #include "Kismet/GameplayStatics.h"
+#include "Global.h"
 #include "Boss/FSM/CBossFSM.h"
+#include "Weapons/CWeaponComponent.h"
+#include "Weapons/CDoAction.h"
 
 // Sets default values
 ACBossWeapon::ACBossWeapon()
@@ -57,6 +60,15 @@ bool ACBossWeapon::CheckGuardBool()
 	return IsGuard;
 }
 
+void ACBossWeapon::PlayParringAnim()
+{
+	//현재 재생중인 몽타주 멈춤
+	MyBoss->AnimInstance->StopAllMontages(0.0f);
+	MyBoss->FSMComponent->AttackState = EBossATTACKState::NONE;
+
+	MyBoss->AnimInstance->Montage_Play(MyBoss->AM_ParringInteraction);
+}
+
 void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	ACPlayer* Player = Cast<ACPlayer>(OtherActor);
@@ -66,14 +78,17 @@ void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		//가드가 가능한 공격일 경우
 		if (IsGuard)
 		{
-			//만약 플레이어가 패링 감지중이면
-			if (Player->Parry->bIsParrying)
-			{
-				//현재 재생중인 몽타주 멈춤
-				MyBoss->AnimInstance->StopAllMontages(0.0f);
-				MyBoss->FSMComponent->AttackState = EBossATTACKState::NONE;
+			UCWeaponComponent* Weapon = CHelpers::GetComponent<UCWeaponComponent>(Player);
 
-				MyBoss->AnimInstance->Montage_Play(MyBoss->AM_ParringInteraction);
+			//만약 플레이어가 패링 감지중이면
+			if (Weapon->GetDoAction()->RetrunParry())
+			{
+
+// 				//현재 재생중인 몽타주 멈춤
+// 				MyBoss->AnimInstance->StopAllMontages(0.0f);
+// 				MyBoss->FSMComponent->AttackState = EBossATTACKState::NONE;
+// 
+// 				MyBoss->AnimInstance->Montage_Play(MyBoss->AM_ParringInteraction);
 
 				return;
 			}

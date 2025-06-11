@@ -201,8 +201,6 @@ public:
 	void BACKSTEPState();
 	void SIDEMOVEState();
 
-	//임의로 하는 IDLE에서 CHASE로 넘어가는 타이머
-	float CurIDLETime = 0.0f;
-	float IDLETime = 6.0f;
-	//임의로 하는 IDLE에서 CHASE로 넘어가는 타이머
+	FTimerHandle SetNONEStateTimerHandle;
+	void SetNONEState();
 };
