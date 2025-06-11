@@ -27,7 +27,12 @@ public:
 	class UBoxComponent* BoxComp;
 
 	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* MeshComp;
+	class UArrowComponent* ArrowComp;
+
+	void SetDirection(FVector ToPlayerDirection);
+
+// 	UPROPERTY(EditAnywhere)
+// 	UStaticMeshComponent* MeshComp;
 
 	//던져질때 속도
 	UPROPERTY(EditAnywhere )
@@ -42,8 +47,8 @@ public:
 	//타겟을 향해 날아가는 방향을 저장하는 변수
 	FVector Direction;
 
-	//콜리전과 외형을 비활성화 변환 시켜주는 함수 
-	void SetActive(bool Value, FVector DirectionToTarget);
+// 	//콜리전과 외형을 비활성화 변환 시켜주는 함수 
+// 	void SetActive(bool Value, FVector DirectionToTarget);
 
 	void OverlapOther(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

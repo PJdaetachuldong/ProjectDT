@@ -90,7 +90,7 @@ public:
 	float DashAttackOverDist = 700.0f;
 
 	//대쉬 공격 때 플레이어보다 약간 앞에서 멈추게 하는 변수
-	float DashAttackFrontDist = 450.0f;
+	float DashAttackFrontDist = 50.0f;
 
 	//대쉬 공격을 할때 위치 선정을 했는지 확인하는 변수
 	bool IsSetDashAttackLocation = false;

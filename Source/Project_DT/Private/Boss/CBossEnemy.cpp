@@ -20,6 +20,9 @@
 #include "Boss/SPAttackCollision/SPAttackCheckCollision.h"
 #include "Component/CStatusComponent.h"
 #include "Widget/BossWidget.h"
+#include "Weapons/CWeaponComponent.h"
+#include "Weapons/CDoAction.h"
+#include "Components/ArrowComponent.h"
 
 ACBossEnemy::ACBossEnemy()
 {
@@ -44,7 +47,7 @@ ACBossEnemy::ACBossEnemy()
 	}
 
 	//일단 임시로 하는 발사 위치 설정
-	ThrowPosition = CreateDefaultSubobject<USceneComponent>(L"ThrowPosition");
+	ThrowPosition = CreateDefaultSubobject<UArrowComponent>(L"ThrowPosition");
 	ThrowPosition->SetupAttachment(RootComponent);
 	//일단 임시로 하는 발사 위치 설정
 
@@ -118,6 +121,15 @@ ACBossEnemy::ACBossEnemy()
 	StartCollision->SetupAttachment(GetMesh());
 	StartCollision->SetCollisionProfileName(L"BossWeapon");
 	StartCollision->OnComponentBeginOverlap.AddDynamic(this, &ACBossEnemy::Start);
+
+	DashATKCollision = CreateDefaultSubobject<UBoxComponent>(L"DashColli");
+	DashATKCollision->SetupAttachment(GetMesh());
+	DashATKCollision->SetCollisionProfileName(L"BossWeapon");
+	DashATKCollision->OnComponentBeginOverlap.AddDynamic(this, &ACBossEnemy::DashPlayerHit);
+	DashATKCollision->SetRelativeLocation(FVector(0, 59, 100));
+	DashATKCollision->SetBoxExtent(FVector(41,29,80));
+	DashATKCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	CHelpers::GetClass(&BossUIClass,AssetPaths::BossUI);
 }
 
@@ -152,21 +164,21 @@ void ACBossEnemy::BeginPlay()
 		}
 	}
 
-	//원거리 공격을 최대 설정 값만큼 미리 생성함
-	for ( int32 i = 0; i < MaxRangedAttackCount; ++i )
-	{
-		//스폰할 객체에 대한 스폰 옵션을 설정하는 구조체
-		FActorSpawnParameters Params;
-		//스폰 과정에 충돌이 생겨도 제자리에서 스폰할 수 있게 만듦
-		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		//원거리 공격 오브젝트를 월드에 소환
-		ACRangeAttack* RangedAttackObject = GetWorld()->SpawnActor<ACRangeAttack>(RangedAttackFactory, Params);
-		//해당 원거리 공격 오브젝트 비활성화 처리
-		RangedAttackObject->SetActive(false, FVector(0));
-		//생성한 것을 오브젝트 풀에 넣음
-		RangedAttackList.Add(RangedAttackObject);
-	}
+// 	//원거리 공격을 최대 설정 값만큼 미리 생성함
+// 	for ( int32 i = 0; i < MaxRangedAttackCount; ++i )
+// 	{
+// 		//스폰할 객체에 대한 스폰 옵션을 설정하는 구조체
+// 		FActorSpawnParameters Params;
+// 		//스폰 과정에 충돌이 생겨도 제자리에서 스폰할 수 있게 만듦
+// 		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+// 
+// 		//원거리 공격 오브젝트를 월드에 소환
+// 		ACRangeAttack* RangedAttackObject = GetWorld()->SpawnActor<ACRangeAttack>(RangedAttackFactory, Params);
+// 		//해당 원거리 공격 오브젝트 비활성화 처리
+// 		RangedAttackObject->SetActive(false, FVector(0));
+// 		//생성한 것을 오브젝트 풀에 넣음
+// 		RangedAttackList.Add(RangedAttackObject);
+// 	}
 
 	if (SPAttackCollision)
 	{
@@ -352,6 +364,22 @@ void ACBossEnemy::OffSwordCollision()
 	{ 
 		//공격 콜리전 비활성화
 		SpawnWeapon->SwordCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void ACBossEnemy::OnDashCollision()
+{
+	if (DashATKCollision)
+	{
+		DashATKCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}
+}
+
+void ACBossEnemy::OffDashCollision()
+{
+	if (DashATKCollision)
+	{
+		DashATKCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
@@ -1271,6 +1299,31 @@ void ACBossEnemy::Start(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 		
 		if (StartCollision)
 			StartCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+
+void ACBossEnemy::DashPlayerHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (Target == Cast<ACPlayer>(OtherActor))
+	{
+		UCWeaponComponent* Weapon = CHelpers::GetComponent<UCWeaponComponent>(Target);
+
+		//만약 플레이어가 패링 감지중이면
+		if (Weapon->GetDoAction() && Weapon->GetDoAction()->RetrunParry())
+		{
+			return;
+		}
+
+		// 사용자 정의 데미지 이벤트 생성
+		HitData->HitDatas[SpawnWeapon->HitNumber].SendDamage(this, SpawnWeapon, Target);
+	}
+
+	//가드 불가능 공격일 경우
+	else
+	{
+		//무조건 사용자 정의 데미지 이벤트 생성
+		HitData->HitDatas[SpawnWeapon->HitNumber].SendDamage(this, SpawnWeapon, Target);
 	}
 }
 

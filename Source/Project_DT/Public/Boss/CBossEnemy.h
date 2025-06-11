@@ -37,13 +37,13 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ACRangeAttack> RangedAttackFactory;
 
-	//원거리 공격 오브젝트를 Object Pool로 관리
-	//오브젝트의 최초 생성 수 (혹시몰라 여유분까지)
-	int32 MaxRangedAttackCount = 4;
-
-	//원거리 공격 오브젝트 목록
-	UPROPERTY(EditAnywhere, Category = ObjectPool)
-	TArray<class ACRangeAttack*> RangedAttackList;
+// 	//원거리 공격 오브젝트를 Object Pool로 관리
+// 	//오브젝트의 최초 생성 수 (혹시몰라 여유분까지)
+// 	int32 MaxRangedAttackCount = 4;
+// 
+// 	//원거리 공격 오브젝트 목록
+// 	UPROPERTY(EditAnywhere, Category = ObjectPool)
+// 	TArray<class ACRangeAttack*> RangedAttackList;
 
 	//현재 쉴드가 없는 시간을 체크하는 변수
 	float CurBreakTime = 0.0f;
@@ -87,7 +87,7 @@ public:
 
 	//일단 임시로 하는 발사 위치 설정
 	UPROPERTY(EditAnywhere)
-	class USceneComponent* ThrowPosition;
+	class UArrowComponent* ThrowPosition;
 	//일단 임시로 하는 발사 위치 설정
 
 	UAnimInstance* AnimInstance;
@@ -97,6 +97,10 @@ public:
 	void OnSwordCollision();
 
 	void OffSwordCollision();
+
+	void OnDashCollision();
+
+	void OffDashCollision();
 
 	bool OnGuardCollision();
 
@@ -225,6 +229,12 @@ public:
 	UPROPERTY()
 	TSubclassOf<UUserWidget>BossUIClass;
 	class UBossWidget* BossUI;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DashATK)
+	class UBoxComponent* DashATKCollision;
+
+	UFUNCTION()
+	void DashPlayerHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	virtual void SetHP(float value) override;
 

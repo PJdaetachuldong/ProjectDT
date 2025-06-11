@@ -12,6 +12,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Widget/BossWidget.h"
 #include "Boss/CBossWeapon.h"
+#include "Components/ArrowComponent.h"
 
 UCBossFSM::UCBossFSM()
 {
@@ -741,24 +742,34 @@ void UCBossFSM::SpawnRangedActor()
 
 	//발사 위치의 Transform을 가져옴
 	FTransform ThrowPos = MyBoss->ThrowPosition->GetComponentTransform();
+	
+	//스폰할 객체에 대한 스폰 옵션을 설정하는 구조체
+	FActorSpawnParameters Params;
+	//스폰 과정에 충돌이 생겨도 제자리에서 스폰할 수 있게 만듦
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	//오브젝트 풀 리스트를 검사하여 비활성화 된 액터를 찾음
-	for ( int32 i = 0; i < MyBoss->RangedAttackList.Num(); ++i )
-	{
-		//비활성화 된 액터를 찾으면
-		if ( !MyBoss->RangedAttackList[i]->MeshComp->IsVisible() )
-		{
-			FindResult = true;
+	//원거리 공격 오브젝트를 월드에 소환
+	ACRangeAttack* SpawnRanged = GetWorld()->SpawnActor<ACRangeAttack>(MyBoss->RangedAttackFactory, MyBoss->ThrowPosition->GetComponentTransform(), Params);
 
-			//활성화를 해주고 방향을 전달
-			MyBoss->RangedAttackList[i]->SetActive(true, Direction);
-			//던져지기 시작하는 위치에 배치
-			MyBoss->RangedAttackList[i]->SetActorTransform(ThrowPos);
+	SpawnRanged->SetDirection(Direction);
 
-			//반복 그만하기
-			break;
-		}
-	}
+// 	//오브젝트 풀 리스트를 검사하여 비활성화 된 액터를 찾음
+// 	for ( int32 i = 0; i < MyBoss->RangedAttackList.Num(); ++i )
+// 	{
+// 		//비활성화 된 액터를 찾으면
+// 		if ( !MyBoss->RangedAttackList[i]->MeshComp->IsVisible() )
+// 		{
+// 			FindResult = true;
+// 
+// 			//활성화를 해주고 방향을 전달
+// 			MyBoss->RangedAttackList[i]->SetActive(true, Direction);
+// 			//던져지기 시작하는 위치에 배치
+// 			MyBoss->RangedAttackList[i]->SetActorTransform(ThrowPos);
+// 
+// 			//반복 그만하기
+// 			break;
+// 		}
+// 	}
 }
 
 void UCBossFSM::DASHATTACKState()
@@ -1318,10 +1329,10 @@ void UCBossFSM::SetDashAttackLocation()
 /*	CalculatedTargetLocation = TargetLocation + (DirectionToTarget * DashAttackOverDist);*/
 
 	//플레이어 위치보다 약간 앞에서 멈추게 값을 계산함
-/*	CalculatedTargetLocation = TargetLocation - (DirectionToTarget * DashAttackFrontDist);*/
+	CalculatedTargetLocation = TargetLocation - (DirectionToTarget * DashAttackFrontDist);
 
 	//타겟 위치를 목표로 설정
-	CalculatedTargetLocation = TargetLocation;
+/*	CalculatedTargetLocation = TargetLocation;*/
 
 	//Navmesh를 비활성화해줌
 	MyBoss->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
