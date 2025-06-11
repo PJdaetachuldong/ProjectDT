@@ -68,11 +68,7 @@ void UCParryComponent::DetectActor()
 	{
 		if (TemporarilyIgnoredActors.Contains(HitActor))
 			return;
-		ACBossWeapon* Enemy = Cast<ACBossWeapon>(HitActor);
-		if (Enemy)
-			if (!Enemy->CheckGuardBool()) {
-				return;
-			}
+
 
 		// DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 20.f, 12, FColor::Red, false, 1.0f);
 		// DrawDebugLine(GetWorld(), Start, HitActor->GetActorLocation(), FColor::Blue, false, 1.0f, 0, 2.0f);
@@ -84,6 +80,11 @@ void UCParryComponent::DetectActor()
 		bIsGuarding = false;
 		GetWorld()->GetTimerManager().ClearTimer(GuardTraceTimer);
 		Weapon->OnParry(Quadrant);
+		ACBossWeapon* Enemy = Cast<ACBossWeapon>(HitActor);
+		if (Enemy)
+			if (!Enemy->CheckGuardBool()) {
+				return;
+			}
 	}
 }
 

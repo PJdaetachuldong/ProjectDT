@@ -324,6 +324,7 @@ void ACPlayer::Hitted()
 	if (!!Damage.Event && !!Damage.Event->HitData)
 	{
 		FHitData* data = Damage.Event->HitData;
+		State->SetHittedMode();
 		data->PlayMontage(this);
 		data->PlayHitStop(GetWorld());
 		{
