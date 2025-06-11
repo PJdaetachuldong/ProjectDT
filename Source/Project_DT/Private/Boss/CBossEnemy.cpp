@@ -537,7 +537,7 @@ void ACBossEnemy::AttackTurn()
 
 	// 부드러운 회전을 위해 Interp 사용 (선택 사항)
 	FRotator CurrentRotation = GetActorRotation();
-	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 40.0f);
+	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 100.0f);
 
 	// Pawn 회전 설정
 	SetActorRotation (NewRotation);
@@ -867,14 +867,11 @@ void ACBossEnemy::Hit(FString Name)
 
 	if (IsKatana)
 	{
-		GEngine->AddOnScreenDebugMessage(80, 1.0f, FColor::Red, TEXT("Katana Hitted"));
-		/*OnDelegateHP.Broadcast(CurHP);*/
-		/*OnDelegateShield.Broadcast(ShieldAmount);*/
 		//사망 상태면 안되게 막음
 		if (FSMComponent->State == EBossState::DIE) return;
 
 		//카운터 가드 상태일때
-		if (FSMComponent->AttackState == EBossATTACKState::COUNTERATTACK)
+		if (FSMComponent->AttackState == EBossATTACKState::COUNTERATTACK && AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) != FName("Counter"))
 		{
 			//정면에서 맞아서 카운터 공격이 나가면 뒤에 데미지 처리가 안되게 막음
 			if (OnGuardCollision())
@@ -896,7 +893,7 @@ void ACBossEnemy::Hit(FString Name)
 		if (CurShieldAmount > 0)
 		{
 			//현재 어떠한 공격 애니메이션이 재생 중이라면
-			if (AnimInstance->Montage_IsPlaying(AM_ComboAttack_01) || AnimInstance->Montage_IsPlaying(AM_ComboAttack_02) || AnimInstance->Montage_IsPlaying(AM_RangedAttack) || AnimInstance->Montage_IsPlaying(AM_DashAttack) || AnimInstance->Montage_IsPlaying(AM_SPAttack))
+			if (AnimInstance->Montage_IsPlaying(AM_ComboAttack_01) || AnimInstance->Montage_IsPlaying(AM_ComboAttack_02) || AnimInstance->Montage_IsPlaying(AM_RangedAttack) || AnimInstance->Montage_IsPlaying(AM_DashAttack) || AnimInstance->Montage_IsPlaying(AM_SPAttack) || AnimInstance->Montage_IsPlaying(AM_Guard))
 			{
 				//쉴드와 체력의 감소를 4:2의 비율로 감소함
 				/*ShieldAmount -= 10.0f * 0.4f;*/
@@ -933,7 +930,7 @@ void ACBossEnemy::Hit(FString Name)
 			{
 				//쉴드가 있는 경우에는 검으로 막는 애니메이션 재생
 				//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
-				if (CurShieldAmount > 0 && AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) != FName("Counter") && FSMComponent->State != EBossState::BREAK)
+				if (CurShieldAmount > 0 && AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) != FName("Counter") /*FSMComponent->AttackState != EBossATTACKState::COUNTERATTACK*/ && FSMComponent->State != EBossState::BREAK && !AnimInstance->Montage_IsPlaying(AM_Guard))
 				{
 					AnimInstance->Montage_Play(AM_ShieldHit);
 				}
@@ -1256,6 +1253,9 @@ void ACBossEnemy::OnPlayerHealed()
 
 void ACBossEnemy::Start(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (BossStart)
+	return;
+
 	ACPlayer* Player = Cast<ACPlayer>(OtherActor);
 	
 	if(Player) 
@@ -1269,8 +1269,8 @@ void ACBossEnemy::Start(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 		if(BossUI)
 		BossUI->AddToViewport();
 		
-		// if(StartCollision)
-		// StartCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		if (StartCollision)
+			StartCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
