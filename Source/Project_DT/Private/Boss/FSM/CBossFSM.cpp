@@ -11,6 +11,7 @@
 #include "NavigationSystem.h"
 #include "Components/CapsuleComponent.h"
 #include "Widget/BossWidget.h"
+#include "Boss/CBossWeapon.h"
 
 UCBossFSM::UCBossFSM()
 {
@@ -113,6 +114,8 @@ void UCBossFSM::DIEState()
 		if (MyBoss->BossUI->IsInViewport())
 		{
 			MyBoss->BossUI->RemoveFromParent();
+			
+			MyBoss->SpawnWeapon->SetActorEnableCollision(ECollisionEnabled::NoCollision);
 		}
 
 		//모든 몽타주 재생을 멈춤
@@ -138,6 +141,12 @@ void UCBossFSM::NONEState()
 	{
 		Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection = 0.0f;
 	}
+
+// 	if (!MyBoss->bUseControllerRotationYaw)
+// 	{
+// 		MyBoss->bUseControllerRotationYaw = true;; // AI 컨트롤러 회전 비활성화
+// 		MyBoss->GetCharacterMovement()->bOrientRotationToMovement = true; // 이동 방향 회전 비활성화
+// 	}
 
 // 	//일정 거리까지는 플레이어를 향해 움직이게 만듦
 // 	if (TargetDist >= 350.0f)
@@ -812,35 +821,77 @@ void UCBossFSM::DASHATTACKState()
 
 void UCBossFSM::COMBOATTACKState()
 {
-	//랜덤값에 따라 콤보 공격이 다르게 나옴
-	switch ( ComboAttackIndex )
+	//콤보 공격 실행 중이 아니라면 일단플레이어한테 다가감
+	if (!MyBoss->AnimInstance->Montage_IsPlaying(MyBoss->AM_ComboAttack_01) || !MyBoss->AnimInstance->Montage_IsPlaying(MyBoss->AM_ComboAttack_02))
 	{
-		case 0:
-			//콤보 공격이 실행중이지 않을경우 콤보공격 실행
-			if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->AM_ComboAttack_01 ) )
+		if (TargetDist >= 150.0f)
+		{
+			AI->MoveToLocation(MyBoss->Target->GetActorLocation());
+		}
+
+		else
+		{
+			//랜덤값에 따라 콤보 공격이 다르게 나옴
+			switch (ComboAttackIndex)
 			{
-				MyBoss->AnimInstance->Montage_Play ( MyBoss->AM_ComboAttack_01 );
+			case 0:
+				//콤보 공격이 실행중이지 않을경우 콤보공격 실행
+				if (!MyBoss->AnimInstance->Montage_IsPlaying(MyBoss->AM_ComboAttack_01))
+				{
+					MyBoss->AnimInstance->Montage_Play(MyBoss->AM_ComboAttack_01);
 
-				//시간 초기화
-				CurComboAttackTime = 0.0f;
+					//시간 초기화
+					CurComboAttackTime = 0.0f;
+				}
+
+				break;
+
+			case 1:
+				//콤보 공격이 실행중이지 않을경우 콤보공격 실행
+				if (!MyBoss->AnimInstance->Montage_IsPlaying(MyBoss->AM_ComboAttack_02))
+				{
+					MyBoss->AnimInstance->Montage_Play(MyBoss->AM_ComboAttack_02);
+
+					//시간 초기화
+					CurComboAttackTime = 0.0f;
+				}
+
+				break;
+
+			default: break;
 			}
-
-		break;
-		
-		case 1:
-			//콤보 공격이 실행중이지 않을경우 콤보공격 실행
-			if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->AM_ComboAttack_02 ) )
-			{
-				MyBoss->AnimInstance->Montage_Play ( MyBoss->AM_ComboAttack_02 );
-
-				//시간 초기화
-				CurComboAttackTime = 0.0f;
-			}
-
-		break;
-		
-		default: break;
+		}
 	}
+
+// 	//랜덤값에 따라 콤보 공격이 다르게 나옴
+// 	switch ( ComboAttackIndex )
+// 	{
+// 		case 0:
+// 			//콤보 공격이 실행중이지 않을경우 콤보공격 실행
+// 			if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->AM_ComboAttack_01 ) )
+// 			{
+// 				MyBoss->AnimInstance->Montage_Play ( MyBoss->AM_ComboAttack_01 );
+// 
+// 				//시간 초기화
+// 				CurComboAttackTime = 0.0f;
+// 			}
+// 
+// 		break;
+// 		
+// 		case 1:
+// 			//콤보 공격이 실행중이지 않을경우 콤보공격 실행
+// 			if ( !MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->AM_ComboAttack_02 ) )
+// 			{
+// 				MyBoss->AnimInstance->Montage_Play ( MyBoss->AM_ComboAttack_02 );
+// 
+// 				//시간 초기화
+// 				CurComboAttackTime = 0.0f;
+// 			}
+// 
+// 		break;
+// 		
+// 		default: break;
+// 	}
 }
 
 void UCBossFSM::COUNTERATTACKState()
@@ -1092,10 +1143,10 @@ void UCBossFSM::BACKSTEPState()
 		{
 			Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping = false;
 
-			SetATKState = ESetATKState::SETATKNONE;
+			SetATKState = ESetATKState::SIDEMOVE;
 			//타이머 써서 일정 시간 지나면 NONE으로 바뀌게
 			
-			GetWorld()->GetTimerManager().SetTimer(SetNONEStateTimerHandle, this, &UCBossFSM::SetNONEState, 2.5f, false);
+			GetWorld()->GetTimerManager().SetTimer(SetSIDEMOVEStateTimerHandle, this, &UCBossFSM::SetSIDEMOVEState, 0.2f, false);
 
 			//AttackState = EBossATTACKState::NONE;
 		}
@@ -1104,12 +1155,107 @@ void UCBossFSM::BACKSTEPState()
 
 void UCBossFSM::SIDEMOVEState()
 {
+	if (!IsSideMoveSetting)
+	{
+		MyBoss->bUseControllerRotationYaw = false; // AI 컨트롤러 회전 비활성화
+		MyBoss->GetCharacterMovement()->bOrientRotationToMovement = false; // 이동 방향 회전 비활성화
 
+		// 현재 Pawn의 위치
+		FVector CurrentLocation = MyBoss->GetActorLocation();
+
+		// 랜덤으로 좌(-1) 또는 우(1) 방향 선택
+		float Direction = FMath::RandBool() ? 1.0f : -1.0f;
+
+		if (Direction >= 0.1f)
+		{
+			Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection = 100;
+		}
+
+		else if (Direction <= -0.1f)
+		{
+			Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection = -100;
+		}
+
+		// 이동할 거리
+		float SideDistance = 550.0f;
+
+		// Pawn의 오른쪽 방향 벡터를 기준으로 좌/우 방향 계산
+		FVector SideVector = MyBoss->GetActorRightVector() * Direction * SideDistance;
+
+		// 목표 위치 계산
+		TargetSideLocation = CurrentLocation + SideVector;
+
+		// 네비게이션 시스템을 통해 유효한 위치로 보정
+		FNavLocation NavLocation;
+		UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(GetWorld());
+		if (NavSystem && NavSystem->ProjectPointToNavigation(TargetSideLocation, NavLocation))
+		{
+			TargetSideLocation = NavLocation.Location;
+
+			//좌우 이동 셋팅이 끝났음을 알림
+			IsSideMoveSetting = true;
+		}
+
+		else
+		{
+			//좌우 이동을 안하고 초기화
+			TotalMoveDistance = 0.0f;
+
+			IsSideMoveSetting = false;
+		}
+	}
+
+	if (IsSideMoveSetting)
+	{
+		// 목표 위치로 이동
+		AI->MoveToLocation(TargetSideLocation);
+
+		// 		if (!MyBoss->bUseControllerRotationYaw)
+		// 		{
+		// 			MyBoss->bUseControllerRotationYaw = true;
+		// 		}
+
+				//회전 뒤집히는거 방지용 거리가 있을때만 플레이어 바라보게
+		if (TargetDist >= 150.0f)
+		{
+			// 플레이어 위치
+			FVector PlayerLocation = MyBoss->Target->GetActorLocation();
+			// 현재 AI 위치
+			FVector AILocation = MyBoss->GetActorLocation();
+			// 플레이어를 향하는 방향 벡터 계산
+			FVector DirectionToPlayer = (PlayerLocation - AILocation).GetSafeNormal();
+			// 방향 벡터를 회전으로 변환 (Yaw만 고려)
+			FRotator LookAtRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
+			// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
+			FRotator NewRotation = FRotator(0.0f, LookAtRotation.Yaw, 0.0f);
+			// 플레이어를 바라보게 고정함
+			MyBoss->SetActorRotation(NewRotation);
+		}
+
+		//만약 이동한 위치랑 얼마 차이가 나지 않으면 다시 플레이어를 향해 움직임
+		if (FVector::Dist(TargetSideLocation, MyBoss->GetActorLocation()) <= 150.0f)
+		{
+			//좌우 이동을 하기전 위치에서 거리값 계산을 막기위해 이동 후 위치를 마지막 위치로 설정
+			LastLocation = MyBoss->GetActorLocation();
+
+			//0으로 되돌려서 다시 플레이어를 향해 움직이게 만듦
+			TotalMoveDistance = 0.0f;
+
+			IsSideMoveSetting = false;
+
+			MyBoss->bUseControllerRotationYaw = true;
+			MyBoss->GetCharacterMovement()->bOrientRotationToMovement = true;
+
+			SetATKState = ESetATKState::SETATKNONE;
+			AttackState = EBossATTACKState::NONE;
+			State = EBossState::ATTACK;
+		}
+	}
 }
 
-void UCBossFSM::SetNONEState()
+void UCBossFSM::SetSIDEMOVEState()
 {
-	AttackState = EBossATTACKState::NONE;
+	SetATKState = ESetATKState::SIDEMOVE;
 }
 
 void UCBossFSM::SetSPDamage(float Damage)

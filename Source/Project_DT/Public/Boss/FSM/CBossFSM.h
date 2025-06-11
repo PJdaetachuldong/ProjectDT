@@ -201,6 +201,6 @@ public:
 	void BACKSTEPState();
 	void SIDEMOVEState();
 
-	FTimerHandle SetNONEStateTimerHandle;
-	void SetNONEState();
+	FTimerHandle SetSIDEMOVEStateTimerHandle;
+	void SetSIDEMOVEState();
 };

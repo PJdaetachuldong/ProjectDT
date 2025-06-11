@@ -81,7 +81,7 @@ void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 			UCWeaponComponent* Weapon = CHelpers::GetComponent<UCWeaponComponent>(Player);
 
 			//만약 플레이어가 패링 감지중이면
-			if (Weapon->GetDoAction()->RetrunParry())
+			if (Weapon->GetDoAction() && Weapon->GetDoAction()->RetrunParry())
 			{
 
 // 				//현재 재생중인 몽타주 멈춤
