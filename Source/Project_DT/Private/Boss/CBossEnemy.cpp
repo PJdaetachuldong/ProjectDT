@@ -1272,7 +1272,7 @@ void ACBossEnemy::OnPlayerHealed()
 	CLog::Log("OnPlayerHealed");
 
 	//다른 공격 모션을 하고 있다면 실행 안되게 막아주기
-	if(FSMComponent->AttackState == EBossATTACKState::NONE)
+	if(FSMComponent->AttackState == EBossATTACKState::NONE || FSMComponent->SetATKState == ESetATKState::SETATKNONE)
 	{ 
 		FSMComponent->State = EBossState::ATTACK;
 		FSMComponent->AttackState = EBossATTACKState::RANGEDATTACK;

@@ -475,6 +475,7 @@ void UCBossFSM::SETATKState()
 	case ESetATKState::SETATKNONE: { SETATKNONEState(); } break;
 	case ESetATKState::BACKSTEP: { BACKSTEPState(); } break;
 	case ESetATKState::SIDEMOVE: { SIDEMOVEState(); } break;
+	case ESetATKState::FRONTMOVE: {FRONTMOVEState();} break;
 	}
 
 	//공격 패턴 우선 순위
@@ -1131,6 +1132,17 @@ void UCBossFSM::BACKSTEPState()
 			AI->MoveToLocation(ProjectedLocation.Location, 150.0f);
 		}
 
+		//유효한 위치가 아니라면
+		else
+		{
+			//앞으로 이동하게 만듦
+			SetATKState=ESetATKState::FRONTMOVE;
+
+			PlayerBackLocation = MyBoss->Target->GetActorLocation() + (ToPlayerDirection * 800);
+
+			/*MyBoss->SetActorLocation(MyBoss->GetActorLocation() + (ToPlayerDirection * 450.0f) * GetWorld()->GetDeltaSeconds());*/
+		}
+
 		// 		// 이동할 거리
 		// 		float BackstepDistance = 300.0f;
 		// 
@@ -1268,6 +1280,26 @@ void UCBossFSM::SIDEMOVEState()
 			AttackState = EBossATTACKState::NONE;
 			State = EBossState::ATTACK;
 		}
+	}
+}
+
+void UCBossFSM::FRONTMOVEState()
+{
+	//뒤로 이동할 수 없는 상태이면 앞으로 빠르게 이동하게 만듦
+	if (MyBoss->GetCharacterMovement()->MaxWalkSpeed == 200.0f)
+	{
+		MyBoss->GetCharacterMovement()->MaxWalkSpeed = 700.0f;
+	}
+
+	AI->MoveToLocation(PlayerBackLocation);
+
+	if (FVector::Dist(PlayerBackLocation, MyBoss->GetActorLocation()) <= 100.0f)
+	{
+		MyBoss->GetCharacterMovement()->MaxWalkSpeed = 200.0f;
+
+		SetATKState = ESetATKState::SETATKNONE;
+		AttackState = EBossATTACKState::NONE;
+		State = EBossState::ATTACK;
 	}
 }
 

@@ -31,7 +31,8 @@ enum class ESetATKState : uint8
 {
 	SETATKNONE UMETA(DisplayName = "SETATKNONE"),
 	BACKSTEP UMETA(DisplayName = "BACKSTEP"),
-	SIDEMOVE UMETA(DisplayName = "SIDEMOVE")
+	SIDEMOVE UMETA(DisplayName = "SIDEMOVE"),
+	FRONTMOVE UMETA(DisplayName = "FRONTMOVE")
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -163,6 +164,9 @@ public:
 	//어느 콤보 공격을 할지 저장하는 변수
 	int32 ComboAttackIndex;
 
+	//플레이어 뒷 위치 저장
+	FVector PlayerBackLocation;
+
 	//콤보공격이 될때 어떤 콤보 공격을 하지 같이 받는 함수
 	void SetCOMBOATTACKState(int32 RandomComboAttack);
 	
@@ -200,6 +204,7 @@ public:
 	void SETATKNONEState();
 	void BACKSTEPState();
 	void SIDEMOVEState();
+	void FRONTMOVEState();
 
 	FTimerHandle SetSIDEMOVEStateTimerHandle;
 	void SetSIDEMOVEState();
