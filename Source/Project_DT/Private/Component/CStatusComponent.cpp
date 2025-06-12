@@ -17,6 +17,8 @@ void UCStatusComponent::BeginPlay ( )
 
 	Health = MaxHealth;
 	Mana = 0;
+
+
 }
 
 float UCStatusComponent::Damage ( float InAmount )

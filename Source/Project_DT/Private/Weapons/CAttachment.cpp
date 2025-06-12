@@ -124,6 +124,8 @@ void ACAttachment::Tick(float DeltaTime)
 			if (EnemyActor == Enemy)return;
 			EnemyActor = Enemy;
 			Enemy->Hit(GetName());
+			if (OnAttachmentBeginOverdwwwwwwwwwwwwwwwwwwlap.IsBound())
+				OnAttachmentBeginOverlap.Broadcast(OwnerCharacter, this, Cast<ACharacter>(Hit.GetActor()));
 			GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Yellow, FString::Printf(TEXT("Hit: %s"), *Hit.GetActor()->GetName()));
 			Status=CHelpers::GetComponent<UCStatusComponent>(OwnerCharacter);
 			Status->RecoverMana(5);
@@ -249,7 +251,6 @@ void ACAttachment::OnComponentBeginOverlap ( UPrimitiveComponent* OverlappedComp
 {
 	CheckTrue ( OwnerCharacter == OtherActor );
 	CheckTrue ( OwnerCharacter->GetClass ( ) == OtherActor->GetClass ( ) );
-
 }
 
 void ACAttachment::OnComponentEndOverlap ( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex )

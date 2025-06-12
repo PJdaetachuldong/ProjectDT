@@ -17,9 +17,18 @@ class PROJECT_DT_API UCGameOverWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
+	void PlayGameOverAnimation();
+
+private:
+	UFUNCTION()
+	void EndGameOverAnimation();
+
 public:
 	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
 	class UWidgetAnimation* GameOverPadeIn;
+
+private:
+	class ACharacter* OwnerCharacter;
 	
 	
 };

@@ -4,8 +4,11 @@
 #include "Component/CMointageComponent.h"
 #include "GameFramework/Character.h"
 #include "Global.h"
+#include "LHW_GameModeBase.h"
 #include "Component/CStateComponent.h"
 #include "Component/CStatusComponent.h"
+#include "GameFramework/GameModeBase.h"
+#include "Widget/CGameOverWidget.h"
 
 // Sets default values for this component's properties
 UCMointageComponent::UCMointageComponent()
@@ -13,6 +16,8 @@ UCMointageComponent::UCMointageComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	CHelpers::GetClass(&GameOverClass,AssetPaths::GameOverWidget);
+	
 
 	// ...
 }
@@ -29,7 +34,7 @@ void UCMointageComponent::BeginPlay ( )
 	OwnerCharacter = Cast<ACharacter> ( GetOwner ( ) );
 	State = CHelpers::GetComponent<UCStateComponent>(OwnerCharacter);
 	Status = CHelpers::GetComponent<UCStatusComponent>(OwnerCharacter);
-
+	GameOver=CreateWidget<UCGameOverWidget>(GetWorld(),GameOverClass);
 
 
 	TArray<FMontagesData*> datas;
@@ -82,10 +87,11 @@ void UCMointageComponent::PlayDeadMode ( )
 	FTimerHandle handler;
 
 	OwnerCharacter->DisableInput(nullptr);
-	GetWorld()->GetTimerManager().SetTimer(handler,[this]() {
-		Respawn();
-		}, 2,false);
-
+	isDead=true;
+	DieDelegate.Broadcast();
+	GameOver->AddToViewport();
+	GameOver->PlayGameOverAnimation();
+	
 }
 
 void UCMointageComponent::PlayEquipMode ( )
@@ -127,6 +133,8 @@ void UCMointageComponent::Respawn()
 	State->SetIdleMode();
 	Status->Heal(100);
 	Status->UseMana(100);
+	isDead=false;
+		
 	}
 }
 

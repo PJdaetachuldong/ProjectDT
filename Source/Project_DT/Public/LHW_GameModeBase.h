@@ -62,5 +62,7 @@ private:
 	
 	UPROPERTY(EditAnywhere)
 	class UCMapWidget* MapWidget;
+
+
 	
 };
