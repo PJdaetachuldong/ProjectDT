@@ -1008,6 +1008,9 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 					{
 						//가드 중 카운터 공격이 나오도록 섹션 점프
 						AnimInstance->Montage_JumpToSection(FName("Counter"), AM_ShieldHit);
+
+						//맞은 횟수 초기화
+						ShieldHitCount = 0;
 					}
 				}
 			}
@@ -1148,6 +1151,9 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 						{
 							//가드 중 카운터 공격이 나오도록 섹션 점프
 							AnimInstance->Montage_JumpToSection(FName("Counter"), AM_ShieldHit);
+
+							//맞은 횟수 초기화
+							ShieldHitCount = 0;
 						}
 					}
 				}
@@ -1565,6 +1571,8 @@ void ACBossEnemy::OnPlayerHealed()
 	//다른 공격 모션을 하고 있다면 실행 안되게 막아주기
 	if(FSMComponent->AttackState == EBossATTACKState::NONE || FSMComponent->SetATKState == ESetATKState::SETATKNONE)
 	{ 
+		if(AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) == FName("Counter")) return;
+
 		FSMComponent->State = EBossState::ATTACK;
 		FSMComponent->AttackState = EBossATTACKState::RANGEDATTACK;
 	}

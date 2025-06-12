@@ -43,6 +43,8 @@ void ACRangeAttack::Tick(float DeltaTime)
 	//현재 가시성이 활성화 된 상태에서만 실행됨
 // 	if ( MeshComp->IsVisible())
 // 	{
+	
+	if(!MyBoss) return;
 		//해당 방향을 향해 계속 앞으로 날아가게 만들어야 함
 		SetActorLocation(GetActorLocation() + (Direction * ThrowSpeed) * DeltaTime);
 
@@ -113,6 +115,8 @@ void ACRangeAttack::OverlapPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 
 void ACRangeAttack::HitPlayer()
 {
+	if(MyBoss == nullptr) return;
+
 	if (MyBoss)
 	{
 		//가드가 가능한 공격일 경우

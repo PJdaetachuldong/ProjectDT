@@ -28,10 +28,10 @@ ACBossWeapon::ACBossWeapon()
 		/*SwordMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_Socket"));*/
 
 		SwordCollComp = CreateDefaultSubobject<UBoxComponent>(L"SwordCollision");
+		SwordCollComp->SetBoxExtent(FVector(10, 48, 10));
 		SwordCollComp->OnComponentBeginOverlap.AddDynamic(this, &ACBossWeapon::WeaponOverlap);
 		SwordCollComp->SetCollisionProfileName(FName("BossWeapon"));
 		SwordCollComp->AttachToComponent(SwordMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Collision_Socket"));
-		SwordCollComp->SetBoxExtent(FVector(10, 48, 10));
 		//공격 판정 콜리전 비활성화
 		SwordCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}

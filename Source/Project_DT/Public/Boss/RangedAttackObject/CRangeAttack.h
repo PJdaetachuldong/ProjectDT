@@ -23,6 +23,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Boss)
 	class ACBossEnemy* MyBoss;
 
 // 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -41,7 +42,7 @@ public:
 	float CurLifeTime = 0.0f;
 
 	//살 수 있는 생존 시간
-	float LimitLifeTime = 5.5f;
+	float LimitLifeTime = 3.0f;
 
 	//타겟을 향해 날아가는 방향을 저장하는 변수
 	FVector Direction;
