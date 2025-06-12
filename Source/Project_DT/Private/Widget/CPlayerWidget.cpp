@@ -27,6 +27,12 @@ void UCPlayerWidget::NativeConstruct()
 	
 	KatanaStartDelegate.BindDynamic(this,&UCPlayerWidget::CancelHandler);
 	GreatSwordStartDelegate.BindDynamic(this,&UCPlayerWidget::CancelHandler);
+
+	WeaponChangeEnd.BindDynamic(this,&UCPlayerWidget::TurnOnLight);
+
+	BindToAnimationFinished(WeaponGageRotationKatana, WeaponChangeEnd);
+	BindToAnimationFinished(WeaponGageRotationGreatSword, WeaponChangeEnd);
+	
 	
 	BindToAnimationFinished(SelectSecondAnimation, KatanaEndDelegate);
 	BindToAnimationFinished(SelectThirdAnimation, GreatSwordEndDelegate);
@@ -45,19 +51,46 @@ void UCPlayerWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 		IsAllowChangeWeapon=true;
 	else
 		IsAllowChangeWeapon=false;
+	// Red HP 부드럽게 감소
+	if (!FMath::IsNearlyEqual(Red_Hp, TargetRed_Hp, 0.001f))
+	{
+		Red_Hp = FMath::Lerp(Red_Hp, TargetRed_Hp, DeltaTime * RedHpLerpSpeed);
+		if (Player_HP_Red)
+		{
+			Player_HP_Red->SetPercent(Red_Hp);
+		}
+	}
+
+	// Dark HP 더 느리게 감소
+	if (!FMath::IsNearlyEqual(Dark_Hp, TargetDark_Hp, 0.001f))
+	{
+		Dark_Hp = FMath::Lerp(Dark_Hp, TargetDark_Hp, DeltaTime * DarkHpLerpSpeed);
+		if (Player_HP_Dark)
+		{
+			Player_HP_Dark->SetPercent(Dark_Hp);
+		}
+	}
+
+	// Sword Mana 부드럽게 감소
+	if (!FMath::IsNearlyEqual(Sword_Mana, TargetMana, 0.001f))
+	{
+		Sword_Mana = FMath::Lerp(Sword_Mana, TargetMana, DeltaTime * ManaLerpSpeed);
+		if (Sword_Energy)
+		{
+			Sword_Energy->SetPercent(Sword_Mana);
+		}
+	}
 }
 
 void UCPlayerWidget::SetHpProgessBar(float HP)
 {
-	float hp = FMath::Clamp(HP / 100, 0.0f, 1.0f);
-	Dark_Hp=hp;
-	Red_Hp=hp;
+	TargetRed_Hp = FMath::Clamp(HP / 100.0f, 0.0f, 1.0f);
+	TargetDark_Hp = TargetRed_Hp;
 }
 
 void UCPlayerWidget::SetManaProgessBar(float Mana)
 {
-	float mana = FMath::Clamp(Mana / 100, 0.0f, 1.0f);
-	Sword_Mana=mana;
+	TargetMana = FMath::Clamp(Mana / 100.0f, 0.0f, 1.0f);
 }
 
 void UCPlayerWidget::FadeInSelectWindow()
@@ -67,7 +100,7 @@ void UCPlayerWidget::FadeInSelectWindow()
 
 void UCPlayerWidget::FadeOutSelectWindow()
 {
-	if (WeaponSelect->GetRenderOpacity()>0.1f)
+	if (WeaponSelect->GetRenderOpacity()>0.01f)
 		PlayAnimationReverse(WeaponSelectPadeAnimation);
 }
 
@@ -106,6 +139,11 @@ void UCPlayerWidget::GreatSwordEndSelect()
 void UCPlayerWidget::CancelHandler()
 {
 	IsCancelWidget=true;
+}
+
+void UCPlayerWidget::TurnOnLight()
+{
+	PlayAnimation(LightOnOff, 0.f, 1, EUMGSequencePlayMode::Forward, 1.0f);
 }
 
 void UCPlayerWidget::ShowStatusUI()

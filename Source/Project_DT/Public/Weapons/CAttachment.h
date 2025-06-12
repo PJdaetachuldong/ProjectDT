@@ -30,15 +30,18 @@ protected:
 
 	virtual void Tick(float DeltaTime) override;
 public:
-	UFUNCTION( BlueprintImplementableEvent )
+	UFUNCTION()
 	void OnBeginEquip();
-	UFUNCTION (BlueprintImplementableEvent)
+	UFUNCTION ()
 	void OnUnequip ( );
 
 
 protected:
 	UFUNCTION(BlueprintCallable,Category="Attach")
 	void AttachTo(FName InSocketName);
+
+	UFUNCTION(BlueprintCallable,Category="Attach")
+	void SpawnWeapon();
 
 public:
 	void OnCollisions ( );
@@ -67,6 +70,9 @@ protected:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class USkeletalMeshComponent* SkeletalMesh;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class USkeletalMeshComponent* ColorMesh;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class UNiagaraSystem* HitEffect;
 
@@ -89,4 +95,7 @@ private:
 	bool bInitialized = false;
 
 	class AActor* EnemyActor;
+
+	FTimerHandle ScaleTimerHandle;
+	float ScaleTime;
 };

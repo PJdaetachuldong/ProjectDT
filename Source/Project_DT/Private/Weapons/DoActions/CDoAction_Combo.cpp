@@ -7,8 +7,6 @@
 #include "Engine/DamageEvents.h"
 void UCDoAction_Combo::DoAction ()
 {
-	CLog::Log ( bParry );
-
 	CheckTrue ( DoActionDatas.Num ( ) < 1 );
 	//CheckTrue ( State->IsSubActionMode ( ) );
 

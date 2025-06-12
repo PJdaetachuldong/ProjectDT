@@ -3,6 +3,9 @@
 
 #include "LHW_GameModeBase.h"
 #include "Global.h"
+#include "Component/CMointageComponent.h"
+#include "Component/CStatusComponent.h"
+#include "Widget/CGameOverWidget.h"
 #include "Widget/CIntroWidget.h"
 #include "Widget/CLoadingWidget.h"
 #include "Widget/CPlayerWidget.h"
@@ -60,11 +63,14 @@ void ALHW_GameModeBase::CreateCharacterUI()
 {
 	PlayerWidget= CHelpers::GetWidget<UCPlayerWidget>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	PlayerWidget->AddToViewport();
+
+	auto* Status= CHelpers::GetComponent<UCStatusComponent>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	Status->Heal(100);
+	// Status->Damage(100);
+	Status->UseMana(100);
 	
-	//이부분 원할때 변경
 	FTimerHandle Handler;
-	GetWorld()->GetTimerManager().SetTimer(Handler,[this](){CreateScriptUI();},20,false,false);
-	
+	// GetWorld()->GetTimerManager().SetTimer(Handler,[this](){CreateScriptUI();},20,false,false);
 }
 
 void ALHW_GameModeBase::CreateScriptUI()

@@ -28,11 +28,14 @@ public:
 	UPROPERTY(EditAnywhere)
 		float PlayRate = 1;
 };
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDieDelegate);
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECT_DT_API UCMointageComponent : public UActorComponent
 {
 	GENERATED_BODY()
+
+public:
+	FOnDieDelegate DieDelegate;
 private:
 	UPROPERTY(EditAnywhere, Category = "DataTable")
 		UDataTable* DataTable;
@@ -69,5 +72,15 @@ private:
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FVector RespawnPosition=FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> GameOverClass;
+
+public:
+	UPROPERTY(EditAnywhere)
+	class UCGameOverWidget* GameOver;
+
+public:
+	bool isDead=false;
 
 };

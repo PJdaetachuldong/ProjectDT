@@ -12,9 +12,18 @@
 // Sets default values
 ACAttachment::ACAttachment()
 {
-	CHelpers::CreateComponent ( this , &Root , "Root" );
+	CHelpers::CreateComponent<USkeletalMeshComponent>(this, &ColorMesh, "ColorMesh");
 	CHelpers::CreateComponent<USkeletalMeshComponent>(this, &SkeletalMesh, "SkeletalMesh");
+	CHelpers::CreateComponent ( this , &Root , "Root" );
+	SetRootComponent(Root);
+	SkeletalMesh->SetupAttachment(Root);
+	ColorMesh->SetupAttachment(Root);
+	
 	SkeletalMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ColorMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	SkeletalMesh->SetVisibility(false);
+	ColorMesh->SetRelativeScale3D(FVector::ZeroVector);
 
 
 	PrimaryActorTick.bCanEverTick = true;
@@ -42,7 +51,6 @@ void ACAttachment::BeginPlay()
 	}
 
 	Super::BeginPlay ( );
-
 }
 
 void ACAttachment::Tick(float DeltaTime)
@@ -116,6 +124,8 @@ void ACAttachment::Tick(float DeltaTime)
 			if (EnemyActor == Enemy)return;
 			EnemyActor = Enemy;
 			Enemy->Hit(GetName());
+			if (OnAttachmentBeginOverdwwwwwwwwwwwwwwwwwwlap.IsBound())
+				OnAttachmentBeginOverlap.Broadcast(OwnerCharacter, this, Cast<ACharacter>(Hit.GetActor()));
 			GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Yellow, FString::Printf(TEXT("Hit: %s"), *Hit.GetActor()->GetName()));
 			Status=CHelpers::GetComponent<UCStatusComponent>(OwnerCharacter);
 			Status->RecoverMana(5);
@@ -141,9 +151,75 @@ void ACAttachment::Tick(float DeltaTime)
 	// DrawDebugBox(GetWorld(), PrevEndLocation, FVector(2.f), FColor::Magenta, false, 0.1f);
 }
 
+void ACAttachment::OnBeginEquip()
+{
+	SpawnWeapon();
+}
+
+void ACAttachment::OnUnequip()
+{
+	SkeletalMesh->SetVisibility(false);
+	ColorMesh->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f)); // 초기 스케일 1
+	ScaleTime = 0.0f; // 시간 초기화
+
+	auto UpdateScale = [this]()
+	{
+		if (!ColorMesh) return;
+
+		// 시간 업데이트
+		ScaleTime += 0.02f; // 타이머 간격만큼 시간 증가
+		float Alpha = FMath::Clamp(ScaleTime / 0.4f, 0.0f, 1.0f); // 0~1로 보간
+
+		// 스케일 Lerp (1에서 0으로)
+		FVector NewScale = FMath::Lerp(FVector(1.0f, 1.0f, 1.0f), FVector(0.0f, 0.0f, 0.0f), Alpha);
+		ColorMesh->SetRelativeScale3D(NewScale);
+
+		// 0.4초가 지나면 타이머 종료
+		if (ScaleTime >= 0.4f)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(ScaleTimerHandle);
+			ColorMesh->SetRelativeScale3D(FVector(0.0f, 0.0f, 0.0f)); // 최종 스케일 고정
+		}
+	};
+
+	// 타이머 시작 (0.02초마다 UpdateScale 호출)
+	GetWorld()->GetTimerManager().SetTimer(ScaleTimerHandle, UpdateScale, 0.02f, true);
+}
+
 void ACAttachment::AttachTo ( FName InSocketName )
 {
 	AttachToComponent ( OwnerCharacter->GetMesh ( ) , FAttachmentTransformRules ( EAttachmentRule::KeepRelative , true ) , InSocketName );
+}
+
+void ACAttachment::SpawnWeapon()
+{
+	ColorMesh->SetRelativeScale3D(FVector(0.0f, 0.0f, 0.0f)); // 초기 스케일 0
+	ScaleTime = 0.0f; // 시간 초기화
+	auto UpdateScale = [this]()
+	{
+		if (!ColorMesh) return;
+
+		// 시간 업데이트
+		ScaleTime += 0.02f; // 타이머 간격만큼 시간 증가
+		float Alpha = FMath::Clamp(ScaleTime / 2.0f, 0.0f, 2.0f); // 0~1로 보간
+
+		// 스케일 Lerp
+		FVector NewScale = FMath::Lerp(FVector(0.0f, 0.0f, 0.0f), FVector(1.0f, 1.0f, 1.0f), Alpha);
+		ColorMesh->SetRelativeScale3D(NewScale);
+
+		// 1초가 지나면 타이머 종료
+		if (ScaleTime >= 2.0f)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(ScaleTimerHandle);
+			ColorMesh->SetRelativeScale3D(FVector(.0f, .0f, .0f)); // 최종 스케일 고정
+			SkeletalMesh->SetVisibility(true);
+		}
+	};
+	// 타이머 시작 (0.02초마다 UpdateScale 호출)
+	GetWorld()->GetTimerManager().SetTimer(ScaleTimerHandle,UpdateScale, 0.02f, true);
+	
+	
+	
 }
 
 void ACAttachment::OnCollisions ( )
@@ -175,7 +251,6 @@ void ACAttachment::OnComponentBeginOverlap ( UPrimitiveComponent* OverlappedComp
 {
 	CheckTrue ( OwnerCharacter == OtherActor );
 	CheckTrue ( OwnerCharacter->GetClass ( ) == OtherActor->GetClass ( ) );
-
 }
 
 void ACAttachment::OnComponentEndOverlap ( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex )

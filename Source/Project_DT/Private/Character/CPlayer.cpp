@@ -309,6 +309,7 @@ void ACPlayer::End_BackStep()
 
 void ACPlayer::Hitted()
 {
+	if (Montages->isDead)return;
 	if (Weapon->GetDoAction())
 		if (Weapon->GetDoAction()->RetrunParry())return;
 	

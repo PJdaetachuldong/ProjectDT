@@ -17,6 +17,7 @@ class PROJECT_DT_API UCPlayerWidget : public UUserWidget
 	FWidgetAnimationDynamicEvent GreatSwordEndDelegate;
 	FWidgetAnimationDynamicEvent KatanaStartDelegate;
 	FWidgetAnimationDynamicEvent GreatSwordStartDelegate;
+	FWidgetAnimationDynamicEvent WeaponChangeEnd;
 public:
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float DeltaTime) override;
@@ -37,6 +38,8 @@ public:
 	void GreatSwordEndSelect();
 	UFUNCTION()
 	void CancelHandler();
+	UFUNCTION()
+	void TurnOnLight();
 
 	void ShowStatusUI();
 	void ShowQuestUI();
@@ -85,6 +88,8 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
 	class UWidgetAnimation* QuestFadeIn;
+	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
+	class UWidgetAnimation* LightOnOff;
 
 private:
 	UFUNCTION()
@@ -100,10 +105,22 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "UI")
 	float Red_Hp=1.0;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "UI")
-	float Sword_Mana=1.0;
+	float Sword_Mana=0.0;
+	float TargetRed_Hp;
+	float TargetDark_Hp;
+	float TargetMana;
 
 private:
 	bool IsAllowChangeWeapon=false;
 	bool IsCancelWidget=false;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	float RedHpLerpSpeed = 5.0f; // 빨간 체력바 감소 속도 (빠름)
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	float DarkHpLerpSpeed = 0.5f; // 다크 체력바 감소 속도 (느림)
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	float ManaLerpSpeed = 4.0f;
 
 };
