@@ -123,8 +123,8 @@ void ACAttachment::Tick(float DeltaTime)
 			ACEnemyBase* Enemy = Cast<ACEnemyBase>(Hit.GetActor());
 			if (EnemyActor == Enemy)return;
 			EnemyActor = Enemy;
-			Enemy->Hit(GetName());
-			if (OnAttachmentBeginOverdwwwwwwwwwwwwwwwwwwlap.IsBound())
+			/*Enemy->Hit(GetName());*/
+			if (OnAttachmentBeginOverlap.IsBound())
 				OnAttachmentBeginOverlap.Broadcast(OwnerCharacter, this, Cast<ACharacter>(Hit.GetActor()));
 			GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Yellow, FString::Printf(TEXT("Hit: %s"), *Hit.GetActor()->GetName()));
 			Status=CHelpers::GetComponent<UCStatusComponent>(OwnerCharacter);
