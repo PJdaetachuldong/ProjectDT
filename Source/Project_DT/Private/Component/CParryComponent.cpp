@@ -150,6 +150,7 @@ FTimerHandle PH;
 //	false
 //);
 	bIsGuarding = true;
+	State->SetGuardMode();
 
 	// 반복적인 스피어 트레이스 시작
 	GetWorld()->GetTimerManager().SetTimer(
@@ -165,6 +166,8 @@ void UCParryComponent::OffGuard()
 {
 
 	bIsGuarding = false;
+	State->SetIdleMode();
+	
 
 	// 타이머 종료
 	GetWorld()->GetTimerManager().ClearTimer(GuardTraceTimer);

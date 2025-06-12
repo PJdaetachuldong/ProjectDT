@@ -15,10 +15,13 @@ void UCAnimNotifyState_Guard::NotifyBegin(USkeletalMeshComponent* MeshComp, UAni
 	CheckNull(MeshComp);
 	CheckNull(MeshComp->GetOwner());
 	UCParryComponent* Parry= CHelpers::GetComponent<UCParryComponent>(MeshComp->GetOwner());
+	UCStateComponent* State= CHelpers::GetComponent<UCStateComponent>(MeshComp->GetOwner());
 
 	CheckNull(Parry);
+	CheckNull(State);
 
 	Parry->OnGuard();
+	State->SetGuardMode();
 
 }
 
@@ -27,8 +30,12 @@ void UCAnimNotifyState_Guard::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimS
 	Super::NotifyEnd(MeshComp, Animation);
 	CheckNull(MeshComp->GetOwner());
 	UCParryComponent* Parry = CHelpers::GetComponent<UCParryComponent>(MeshComp->GetOwner());
+	UCStateComponent* State= CHelpers::GetComponent<UCStateComponent>(MeshComp->GetOwner());
 
 	CheckNull(Parry);
+	CheckNull(State);
+	
+	State->SetIdleMode();
 
 	Parry->OffGuard();
 }
