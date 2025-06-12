@@ -20,7 +20,6 @@ void UCAnimNotifyState_Guard::NotifyBegin(USkeletalMeshComponent* MeshComp, UAni
 	CheckNull(Parry);
 	CheckNull(State);
 
-	Parry->OnGuard();
 	State->SetGuardMode();
 
 }
@@ -37,5 +36,4 @@ void UCAnimNotifyState_Guard::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimS
 	
 	State->SetIdleMode();
 
-	Parry->OffGuard();
 }

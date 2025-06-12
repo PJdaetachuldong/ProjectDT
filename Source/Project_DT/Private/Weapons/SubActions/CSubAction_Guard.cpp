@@ -13,7 +13,6 @@ void UCSubAction_Guard::Pressed ( )
 {
 	CheckTrue ( State->IsHittedMode());
 	CheckTrue ( State->IsSubActionMode ( ) );
-	CheckTrue ( State->IsGuardMode());
 	Super::Pressed();
 
 	State->SetActionMode ( );

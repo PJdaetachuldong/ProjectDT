@@ -201,14 +201,14 @@ void ACAttachment::SpawnWeapon()
 
 		// 시간 업데이트
 		ScaleTime += 0.02f; // 타이머 간격만큼 시간 증가
-		float Alpha = FMath::Clamp(ScaleTime / 2.0f, 0.0f, 2.0f); // 0~1로 보간
+		float Alpha = FMath::Clamp(ScaleTime / 1.0f, 0.0f, 1.0f); // 0~1로 보간
 
 		// 스케일 Lerp
 		FVector NewScale = FMath::Lerp(FVector(0.0f, 0.0f, 0.0f), FVector(1.0f, 1.0f, 1.0f), Alpha);
 		ColorMesh->SetRelativeScale3D(NewScale);
 
 		// 1초가 지나면 타이머 종료
-		if (ScaleTime >= 2.0f)
+		if (ScaleTime >= 1.0f)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(ScaleTimerHandle);
 			ColorMesh->SetRelativeScale3D(FVector(.0f, .0f, .0f)); // 최종 스케일 고정

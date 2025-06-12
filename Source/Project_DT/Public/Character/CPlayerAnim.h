@@ -30,6 +30,8 @@ protected:
 	EWeaponType WeaponType = EWeaponType::Max;
 	UPROPERTY ( BlueprintReadOnly , EditAnywhere , Category = "Animation" )
 	EStateType StateType = EStateType::Max;
+	UPROPERTY ( BlueprintReadOnly , EditAnywhere , Category = "Animation" )
+	bool isGuardHit;
 
 
 public:

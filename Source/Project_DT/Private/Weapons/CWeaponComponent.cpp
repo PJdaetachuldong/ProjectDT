@@ -153,16 +153,17 @@ void UCWeaponComponent::DoHeavyAction ( )
 void UCWeaponComponent::SubAction_Pressed()
 {
 	//if ( !bCanParry ) return;
-	State = CHelpers::GetComponent<UCStateComponent> ( OwnerCharacter );
+	// State = CHelpers::GetComponent<UCStateComponent> ( OwnerCharacter );
+	//
+	// //CheckFalse ( State->IsIdleMode ( ) );
+	//
+	// if (!!GetSubAction())
+	// 	GetSubAction()->Pressed();
+	//
+	// UCParryComponent* parry = CHelpers::GetComponent<UCParryComponent>(OwnerCharacter);
+	// CheckNull(parry);
 
-	//CheckFalse ( State->IsIdleMode ( ) );
-
-	if (!!GetSubAction())
-		GetSubAction()->Pressed();
-
-	UCParryComponent* parry = CHelpers::GetComponent<UCParryComponent>(OwnerCharacter);
-	CheckNull(parry);
-
+	State->SetGuardMode();
 
 
 
@@ -170,12 +171,13 @@ void UCWeaponComponent::SubAction_Pressed()
 
 void UCWeaponComponent::SubAction_Released ( )
 {
+	State->SetIdleMode();
 
-	if ( !!GetSubAction ( ) )
-		GetSubAction ( )->Released ( );
-
-	UCParryComponent* parry = CHelpers::GetComponent<UCParryComponent> ( OwnerCharacter );
-	CheckNull ( parry );
+	// if ( !!GetSubAction ( ) )
+	// 	GetSubAction ( )->Released ( );
+	//
+	// UCParryComponent* parry = CHelpers::GetComponent<UCParryComponent> ( OwnerCharacter );
+	// CheckNull ( parry );
 	//parry->OffParryCollision ( );
 
 }
@@ -197,7 +199,6 @@ void UCWeaponComponent::OnParry ( EParryState ParryState )
 {
 	if ( !!GetDoAction())
 		GetDoAction ( )->DoActionParry ( ParryState );
-
 }
 
 void UCWeaponComponent::SetMode ( EWeaponType InType )

@@ -18,8 +18,9 @@ void UCAnimNotifyState_ParryCollision::NotifyBegin ( USkeletalMeshComponent* Mes
 	CheckNull ( MeshComp->GetOwner ( ) );
 
 	UCWeaponComponent* weapon = CHelpers::GetComponent<UCWeaponComponent> ( MeshComp->GetOwner ( ) );
-	CheckNull ( weapon );
-	CheckNull ( weapon->GetDoAction ( ) );
+	UCParryComponent* Parry = CHelpers::GetComponent<UCParryComponent> ( MeshComp->GetOwner ( ) );
+	CheckNull ( Parry );
+	
 
 	weapon->GetDoAction ( )->Begin_Parry ( );
 }
