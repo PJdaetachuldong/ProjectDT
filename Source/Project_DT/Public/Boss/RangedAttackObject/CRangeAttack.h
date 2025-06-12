@@ -23,20 +23,19 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
-	class UBoxComponent* BoxComp;
+	class ACBossEnemy* MyBoss;
 
-	UPROPERTY(EditAnywhere)
-	class UArrowComponent* ArrowComp;
+// 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+// 	class UBoxComponent* BoxComp;
 
-	void SetDirection(FVector ToPlayerDirection);
+	void SetDirectionAndBoss(FVector ToPlayerDirection, ACBossEnemy* Who);
 
 // 	UPROPERTY(EditAnywhere)
 // 	UStaticMeshComponent* MeshComp;
 
 	//던져질때 속도
 	UPROPERTY(EditAnywhere )
-	float ThrowSpeed = 2700.0f;
+	float ThrowSpeed = 1300.0f;
 
 	//현재 자신이 살아 있는 시간을 체크
 	float CurLifeTime = 0.0f;
@@ -50,5 +49,9 @@ public:
 // 	//콜리전과 외형을 비활성화 변환 시켜주는 함수 
 // 	void SetActive(bool Value, FVector DirectionToTarget);
 
-	void OverlapOther(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OverlapPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintCallable, Category = Hit)
+	void HitPlayer();
 };

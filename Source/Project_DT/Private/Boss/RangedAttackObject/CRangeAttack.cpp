@@ -4,6 +4,12 @@
 #include "Boss/RangedAttackObject/CRangeAttack.h"
 #include "Components/BoxComponent.h"
 #include "Components/ArrowComponent.h"
+#include "Weapons/CWeaponComponent.h"
+#include "Character/CPlayer.h"
+#include "Global.h"
+#include "Boss/CBossWeapon.h"
+#include "Boss/CBossEnemy.h"
+#include "Weapons/CDoAction.h"
 
 // Sets default values
 ACRangeAttack::ACRangeAttack()
@@ -11,11 +17,11 @@ ACRangeAttack::ACRangeAttack()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	BoxComp = CreateDefaultSubobject<UBoxComponent>(L"BoxCollision");
-	SetRootComponent(BoxComp);
-	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &ACRangeAttack::OverlapOther);
-
-	ArrowComp = CreateDefaultSubobject<UArrowComponent>(L"Arrow");
+// 	BoxComp = CreateDefaultSubobject<UBoxComponent>(L"RangedATKCollision");
+// 	SetRootComponent(BoxComp);
+// 	
+// 	BoxComp->SetCollisionProfileName(FName("BossWeapon"));
+// 	BoxComp->SetBoxExtent(FVector(221, 23, 217));
 
 // 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(L"MeshComp");
 // 	MeshComp->SetupAttachment(RootComponent);
@@ -26,6 +32,7 @@ void ACRangeAttack::BeginPlay()
 {
 	Super::BeginPlay();
 	
+/*	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &ACRangeAttack::OverlapPlayer);*/
 }
 
 // Called every frame
@@ -53,9 +60,85 @@ void ACRangeAttack::Tick(float DeltaTime)
 /*	}*/
 }
 
-void ACRangeAttack::SetDirection(FVector ToPlayerDirection)
+void ACRangeAttack::SetDirectionAndBoss(FVector ToPlayerDirection, ACBossEnemy* Who)
 {
+	MyBoss = Who;
 	Direction = ToPlayerDirection;
+
+	// 방향 벡터를 회전으로 변환 (Yaw만 고려)
+	FRotator LookAtRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
+	// Z축 회전(Yaw)만 적용하여 캐릭터가 플레이어를 향하도록 설정
+	FRotator NewRotation = FRotator(LookAtRotation);
+
+	SetActorRotation(NewRotation);
+}
+
+void ACRangeAttack::OverlapPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+// 	ACPlayer* Player = Cast<ACPlayer>(OtherActor);
+// 
+// 	if (Player && MyBoss)
+// 	{
+// 		//가드가 가능한 공격일 경우
+// 		if (MyBoss->SpawnWeapon->IsGuard)
+// 		{
+// 			UCWeaponComponent* Weapon = CHelpers::GetComponent<UCWeaponComponent>(Player);
+// 
+// 			//만약 플레이어가 패링 감지중이면
+// 			if (Weapon->GetDoAction() && Weapon->GetDoAction()->RetrunParry())
+// 			{
+// 				return;
+// 			}
+// 
+// 			// 사용자 정의 데미지 이벤트 생성
+// 			MyBoss->HitData->HitDatas[MyBoss->SpawnWeapon->HitNumber].SendDamage(MyBoss, MyBoss->SpawnWeapon, Player);
+// 		}
+// 
+// 		//가드 불가능 공격일 경우
+// 		else
+// 		{
+// 			//필살기 첫번째 공격일 경우
+// 			if (MyBoss->AnimInstance->Montage_IsPlaying(MyBoss->AM_SPAttack))
+// 			{
+// 				MyBoss->IsSPFirstATKHit = true;
+// 			}
+// 
+// 			//무조건 사용자 정의 데미지 이벤트 생성
+// 			MyBoss->HitData->HitDatas[MyBoss->SpawnWeapon->HitNumber].SendDamage(MyBoss, MyBoss->SpawnWeapon, Player);
+// 		}
+// 	}
+// 
+// 	Destroy();
+}
+
+void ACRangeAttack::HitPlayer()
+{
+	if (MyBoss)
+	{
+		//가드가 가능한 공격일 경우
+		if (MyBoss->SpawnWeapon->IsGuard)
+		{
+			UCWeaponComponent* Weapon = CHelpers::GetComponent<UCWeaponComponent>(MyBoss->Target);
+
+			//만약 플레이어가 패링 감지중이면
+			if (Weapon->GetDoAction() && Weapon->GetDoAction()->RetrunParry())
+			{
+				return;
+			}
+
+			// 사용자 정의 데미지 이벤트 생성
+			MyBoss->HitData->HitDatas[MyBoss->SpawnWeapon->HitNumber].SendDamage(MyBoss, MyBoss->SpawnWeapon, MyBoss->Target);
+		}
+
+		//가드 불가능 공격일 경우
+		else
+		{
+			//무조건 사용자 정의 데미지 이벤트 생성
+			MyBoss->HitData->HitDatas[MyBoss->SpawnWeapon->HitNumber].SendDamage(MyBoss, MyBoss->SpawnWeapon, MyBoss->Target);
+		}
+	}
+
+	Destroy();
 }
 
 // void ACRangeAttack::SetActive(bool Value, FVector DirectionToTarget)
@@ -79,9 +162,5 @@ void ACRangeAttack::SetDirection(FVector ToPlayerDirection)
 // 	MeshComp->SetVisibility(Value);
 // }
 
-void ACRangeAttack::OverlapOther ( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult )
-{
-// 	//자신을 안보이게 하고 다시 오브젝트 풀로 되돌림
-// 	SetActive(false, FVector(0));
-}
+
 

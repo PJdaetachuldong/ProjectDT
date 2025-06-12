@@ -726,14 +726,6 @@ void UCBossFSM::SideMove()
 
 void UCBossFSM::SpawnRangedActor()
 {
-	//원거리 엑터 소환을 2번했으면 더 이상 못하도록 초기화
-	if (RangedAttackCount == 2)
-	{
-		RangedAttackCount = 0;
-
-		return;
-	}
-
 	++RangedAttackCount;
 
 	bool FindResult = false;
@@ -747,11 +739,26 @@ void UCBossFSM::SpawnRangedActor()
 	FActorSpawnParameters Params;
 	//스폰 과정에 충돌이 생겨도 제자리에서 스폰할 수 있게 만듦
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+	if (RangedAttackCount == 1)
+	{
+		//원거리 공격 오브젝트를 월드에 소환
+		ACRangeAttack* SpawnRanged = GetWorld()->SpawnActor<ACRangeAttack>(MyBoss->RangedAttackFactory1, MyBoss->ThrowPosition->GetComponentTransform(), Params);
+		SpawnRanged->SetDirectionAndBoss(Direction, MyBoss);
+	}
 
-	//원거리 공격 오브젝트를 월드에 소환
-	ACRangeAttack* SpawnRanged = GetWorld()->SpawnActor<ACRangeAttack>(MyBoss->RangedAttackFactory, MyBoss->ThrowPosition->GetComponentTransform(), Params);
+	else if (RangedAttackCount == 2)
+	{
+		//원거리 공격 오브젝트를 월드에 소환
+		ACRangeAttack* SpawnRanged = GetWorld()->SpawnActor<ACRangeAttack>(MyBoss->RangedAttackFactory2, MyBoss->ThrowPosition->GetComponentTransform(), Params);
+		SpawnRanged->SetDirectionAndBoss(Direction, MyBoss);
+	}
 
-	SpawnRanged->SetDirection(Direction);
+	//원거리 엑터 소환을 2번했으면 더 이상 못하도록 초기화
+	if (RangedAttackCount == 2)
+	{
+		RangedAttackCount = 0;
+	}
 
 // 	//오브젝트 풀 리스트를 검사하여 비활성화 된 액터를 찾음
 // 	for ( int32 i = 0; i < MyBoss->RangedAttackList.Num(); ++i )

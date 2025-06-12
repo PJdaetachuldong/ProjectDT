@@ -35,7 +35,10 @@ public:
 
 	//원거리 공격 오브젝트 할당
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ACRangeAttack> RangedAttackFactory;
+	TSubclassOf<class ACRangeAttack> RangedAttackFactory1;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ACRangeAttack> RangedAttackFactory2;
 
 // 	//원거리 공격 오브젝트를 Object Pool로 관리
 // 	//오브젝트의 최초 생성 수 (혹시몰라 여유분까지)
