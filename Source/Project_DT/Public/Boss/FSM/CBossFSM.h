@@ -169,9 +169,16 @@ public:
 
 	//콤보공격이 될때 어떤 콤보 공격을 하지 같이 받는 함수
 	void SetCOMBOATTACKState(int32 RandomComboAttack);
+
+	//해당 값보다 클 경우 가운데로 가게 만드는 변수
+	float CenterDist = 1800.0f;
 	
 	//시작될때 자신의 주인과 AI를 받게하는 함수
 	void GetOwnerEnemy();
+
+	float CurSideMoveTime = 0.0f;
+	float SideMoveLimitTime = 3.5f;
+	float SideDirection = 0.0f;
 
 	//자신의 주인과 AI를 저장하는 변수
 	class ACBossEnemy* MyBoss;

@@ -33,6 +33,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere)
+	AActor* CenterActor;
+
 	//원거리 공격 오브젝트 할당
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ACRangeAttack> RangedAttackFactory1;
