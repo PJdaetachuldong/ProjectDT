@@ -319,6 +319,7 @@ void ACPlayer::Hitted()
 		State->SetDeadMode();
 		return;
 	}
+	State->SetHittedMode();
 	Damage.Power = 0;
 
 	if (!!Damage.Event && !!Damage.Event->HitData)
@@ -326,7 +327,7 @@ void ACPlayer::Hitted()
 		FHitData* data = Damage.Event->HitData;
 		State->SetHittedMode();
 		data->PlayMontage(this);
-		// data->PlayHitStop(GetWorld());
+		data->PlayHitStop(GetWorld());
 		{
 			FVector start = GetActorLocation();
 			FVector target = Damage.Character->GetActorLocation();

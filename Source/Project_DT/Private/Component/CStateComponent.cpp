@@ -59,17 +59,6 @@ void UCStateComponent::SetCancelMode()
 	ChangeType(EStateType::Cancel);
 }
 
-void UCStateComponent::SetGuardMode()
-{
-	ChangeType(EStateType::Guard);
-	
-}
-
-void UCStateComponent::SetHealMode()
-{
-	ChangeType(EStateType::Heal);
-}
-
 void UCStateComponent::OnSubActionMode ( )
 {
 	bInSubActionMode = true;

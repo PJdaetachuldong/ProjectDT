@@ -11,9 +11,8 @@
 
 void UCSubAction_Guard::Pressed ( )
 {
-	CheckTrue ( State->IsHittedMode());
+	//CheckFalse ( State->IsIdleMode ( ) );
 	CheckTrue ( State->IsSubActionMode ( ) );
-	CheckTrue ( State->IsGuardMode());
 	Super::Pressed();
 
 	State->SetActionMode ( );
@@ -27,10 +26,9 @@ void UCSubAction_Guard::Released ( )
 {
 	Super::Released ( );
 	UAnimMontage* CurrentMontage = AnimInstance->GetCurrentActiveMontage ( );
-	CheckFalse( State->IsGuardMode());
-	if (CurrentMontage)
-		ActionData[1].DoAction ( Owner );
-
+	if ( CurrentMontage ){
+		AnimInstance->Montage_JumpToSection ( FName ( "Off" ) , CurrentMontage );
+	}
 }
 
 void UCSubAction_Guard::Begin_SubAction_Implementation ( )
