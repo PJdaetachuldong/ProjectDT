@@ -30,9 +30,9 @@ protected:
 
 	virtual void Tick(float DeltaTime) override;
 public:
-	UFUNCTION( BlueprintImplementableEvent )
+	UFUNCTION()
 	void OnBeginEquip();
-	UFUNCTION (BlueprintImplementableEvent)
+	UFUNCTION ()
 	void OnUnequip ( );
 
 
@@ -41,7 +41,7 @@ protected:
 	void AttachTo(FName InSocketName);
 
 	UFUNCTION(BlueprintCallable,Category="Attach")
-	void SpawnWeapon(FName InSocketName);
+	void SpawnWeapon();
 
 public:
 	void OnCollisions ( );

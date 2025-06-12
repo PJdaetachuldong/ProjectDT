@@ -37,17 +37,18 @@ void UCEquipment::Equip_Implementation ( )
 void UCEquipment::End_Equip_Implementation ( )
 {
 	bBeginEquip = true;
-	if ( OnEquipmentBeginEquip.IsBound ( ) )
-		OnEquipmentBeginEquip.Broadcast ( );
+	State->SetIdleMode();
+	
 }
 
 void UCEquipment::Begin_Equip_Implementation ( )
 {
 	bBeginEquip = false;
 	bEquipped = true;
-
+	if ( OnEquipmentBeginEquip.IsBound ( ) )
+		OnEquipmentBeginEquip.Broadcast ( );
 	Movement->Move ( );
-	State->SetIdleMode ( );
+	State->SetActionMode ( );
 
 }
 

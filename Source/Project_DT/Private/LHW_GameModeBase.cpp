@@ -63,8 +63,7 @@ void ALHW_GameModeBase::CreateCharacterUI()
 	
 	//이부분 원할때 변경
 	FTimerHandle Handler;
-	GetWorld()->GetTimerManager().SetTimer(Handler,[this](){CreateScriptUI();},20,false,false);
-	
+	// GetWorld()->GetTimerManager().SetTimer(Handler,[this](){CreateScriptUI();},20,false,false);
 }
 
 void ALHW_GameModeBase::CreateScriptUI()

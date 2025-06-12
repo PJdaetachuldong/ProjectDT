@@ -16,7 +16,7 @@ void UCStatusComponent::BeginPlay ( )
 	OwnerCharacter = Cast<ACharacter> ( GetOwner ( ) );
 
 	Health = MaxHealth;
-	Mana = MaxMana;
+	Mana = 0;
 }
 
 float UCStatusComponent::Damage ( float InAmount )
