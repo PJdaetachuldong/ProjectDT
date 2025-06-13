@@ -231,7 +231,7 @@ void UCParryComponent::EndParryWindow()
     // 2. 패링 실패 애니메이션 재생 (짧고 취약한 애니메이션)
     if (OwnerCharacter && ParryFailMontage) 
     {
-        OwnerCharacter->PlayAnimMontage(ParryFailMontage);
+        // OwnerCharacter->PlayAnimMontage(ParryFailMontage);
         CLog::Log("Parry | Playing ParryFailMontage.");
     }
     // 3. 스태미나 소모 등 (게임 시스템에 따라)

@@ -3,6 +3,7 @@
 
 #include "Notifies/CAnimNotifyState_HealState.h"
 #include "Global.h"
+#include "Component/CStatusComponent.h"
 
 FString UCAnimNotifyState_HealState::GetNotifyName_Implementation ( ) const
 {
@@ -28,6 +29,9 @@ void UCAnimNotifyState_HealState::NotifyEnd ( USkeletalMeshComponent* MeshComp ,
 	CheckNull ( MeshComp->GetOwner ( ) );
 
 	UCStateComponent* State=CHelpers::GetComponent<UCStateComponent>(MeshComp->GetOwner());
+	UCStatusComponent* Status=CHelpers::GetComponent<UCStatusComponent>(MeshComp->GetOwner());
 	CheckNull(State);
+	Status->Heal(50);
+	Status->UseMana(40);
 	State->SetIdleMode();
 }
