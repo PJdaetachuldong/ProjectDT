@@ -30,11 +30,9 @@ ACMeleeEnemy::ACMeleeEnemy()
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0,0,-88),FRotator(0,-90,0));
 	}
 
-	ConstructorHelpers::FObjectFinder<UAnimBlueprint> TempAnim(L"/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Enemy/ABP_Enemy.ABP_Enemy'");
-	if (TempAnim.Succeeded())
-	{
-		GetMesh()->SetAnimInstanceClass(TempAnim.Object->GeneratedClass);
-	}
+	TSubclassOf<UAnimInstance> Anim;
+	CHelpers::GetClass<UAnimInstance>(&Anim, AssetPaths::MeleeAnim);
+	GetMesh()->SetAnimClass(Anim);
 
 	GetCharacterMovement ( )->bUseRVOAvoidance = true;
 	GetCharacterMovement ( )->AvoidanceConsiderationRadius = 200.0f;

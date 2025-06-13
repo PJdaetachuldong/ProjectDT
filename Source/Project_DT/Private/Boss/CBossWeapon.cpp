@@ -20,7 +20,7 @@ ACBossWeapon::ACBossWeapon()
 
 	SwordMesh = CreateDefaultSubobject<USkeletalMeshComponent>(L"SwordMesh");
 	/*SwordMesh->SetupAttachment(GetMesh());*/
-
+	
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(L"/Script/Engine.SkeletalMesh'/Game/ODH/Asset/Boss/ElfArden/BaseMesh/Sword/SK_sword.SK_sword'");
 	if (TempMesh.Succeeded())
 	{
@@ -31,9 +31,7 @@ ACBossWeapon::ACBossWeapon()
 		SwordCollComp->SetBoxExtent(FVector(10, 48, 10));
 		SwordCollComp->OnComponentBeginOverlap.AddDynamic(this, &ACBossWeapon::WeaponOverlap);
 		SwordCollComp->SetCollisionProfileName(FName("BossWeapon"));
-		SwordCollComp->AttachToComponent(SwordMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Collision_Socket"));
 		//공격 판정 콜리전 비활성화
-		SwordCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
@@ -41,6 +39,9 @@ ACBossWeapon::ACBossWeapon()
 void ACBossWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+		SwordCollComp->AttachToComponent(SwordMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Collision_Socket"));
+		SwordCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 	
 }
 
