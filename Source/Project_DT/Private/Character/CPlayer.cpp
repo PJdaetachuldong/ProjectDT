@@ -359,9 +359,6 @@ float ACPlayer::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& Da
 	Damage.Character = Cast<ACharacter>(EventInstigator->GetPawn());
 	Damage.Causer = DamageCauser;
 	Damage.Event = (FActionDamageEvent*)&DamageEvent;
-	ACBossWeapon* Enemy = Cast<ACBossWeapon>(DamageCauser);
-	if (Enemy)
-		if (Enemy->CheckGuardBool()) return 0;
 	if (Dodge->ReturnPerfectDodge())return 0;
 	Hitted();
 

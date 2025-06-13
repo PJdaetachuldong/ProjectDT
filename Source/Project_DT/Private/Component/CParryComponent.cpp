@@ -180,6 +180,10 @@ void UCParryComponent::PerformParryDetection()
 
             if (WeaponComponent)
             {
+                ACBossWeapon* Enemy = Cast<ACBossWeapon>(HitActor);
+
+                if(!Enemy->CheckGuardBool())  return;
+
                 WeaponComponent->OnParry(ParryDirection); // 4방향 몽타주 재생 트리거
             }
             if (BossWeapon)
