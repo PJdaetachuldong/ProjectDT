@@ -95,8 +95,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UArrowComponent* ThrowPosition;
 	//일단 임시로 하는 발사 위치 설정
-
-	UAnimInstance* AnimInstance;
+	UPROPERTY()
+	class UAnimInstance* AnimInstance;
 	
 	void ReadyDashAttack();
 

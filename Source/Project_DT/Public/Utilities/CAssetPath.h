@@ -36,5 +36,9 @@ namespace AssetPaths
     constexpr const TCHAR* MapWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_MapWidget.WBP_MapWidget_C'" );
     constexpr const TCHAR* GameOverWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_GameOverWidget.WBP_GameOverWidget_C'" );
 
+    //보스
+    constexpr const TCHAR* BossAnim = TEXT ("/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Boss/ABP_BossAnim.ABP_BossAnim_C'" );
+    constexpr const TCHAR* MeleeAnim = TEXT ("/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Enemy/ABP_Enemy.ABP_Enemy_C'" );
+
 
 }

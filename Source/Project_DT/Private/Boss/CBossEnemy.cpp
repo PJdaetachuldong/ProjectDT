@@ -40,11 +40,15 @@ ACBossEnemy::ACBossEnemy()
 
 	FSMComponent = CreateDefaultSubobject<UCBossFSM>(TEXT("FSMComponent"));
 
-	ConstructorHelpers::FObjectFinder<UAnimBlueprint> TempAnim (L"/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Boss/ABP_BossAnim.ABP_BossAnim'");
-	if ( TempAnim.Succeeded() )
-	{
-		GetMesh()->SetAnimInstanceClass(TempAnim.Object->GeneratedClass);
-	}
+	TSubclassOf<UAnimInstance> Anim;
+	CHelpers::GetClass<UAnimInstance>(&Anim, AssetPaths::BossAnim);
+	GetMesh()->SetAnimClass(Anim);
+
+	// ConstructorHelpers::FClassFinder<UAnimBlueprint> TempAnim (L"/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Boss/ABP_BossAnim.ABP_BossAnim_C'");
+	// if ( TempAnim.Succeeded() )
+	// {
+	// 	GetMesh()->SetAnimInstanceClass(TempAnim.Class);
+	// }
 
 	//일단 임시로 하는 발사 위치 설정
 	ThrowPosition = CreateDefaultSubobject<UArrowComponent>(L"ThrowPosition");
@@ -1580,7 +1584,8 @@ void ACBossEnemy::Start(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 	if(Player) 
 	{
 		BossStart = true;;
-		Cast<UCBossAnim>(AnimInstance)->IsStartBoss = true;
+		if(AnimInstance)
+			Cast<UCBossAnim>(AnimInstance)->IsStartBoss = true;
 		
 		if (!BossUIClass)return;
 		BossUI=CreateWidget<UBossWidget>(GetWorld(),BossUIClass);

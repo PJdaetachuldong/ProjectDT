@@ -20,7 +20,7 @@ ACBossWeapon::ACBossWeapon()
 
 	SwordMesh = CreateDefaultSubobject<USkeletalMeshComponent>(L"SwordMesh");
 	/*SwordMesh->SetupAttachment(GetMesh());*/
-
+	
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(L"/Script/Engine.SkeletalMesh'/Game/ODH/Asset/Boss/ElfArden/BaseMesh/Sword/SK_sword.SK_sword'");
 	if (TempMesh.Succeeded())
 	{
@@ -28,12 +28,10 @@ ACBossWeapon::ACBossWeapon()
 		/*SwordMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_Socket"));*/
 
 		SwordCollComp = CreateDefaultSubobject<UBoxComponent>(L"SwordCollision");
+		SwordCollComp->SetBoxExtent(FVector(10, 48, 10));
 		SwordCollComp->OnComponentBeginOverlap.AddDynamic(this, &ACBossWeapon::WeaponOverlap);
 		SwordCollComp->SetCollisionProfileName(FName("BossWeapon"));
-		SwordCollComp->AttachToComponent(SwordMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Collision_Socket"));
-		SwordCollComp->SetBoxExtent(FVector(10, 48, 10));
 		//공격 판정 콜리전 비활성화
-		SwordCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
@@ -41,6 +39,9 @@ ACBossWeapon::ACBossWeapon()
 void ACBossWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+		SwordCollComp->AttachToComponent(SwordMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Collision_Socket"));
+		SwordCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 	
 }
 
@@ -93,6 +94,19 @@ void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 				return;
 			}
 
+			FVector HitLocation = bFromSweep ? FVector(SweepResult.ImpactPoint) : OtherActor->GetActorLocation();
+			FRotator HitRotation = bFromSweep ? SweepResult.ImpactNormal.Rotation() : FRotator::ZeroRotator;
+
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				HitEffect,
+				HitLocation, // 충돌 지점
+				HitRotation, // 충돌 방향
+				FVector(1.0f), // 스케일
+				true, // Auto Destroy
+				true // Auto Activate
+			);
+
 			// 사용자 정의 데미지 이벤트 생성
 			MyBoss->HitData->HitDatas[HitNumber].SendDamage(MyBoss, this, Player);
 		}
@@ -105,6 +119,19 @@ void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 			{
 				MyBoss->IsSPFirstATKHit = true;
 			}
+
+			FVector HitLocation = bFromSweep ? FVector(SweepResult.ImpactPoint) : OtherActor->GetActorLocation();
+			FRotator HitRotation = bFromSweep ? SweepResult.ImpactNormal.Rotation() : FRotator::ZeroRotator;
+
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				HitEffect,
+				HitLocation, // 충돌 지점
+				HitRotation, // 충돌 방향
+				FVector(1.0f), // 스케일
+				true, // Auto Destroy
+				true // Auto Activate
+			);
 
 			//무조건 사용자 정의 데미지 이벤트 생성
 			MyBoss->HitData->HitDatas[HitNumber].SendDamage(MyBoss, this, Player);

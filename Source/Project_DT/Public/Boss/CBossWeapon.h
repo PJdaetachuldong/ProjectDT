@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../../../../Plugins/FX/Niagara/Source/Niagara/Classes/NiagaraSystem.h"
 #include "CBossWeapon.generated.h"
 
 UCLASS()
@@ -24,6 +25,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	class ACBossEnemy* MyBoss;
+
+	UPROPERTY(EditAnywhere, Category = Effect)
+	UNiagaraSystem* HitEffect;
 
 	//보스 공격 종류에 따라 피격 불러오는 Hit Data가 다름
 	int32 HitNumber = 0;
