@@ -36,19 +36,12 @@ ACBossEnemy::ACBossEnemy()
 	}
 
 	GetCapsuleComponent()->SetCollisionProfileName(FName("TestEnemy"));
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ACBossEnemy::EnemyHitDamage);
 
 	FSMComponent = CreateDefaultSubobject<UCBossFSM>(TEXT("FSMComponent"));
 
 	TSubclassOf<UAnimInstance> Anim;
 	CHelpers::GetClass<UAnimInstance>(&Anim, AssetPaths::BossAnim);
 	GetMesh()->SetAnimClass(Anim);
-
-	// ConstructorHelpers::FClassFinder<UAnimBlueprint> TempAnim (L"/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Boss/ABP_BossAnim.ABP_BossAnim_C'");
-	// if ( TempAnim.Succeeded() )
-	// {
-	// 	GetMesh()->SetAnimInstanceClass(TempAnim.Class);
-	// }
 
 	//일단 임시로 하는 발사 위치 설정
 	ThrowPosition = CreateDefaultSubobject<UArrowComponent>(L"ThrowPosition");
@@ -73,11 +66,11 @@ ACBossEnemy::ACBossEnemy()
 		AM_DashAttack = TempDash.Object;
 	}
 
-// 	ConstructorHelpers::FObjectFinder<UAnimMontage> TempRanged ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/ComboAttack_01/AM_ComboAttack_01_01.AM_ComboAttack_01_01'" );
-// 	if ( TempRanged.Succeeded ( ) )
-// 	{
-// 		AM_RangedAttack = TempRanged.Object;
-// 	}
+	ConstructorHelpers::FObjectFinder<UAnimMontage> TempRanged ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/Ranged_Attack.Ranged_Attack'" );
+	if ( TempRanged.Succeeded ( ) )
+	{
+		AM_RangedAttack = TempRanged.Object;
+	}
 
 	ConstructorHelpers::FObjectFinder<UAnimMontage> TempGuard ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/Guard/AM_Guard.AM_Guard'" );
 	if ( TempGuard.Succeeded ( ) )
@@ -85,7 +78,7 @@ ACBossEnemy::ACBossEnemy()
 		AM_Guard = TempGuard.Object;
 	}
 
-	ConstructorHelpers::FObjectFinder<UAnimMontage> TempSP ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/SPAttack/AM_SPAttack.AM_SPAttack'" );
+	ConstructorHelpers::FObjectFinder<UAnimMontage> TempSP ( L"/Script/Engine.AnimMontage'/Game/ODH/Animation/Boss/Montage/SPAttack/AM_SPAttack1.AM_SPAttack1'" );
 	if ( TempSP.Succeeded ( ) )
 	{
 		AM_SPAttack = TempSP.Object;
@@ -168,22 +161,6 @@ void ACBossEnemy::BeginPlay()
 		}
 	}
 
-// 	//원거리 공격을 최대 설정 값만큼 미리 생성함
-// 	for ( int32 i = 0; i < MaxRangedAttackCount; ++i )
-// 	{
-// 		//스폰할 객체에 대한 스폰 옵션을 설정하는 구조체
-// 		FActorSpawnParameters Params;
-// 		//스폰 과정에 충돌이 생겨도 제자리에서 스폰할 수 있게 만듦
-// 		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-// 
-// 		//원거리 공격 오브젝트를 월드에 소환
-// 		ACRangeAttack* RangedAttackObject = GetWorld()->SpawnActor<ACRangeAttack>(RangedAttackFactory, Params);
-// 		//해당 원거리 공격 오브젝트 비활성화 처리
-// 		RangedAttackObject->SetActive(false, FVector(0));
-// 		//생성한 것을 오브젝트 풀에 넣음
-// 		RangedAttackList.Add(RangedAttackObject);
-// 	}
-
 	if (SPAttackCollision)
 	{
 		//스폰할 객체에 대한 스폰 옵션을 설정하는 구조체
@@ -206,8 +183,19 @@ void ACBossEnemy::BeginPlay()
 	//공격 섹션 이름 초기화
 	InitAttackTMap();
 
-	//위젯 추가
+	// 게임 시작 시 액터를 미리 스폰하고 비활성화(보이지 않게 설정)
+	if (GuardVFX && GetWorld())
+	{
+		SpawnBarrier = GetWorld()->SpawnActor<AActor>(GuardVFX, GetActorTransform());
+		if (SpawnBarrier)
+		{
+			// SpawnBarrier를 ACBossEnemy의 자식으로 붙임
+			SpawnBarrier->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 
+			// 액터의 루트 컴포넌트 가시성 비활성화
+			SpawnBarrier->SetActorHiddenInGame(true);
+		}
+	}
 }
 
 void ACBossEnemy::InitializeMontageMap()
@@ -321,6 +309,30 @@ void ACBossEnemy::Tick(float DeltaTime)
 			ShieldHitCount = 0;
 		}
 	}
+}
+
+void ACBossEnemy::SpawnGuardVFX()
+{
+	if (SpawnBarrier)
+	{
+		// 액터를 게임에서 보이게 설정
+		SpawnBarrier->SetActorHiddenInGame(false);
+	}
+}
+
+void ACBossEnemy::DeSpawnGuardVFX()
+{
+	if (SpawnBarrier)
+	{
+		// 액터를 게임에서 보이게 설정
+		SpawnBarrier->SetActorHiddenInGame(true);
+	}
+
+// 	if (SpawnBarrier)
+// 	{
+// 		SpawnBarrier->Destroy();
+// 		SpawnBarrier = nullptr;
+// 	}
 }
 
 bool ACBossEnemy::BackstepUse()
@@ -724,107 +736,6 @@ bool ACBossEnemy::SetGuardBool(UAnimMontage* CurrentMontage, FName CurrentSectio
 
 	//매핑이 없으면 기본값 전환
 	return true;
-}
-
-void ACBossEnemy::EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-// 	//가드가 성공한 경우에는 데미지 처리 및 피격 애니메이션이 안 나오도록 만듦
-// 	if(IsGuardSucssess )
-// 	return;
-// 
-// 	ACAttachment* Weapon = Cast<ACAttachment> ( OtherActor );
-// 
-// 	//맞은 위치를 기준으로 어떤 피격 애니메이션이 재생될지 방향값을 구하는 코드, 가드, 피격 상태일때 해당 코드를 써서 봐야함
-// 	FVector HitLocation = SweepResult.Location;
-//     FVector EnemyLocation = GetActorLocation();
-//     FVector EnemyRightVector = GetActorRightVector();
-//     FVector ToHitLocation = (HitLocation -EnemyLocation).GetSafeNormal();
-//     float DotProduct = FVector::DotProduct(ToHitLocation, EnemyRightVector);
-// 	//맞은 위치를 기준으로 어떤 피격 애니메이션이 재생될지 방향값을 구하는 코드, 가드, 피격 상태일때 해당 코드를 써서 봐야함
-// 
-// 	if ( Weapon )
-// 	{
-// 		GEngine->AddOnScreenDebugMessage ( 80 , 1.0f , FColor::Red , TEXT ( "Hit Boss" ) );
-// 
-// 		//현재 필살기를 공격하려고 준비중이라면
-// 		if ( IsReadySPAttack )
-// 		{
-// 			//데미지를 저장
-// 			FSMComponent->SetSPDamage(10.0f);
-// 		}
-// 
-// 		//공격을 맞았을 때 쉴드 게이지가 있다면
-// 		if ( ShieldAmount > 0.0f )
-// 		{
-// 			//쉴드게이지가 감소하도록 설정
-// 			ShieldAmount -= /*Damage*/10.0f;
-// 
-// 			AnimInstance->Montage_Play ( AM_ShieldHit );
-// 
-// 			//쉴드 상태에서 몇번 맞았는지 체크함
-// 			ShieldHitCount++;
-// 
-// 			//만약 일정 횟수 이상 맞았을 경우
-// 			if ( ShieldHitCount >= ShieldHitCounter )
-// 			{
-// 				AnimInstance->Montage_JumpToSection ( FName ( "Counter" ) , AM_ShieldHit );
-// 
-// 				//맞은 횟수 초기화
-// 				ShieldHitCount = 0;
-// 			}
-// 
-// 			//만약 쉴드게이지 감소되어서 0이 된다면
-// 			if ( ShieldAmount <= 0.0f )
-// 			{
-// 				//에너미가 휘청거리는 애니메이션 출력? / 단 필살기 준비중에는 일어나지 않게 / 브레이크 상태에서도 나오지 않게
-// 				if ( FSMComponent->AttackState != EBossATTACKState::SPATTACK || FSMComponent->State != EBossState::BREAK )
-// 				{
-// 					GEngine->AddOnScreenDebugMessage ( 81 , 1.0f , FColor::Red , TEXT ( "Boss Shield Break!!" ) );
-// 				}
-// 
-// 				//쉴드 게이지가 -의 값이 되면 해당 값 만큼 체력을 깎게 만듦
-// 				CurHP += ShieldAmount;
-// 
-// 				return;
-// 			}
-// 
-// 			//가드 애니메이션이 나오도록 만들어주기 / 단 필살기 준비중에는 일어나지 않게 / 브레이크 상태에서도 나오지 않게
-// 			if ( FSMComponent->AttackState != EBossATTACKState::SPATTACK || FSMComponent->State != EBossState::BREAK )
-// 			{
-// 				/*GEngine->AddOnScreenDebugMessage ( 82 , 1.0f , FColor::Red , TEXT ( "Boss Gard Animation" ) );*/
-// 
-// 				
-// 			}
-// 		}
-// 
-// 		//쉴드 게이지가 없는 상태에서 맞았을 경우
-// 		else
-// 		{
-// 			//체력을 깎게 만들어줌
-// 			CurHP -= /*Damage*/10.0f;
-// 
-// 			//체력이 깎였는데 0 이하가 된다면
-// 			if ( CurHP <= 0.0f )
-// 			{
-// 				//사망 상태로 만듦
-// 				/*FSMComponent->State = EBossState::DIE;*/
-// 
-// 				//만약 에너미 매니저가 있다면
-// 				if ( Manager )
-// 				{
-// 					Manager->RemoveEnemiesList ( MyUniqeID , IsCanAttack );
-// 				}
-// 
-// 				GEngine->AddOnScreenDebugMessage ( 83 , 1.0f , FColor::Red , TEXT ( "Boss is Dead" ) );
-// 			}
-// 
-// 			//피격 애니메이션이 나오게 만듦 / 단 필살기 준비중에는 일어나지 않게 / 브레이크 상태에서도 나오지 않게
-// 			if ( FSMComponent->AttackState != EBossATTACKState::SPATTACK || FSMComponent->State != EBossState::BREAK )
-// 			{
-// 				GEngine->AddOnScreenDebugMessage ( 84 , 1.0f , FColor::Red , TEXT ( "Boss Hit Damage" ) );
-// 			}
-// 		}
-// 	}
 }
 
 void ACBossEnemy::Hitted()

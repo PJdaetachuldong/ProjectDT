@@ -43,6 +43,15 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ACRangeAttack> RangedAttackFactory2;
 
+	UPROPERTY(EditAnywhere, Category = VFX)
+	TSubclassOf<class AActor> GuardVFX;
+
+	UPROPERTY()
+	AActor* SpawnBarrier;
+
+	void SpawnGuardVFX();
+	void DeSpawnGuardVFX();
+
 // 	//원거리 공격 오브젝트를 Object Pool로 관리
 // 	//오브젝트의 최초 생성 수 (혹시몰라 여유분까지)
 // 	int32 MaxRangedAttackCount = 4;
@@ -199,8 +208,6 @@ public:
 	TMap<FName, EAttackType> AttackSectionToEnumMap;
 
 	void InitAttackTMap();
-	
-	virtual void EnemyHitDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
 	virtual void LoadStatsFromAsset() override;
 
