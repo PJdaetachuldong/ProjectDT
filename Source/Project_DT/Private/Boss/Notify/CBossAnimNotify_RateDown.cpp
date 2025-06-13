@@ -39,6 +39,4 @@ void UCBossAnimNotify_RateDown::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 	
 	//받은 Rate값을 설정해줌
 	My->AnimInstance->Montage_SetPlayRate(NowMontage, RateScale);
-
-	GEngine->AddOnScreenDebugMessage(170, 8.0f, FColor::Orange, TEXT("Rate Down"));
 }

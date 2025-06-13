@@ -396,8 +396,6 @@ bool ACBossEnemy::OnGuardCollision ( )
 	Params.AddIgnoredActor(this);
 	bool bHit = GetWorld()->SweepSingleByChannel(Hit, GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel3 , FCollisionShape::MakeSphere(130.0f), Params);
 
-	DrawDebugSphere ( GetWorld ( ) , GetActorLocation ( ) , 130.0f , 21 , FColor::Green , false , 0.1f );
-
 	//일단 닿은게 플레이어 무기면 
 	if ( bHit && Hit.GetActor()->IsA(/*ACAttachment*/ACPlayer::StaticClass()) )
 	{
@@ -486,8 +484,6 @@ bool ACBossEnemy::CheckPlayer()
 	Params.AddIgnoredActor(this);
 	bool bHit = GetWorld()->SweepSingleByChannel(Hit,GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel3 , FCollisionShape::MakeSphere(300.0f), Params);
 
-	DrawDebugSphere(GetWorld(), GetActorLocation(), 300.0f, 21, FColor::Green, false, 3.0f);
-
 	if (bHit && Hit.GetActor()->IsA(ACPlayer::StaticClass()))
 	{
 		FVector ToPlayer = (Hit.GetActor()->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
@@ -526,8 +522,6 @@ bool ACBossEnemy::CheckAttack1_3Player()
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 	bool bHit = GetWorld()->SweepSingleByChannel(Hit, Attack3Location, Attack3Location, FQuat::Identity, ECC_GameTraceChannel3, FCollisionShape::MakeSphere(300.0f), Params);
-
-	DrawDebugSphere(GetWorld(), Attack3Location, 300.0f, 21, FColor::Green, false, 3.0f);
 
 	if (bHit && Hit.GetActor()->IsA(ACPlayer::StaticClass()))
 	{
@@ -1041,8 +1035,6 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 
 		if (IsGreatSword)
 		{
-			GEngine->AddOnScreenDebugMessage(80, 1.0f, FColor::Red, TEXT("Greate Sword Hitted"));
-
 			//사망 상태면 안되게 막음
 			if (FSMComponent->State == EBossState::DIE) return 0;
 

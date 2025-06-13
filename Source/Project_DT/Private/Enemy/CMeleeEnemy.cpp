@@ -121,8 +121,6 @@ void ACMeleeEnemy::CheckPlayerInRange()
 	Params.AddIgnoredActor(this);
 	bool bHit = GetWorld()->SweepSingleByChannel(Hit,GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_GameTraceChannel3 , FCollisionShape::MakeSphere(500.0f), Params);
 
-	DrawDebugSphere(GetWorld(), GetActorLocation(), 500.0f, 21, FColor::Green, false, 0.1f);
-
 	if (bHit && Hit.GetActor()->IsA(ACPlayer::StaticClass()))
 	{
 // 		UE_LOG ( LogTemp , Warning , TEXT ( "Hit Actor: %s, Class: %s" ) ,
@@ -170,8 +168,6 @@ bool bFromSweep, const FHitResult& SweepResult)
 
 	if ( Weapon )
 	{
-		GEngine->AddOnScreenDebugMessage ( 40 , 1.0f , FColor::Red , TEXT ( "Hit Enemy" ) );
-
 		//공격을 맞았을 때 쉴드 게이지가 있다면
 		if (CurShieldAmount > 0.0f )
 		{
@@ -181,17 +177,12 @@ bool bFromSweep, const FHitResult& SweepResult)
 			//만약 쉴드게이지 감소되어서 0이 된다면
 			if (CurShieldAmount <= 0.0f )
 			{
-				//에너미가 휘청거리는 애니메이션 출력?
-				GEngine->AddOnScreenDebugMessage ( 41 , 1.0f , FColor::Red , TEXT ( "Shield Break!!" ) );
 
 				//쉴드 게이지가 -의 값이 되면 해당 값 만큼 체력을 깎게 만듦
 				CurHP += CurShieldAmount;
 
 				return;
 			}
-
-			//가드 애니메이션이 나오도록 만들어주기
-			GEngine->AddOnScreenDebugMessage ( 42 , 1.0f , FColor::Red , TEXT ( "Gard Animation" ) );
 		}
 
 		//쉴드 게이지가 없는 상태에서 맞았을 경우
@@ -211,12 +202,7 @@ bool bFromSweep, const FHitResult& SweepResult)
 				{
 					Manager->RemoveEnemiesList ( MyUniqeID , IsCanAttack );
 				}
-
-				GEngine->AddOnScreenDebugMessage ( 43 , 1.0f , FColor::Red , TEXT ( "Enemy is Dead" ) );
 			}
-
-			//피격 애니메이션이 나오게 만듦
-			GEngine->AddOnScreenDebugMessage ( 44 , 1.0f , FColor::Red , TEXT ( "Enemy Hit Damage" ) );
 		}
 	}
 }
@@ -286,8 +272,6 @@ void ACMeleeEnemy::Hit(FString Name)
 
 	if (IsKatana)
 	{
-		GEngine->AddOnScreenDebugMessage(80, 1.0f, FColor::Red, TEXT("Katana Hitted"));
-
 		//사망 상태면 안되게 막음
 		if (FSMComponent->State == EMeleeEnemyState::DIE) return;
 
@@ -404,8 +388,6 @@ void ACMeleeEnemy::Hit(FString Name)
 
 		if (IsGreatSword)
 		{
-			GEngine->AddOnScreenDebugMessage(80, 1.0f, FColor::Red, TEXT("Greate Sword Hitted"));
-
 			//사망 상태면 안되게 막음
 			if (FSMComponent->State == EMeleeEnemyState::DIE) return;
 

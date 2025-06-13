@@ -230,7 +230,6 @@ void UCBossFSM::NONEState()
 			//플레이어를 향해서 움직이게 만듦
 			AI->MoveToLocation(MyBoss->Target->GetActorLocation());
 
-			GEngine->AddOnScreenDebugMessage(160, 1.0f, FColor::White, TEXT("State: NONE, TargetDIst >= 200"));
 		}
 	}
 
@@ -239,8 +238,6 @@ void UCBossFSM::NONEState()
 	{
 		//이동을 멈추고 
 		AI->StopMovement();
-
-		GEngine->AddOnScreenDebugMessage(165, 1.0f, FColor::White, TEXT("State: NONE, TargetDIst <= 300"));
 
 		//좌우 이동이나 뒷 걸음질, 그리고 공격 조건을 만족하는지 체크한다
 		AttackState = EBossATTACKState::SETATK;
@@ -1373,8 +1370,6 @@ void UCBossFSM::SetSPDamage(float Damage)
 	//만약 데미지가 Break 조건 이상이 됐을 경우
 	if ( OnSpDamageAmount >= SPBreakDamageAmount )
 	{
-		//필살기 패턴이 파훼됨
-		GEngine->AddOnScreenDebugMessage ( 89 , 10.0f , FColor::Red , TEXT ( "SPAttack Break!!" ) );
 
 		//필살기 상태가 되면 애니메이션 재생
 		if ( MyBoss->AnimInstance->Montage_IsPlaying ( MyBoss->AM_SPAttack ) )

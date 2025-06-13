@@ -39,16 +39,6 @@ void ASPAttackCheckCollision::SetActive(bool Value, FVector SpawnLocation)
 
 		//받아온 위치에 소환
 		SetActorLocation(SpawnLocation);
-
-		DrawDebugSphere(
-			GetWorld(),
-			GetActorLocation(),
-			Collision->GetScaledSphereRadius(),
-			32, // 세그먼트 수 (구체의 부드러움)
-			FColor::Black,
-			false, // 지속 여부
-			20.0f // 지속 시간 (0이면 매 프레임 갱신)
-		);
 	}
 	//false면 콜리전 비활성화
 	else

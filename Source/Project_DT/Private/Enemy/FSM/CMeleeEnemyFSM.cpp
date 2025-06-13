@@ -127,8 +127,6 @@ void UCMeleeEnemyFSM::WANDERState()
 		{
 			AI->MoveToLocation(WanderMoveLocation);
 
-			DrawDebugSphere(GetWorld (), WanderMoveLocation, 20.0f, 30, FColor::Yellow, false, 0.1f); // 디버그용
-
 			//목표 위치랑 거리가 좁혀졌다면 다시 위치 설정이 이루어지도록 불 값 변경
 			if ( FVector::Dist(WanderMoveLocation, MyEnemy->GetActorLocation()) <= 100.0f)
 			{
@@ -162,7 +160,6 @@ void UCMeleeEnemyFSM::ATTACKState()
 	if (IsSetAttackRandomLocation)
 	{
 		AI->MoveToLocation(AttackRandomLocation);
-		DrawDebugSphere (GetWorld(), AttackRandomLocation, 20.0f, 15, FColor::Red, false, 0.1f ); // 디버그용
 
 		//자신과 공격랜덤 위치가 120이하일 경우
 		if (FVector::Dist(MyEnemy->GetActorLocation(), AttackRandomLocation) <= 120.0f)
@@ -173,9 +170,6 @@ void UCMeleeEnemyFSM::ATTACKState()
 				//만약 이동한 다음 공격 범위안에 플레이어가 있으면 
 				if (FVector::Dist(MyEnemy->Target->GetActorLocation(), MyEnemy->GetActorLocation()) <= 250.0f + 50.0f)
 				{
-					//플레이어를 공격, 공격후 공격 상태는 유지
-					GEngine->AddOnScreenDebugMessage( 2 , 1.0f , FColor::Red , TEXT ( "Attack!" ) );
-
 					//만약 공격 애니메이션이 재생중이지 않으면 재생하게 만듦
 					if (!MyEnemy->AnimInstance->Montage_IsPlaying(MyEnemy->AM_Attack))
 					{
