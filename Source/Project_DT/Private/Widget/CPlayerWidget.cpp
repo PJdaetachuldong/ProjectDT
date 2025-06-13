@@ -5,6 +5,7 @@
 
 #include "GameFramework/Character.h"
 #include "Component/CStatusComponent.h"
+#include "Component/CStateComponent.h"
 #include "Global.h"
 #include "Components/CanvasPanel.h"
 #include "Components/ProgressBar.h"
@@ -18,6 +19,7 @@ void UCPlayerWidget::NativeConstruct()
 	if (OwnerCharacter)
 		Status=CHelpers::GetComponent<UCStatusComponent>(OwnerCharacter);
 		Weapon=CHelpers::GetComponent<UCWeaponComponent>(OwnerCharacter);
+		State=CHelpers::GetComponent<UCStateComponent>(OwnerCharacter);
 	
 	Status->OnDelegateHP.AddDynamic(this,&UCPlayerWidget::SetHpProgessBar);
 	Status->OnDelegateMana.AddDynamic(this,&UCPlayerWidget::SetManaProgessBar);
@@ -119,7 +121,10 @@ void UCPlayerWidget::SelectGreatSword()
 
 void UCPlayerWidget::KatanaEndSelect()
 {
+	CheckNull(State);
+	State->SetIdleMode();
 	Weapon->SetKatanaMode();
+
 	IsCancelWidget=false;
 	UGameplayStatics::SetGlobalTimeDilation(OwnerCharacter, 1.0f);
 	PlayAnimation(WeaponGageRotationKatana);
@@ -127,6 +132,8 @@ void UCPlayerWidget::KatanaEndSelect()
 
 void UCPlayerWidget::GreatSwordEndSelect()
 {
+	CheckNull(State);
+	State->SetIdleMode();
 	Weapon->SetGreatSwordMode();
 	IsCancelWidget=false;
 	UGameplayStatics::SetGlobalTimeDilation(OwnerCharacter, 1.0f);
@@ -136,6 +143,8 @@ void UCPlayerWidget::GreatSwordEndSelect()
 void UCPlayerWidget::CancelHandler()
 {
 	IsCancelWidget=true;
+	CheckNull(State);
+	State->SetCancelMode();
 }
 
 void UCPlayerWidget::TurnOnLight()

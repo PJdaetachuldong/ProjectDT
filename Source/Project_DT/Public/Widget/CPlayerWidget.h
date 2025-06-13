@@ -51,6 +51,8 @@ private:
 	class UCStatusComponent* Status;
 	UPROPERTY()
 	class UCWeaponComponent* Weapon;
+	UPROPERTY()
+	class UCStateComponent* State;
 
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
