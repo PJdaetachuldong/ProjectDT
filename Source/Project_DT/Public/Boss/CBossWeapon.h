@@ -41,7 +41,7 @@ public:
 	//가드 가능한 공격인지 전달하는 변수
 	bool CheckGuardBool();
 
-	void PlayParringAnim();
+	virtual void PlayParringAnim();
 
 	bool IsPlayerParring = false;
 

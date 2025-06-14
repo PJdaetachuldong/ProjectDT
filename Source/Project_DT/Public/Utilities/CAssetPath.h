@@ -40,5 +40,6 @@ namespace AssetPaths
     constexpr const TCHAR* BossAnim = TEXT ("/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Boss/ABP_BossAnim.ABP_BossAnim_C'" );
     constexpr const TCHAR* MeleeAnim = TEXT ("/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Enemy/ABP_Enemy.ABP_Enemy_C'" );
 
-
+    //튜토 에너미
+    constexpr const TCHAR* TutoAnim = TEXT("/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Tuto/ABP_Tuto.ABP_Tuto_C'");
 }
