@@ -67,8 +67,34 @@ void ACBossWeapon::PlayParringAnim()
 	//현재 재생중인 몽타주 멈춤
 	MyBoss->AnimInstance->StopAllMontages(0.0f);
 	MyBoss->FSMComponent->AttackState = EBossATTACKState::NONE;
+
+	IsPlayerParring = true;
 	
 	MyBoss->AnimInstance->Montage_Play(MyBoss->AM_ParringInteraction);
+}
+
+void ACBossWeapon::PlayerDamage()
+{
+	//만약 플레이어가 패링 감지중이면
+	if (IsPlayerParring)
+	{
+		GEngine->AddOnScreenDebugMessage(111, 10.0f, FColor::White, TEXT("PlayerParrying"));
+		IsPlayerParring = false;
+
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			HitEffect,
+			OverlapLocation, // 충돌 지점
+			OverlapRotator, // 충돌 방향
+			FVector(1.0f), // 스케일
+			true, // Auto Destroy
+			true // Auto Activate
+		);
+
+		return;
+	}
+	// 사용자 정의 데미지 이벤트 생성
+	MyBoss->HitData->HitDatas[HitNumber].SendDamage(MyBoss, this, MyBoss->Target);
 }
 
 void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -80,37 +106,43 @@ void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		//가드가 가능한 공격일 경우
 		if (IsGuard)
 		{
-			UCWeaponComponent* Weapon = CHelpers::GetComponent<UCWeaponComponent>(Player);
+			OverlapLocation = bFromSweep ? FVector(SweepResult.ImpactPoint) : OtherActor->GetActorLocation();
+			OverlapRotator = bFromSweep ? SweepResult.ImpactNormal.Rotation() : FRotator::ZeroRotator;
 
-			//만약 플레이어가 패링 감지중이면
-			if (Weapon->GetDoAction() && Weapon->GetDoAction()->RetrunParry())
-			{
+			GetWorld()->GetTimerManager().SetTimer(ParringCheckTimer,this, &ACBossWeapon::PlayerDamage,0.1f,false);
 
-// 				//현재 재생중인 몽타주 멈춤
-// 				MyBoss->AnimInstance->StopAllMontages(0.0f);
-// 				MyBoss->FSMComponent->AttackState = EBossATTACKState::NONE;
+// 			//만약 플레이어가 패링 감지중이면
+// 			if (/*Weapon->GetDoAction() && Weapon->GetDoAction()->RetrunParry()*/ IsPlayerParring)
+// 			{
+// 				GEngine->AddOnScreenDebugMessage(111, 10.0f, FColor::White, TEXT("PlayerParrying"));
 // 
-// 				MyBoss->AnimInstance->Montage_Play(MyBoss->AM_ParringInteraction);
-
-				return;
-			}
-
-			FVector HitLocation = bFromSweep ? FVector(SweepResult.ImpactPoint) : OtherActor->GetActorLocation();
-			FRotator HitRotation = bFromSweep ? SweepResult.ImpactNormal.Rotation() : FRotator::ZeroRotator;
-
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-				GetWorld(),
-				HitEffect,
-				HitLocation, // 충돌 지점
-				HitRotation, // 충돌 방향
-				FVector(1.0f), // 스케일
-				true, // Auto Destroy
-				true // Auto Activate
-			);
-
-			// 사용자 정의 데미지 이벤트 생성
-			MyBoss->HitData->HitDatas[HitNumber].SendDamage(MyBoss, this, Player);
-		}
+// 				IsPlayerParring = false;
+// 
+// // 				//현재 재생중인 몽타주 멈춤
+// // 				MyBoss->AnimInstance->StopAllMontages(0.0f);
+// // 				MyBoss->FSMComponent->AttackState = EBossATTACKState::NONE;
+// // 
+// // 				MyBoss->AnimInstance->Montage_Play(MyBoss->AM_ParringInteraction);
+// 
+// 				return;
+// 			}
+// 
+// 			FVector HitLocation = bFromSweep ? FVector(SweepResult.ImpactPoint) : OtherActor->GetActorLocation();
+// 			FRotator HitRotation = bFromSweep ? SweepResult.ImpactNormal.Rotation() : FRotator::ZeroRotator;
+// 
+// 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+// 				GetWorld(),
+// 				HitEffect,
+// 				HitLocation, // 충돌 지점
+// 				HitRotation, // 충돌 방향
+// 				FVector(1.0f), // 스케일
+// 				true, // Auto Destroy
+// 				true // Auto Activate
+// 			);
+// 
+// 			// 사용자 정의 데미지 이벤트 생성
+// 			MyBoss->HitData->HitDatas[HitNumber].SendDamage(MyBoss, this, Player);
+ 		}
 
 		//가드 불가능 공격일 경우
 		else
@@ -121,18 +153,18 @@ void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 				MyBoss->IsSPFirstATKHit = true;
 			}
 
-			FVector HitLocation = bFromSweep ? FVector(SweepResult.ImpactPoint) : OtherActor->GetActorLocation();
-			FRotator HitRotation = bFromSweep ? SweepResult.ImpactNormal.Rotation() : FRotator::ZeroRotator;
-
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-				GetWorld(),
-				HitEffect,
-				HitLocation, // 충돌 지점
-				HitRotation, // 충돌 방향
-				FVector(1.0f), // 스케일
-				true, // Auto Destroy
-				true // Auto Activate
-			);
+// 			FVector HitLocation = bFromSweep ? FVector(SweepResult.ImpactPoint) : OtherActor->GetActorLocation();
+// 			FRotator HitRotation = bFromSweep ? SweepResult.ImpactNormal.Rotation() : FRotator::ZeroRotator;
+// 
+// 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+// 				GetWorld(),
+// 				HitEffect,
+// 				HitLocation, // 충돌 지점
+// 				HitRotation, // 충돌 방향
+// 				FVector(1.0f), // 스케일
+// 				true, // Auto Destroy
+// 				true // Auto Activate
+// 			);
 
 			//무조건 사용자 정의 데미지 이벤트 생성
 			MyBoss->HitData->HitDatas[HitNumber].SendDamage(MyBoss, this, Player);

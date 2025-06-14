@@ -40,6 +40,15 @@ public:
 
 	void PlayParringAnim();
 
+	bool IsPlayerParring = false;
+
+	FTimerHandle ParringCheckTimer;
+
+	FVector OverlapLocation;
+	FRotator OverlapRotator;
+
+	void PlayerDamage();
+
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* SwordMesh;
 
