@@ -136,24 +136,8 @@ public:
 	//필살기 공격 사용가능하도록 만드는 스택
 	int32 SPAttackStack = 30;
 
-	//임의로 적은 필살기 사용 조건
-	float TestCurSPTime = 0.0f;
-	float TestSPCooltime = 10.0f;
-	//임의로 적은 필살기 사용 조건
-
-	//임의로 적은 필살기 준비 시간
-	float CurSPReadyTime = 0.0f;
-	float SPReadyTime = 15.0f;
-	//임의로 적은 필살기 준비 시간
-
 	//필살기 준비자세일 때 받은 데미지를 받게하는 변수
 	void SetSPDamage(float Damage);
-
-	//필살기가 파훼되어서 Break 상태의 시간을 저장하는 변수
-	float CurBreakTime = 0.0f;
-
-	//Break상태의 지속시간을 설정한 변수
-	float BreakLimitTime = 5.0f;
 
 	//콤보 공격 실행 조건 변수
 	float CurComboAttackTime = 0.0f;

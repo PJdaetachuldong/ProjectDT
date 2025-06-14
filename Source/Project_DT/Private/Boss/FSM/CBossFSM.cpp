@@ -54,7 +54,7 @@ void UCBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 void UCBossFSM::IDLEState()
 {
 	//일정 시간이 지나면 IDLE에서 CHASE상태가 되게, 나중에 애니메이션 넣어서 노티파이로 변환되게 해주기
-	if ( Cast<UCBossAnim>(MyBoss->AnimInstance)->IsPlayingIdle )
+	if ( MyBoss->AnimInstance->IsPlayingIdle )
 	{
 		State = EBossState::ATTACK;
 
@@ -110,7 +110,7 @@ void UCBossFSM::BREAKState()
 
 void UCBossFSM::DIEState()
 {
-	if(Cast<UCBossAnim>(MyBoss->AnimInstance)->State != EBossState::DIE)
+	if(MyBoss->AnimInstance->State != EBossState::DIE)
 	{ 
 		if (MyBoss->BossUI->IsInViewport())
 		{
@@ -122,7 +122,7 @@ void UCBossFSM::DIEState()
 		//모든 몽타주 재생을 멈춤
 		MyBoss->AnimInstance->StopAllMontages(0.4f);
 
-		Cast<UCBossAnim>(MyBoss->AnimInstance)->State = EBossState::DIE;
+		MyBoss->AnimInstance->State = EBossState::DIE;
 
 		//AI 움직임 멈춤
 		AI->StopMovement();
@@ -146,7 +146,7 @@ void UCBossFSM::NONEState()
 
 // 	if (Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection == 100.0f || Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection == -100.0f)
 // 	{
-		Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection = 0.0f;
+		MyBoss->AnimInstance->MoveDirection = 0.0f;
 /*	}*/
 
 // 	if (FVector::Dist(MyBoss->CenterActor->GetActorLocation(), MyBoss->GetActorLocation()) >= CenterDist)
@@ -666,12 +666,12 @@ void UCBossFSM::SideMove()
 
 	if (SideDirection >= 0.1f)
 	{
-		Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection = 100;
+		MyBoss->AnimInstance->MoveDirection = 100;
 	}
 
 	else if (SideDirection <= -0.1f)
 	{
-		Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection = -100;
+		MyBoss->AnimInstance->MoveDirection = -100;
 	}
 
 	CurSideMoveTime += GetWorld()->GetDeltaSeconds();
@@ -1184,9 +1184,9 @@ void UCBossFSM::BACKSTEPState()
 // 	if (TargetDist <= 300.0f /*&& TargetDist >= 150.0f*/)
 // 	{
 		//이동 값을 억지로 -값으로 변경
-		if (!Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping)
+		if (!MyBoss->AnimInstance->IsBacksteping)
 		{
-			Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping = true;
+			MyBoss->AnimInstance->IsBacksteping = true;
 		}
 
 		//현재 에너미와 플레이어 간에 방향을 구함
@@ -1232,9 +1232,9 @@ void UCBossFSM::BACKSTEPState()
 
 	if(TargetDist >= 550.0f)
 	{
-		if (Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping)
+		if (MyBoss->AnimInstance->IsBacksteping)
 		{
-			Cast<UCBossAnim>(MyBoss->AnimInstance)->IsBacksteping = false;
+			MyBoss->AnimInstance->IsBacksteping = false;
 
 			SetATKState = ESetATKState::SIDEMOVE;
 			//타이머 써서 일정 시간 지나면 NONE으로 바뀌게
@@ -1261,12 +1261,12 @@ void UCBossFSM::SIDEMOVEState()
 
 	if (SideDirection >= 0.1f)
 	{
-		Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection = 100;
+		MyBoss->AnimInstance->MoveDirection = 100;
 	}
 
 	else if (SideDirection <= -0.1f)
 	{
-		Cast<UCBossAnim>(MyBoss->AnimInstance)->MoveDirection = -100;
+		MyBoss->AnimInstance->MoveDirection = -100;
 	}
 
 	CurSideMoveTime += GetWorld()->GetDeltaSeconds();
@@ -1442,8 +1442,6 @@ void UCBossFSM::SetSPDamage(float Damage)
 		//상태는 BREAK로 변환
 		State = EBossState::BREAK;
 
-		//시간 초기화
-		CurSPReadyTime = 0.0f;
 		//bool 초기화
 		MyBoss->IsReadySPAttack = false;
 	}

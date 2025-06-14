@@ -11,6 +11,7 @@
 #include "Boss/FSM/CBossFSM.h"
 #include "Weapons/CWeaponComponent.h"
 #include "Weapons/CDoAction.h"
+#include "Boss/CBossAnim.h"
 
 // Sets default values
 ACBossWeapon::ACBossWeapon()
@@ -66,7 +67,7 @@ void ACBossWeapon::PlayParringAnim()
 	//현재 재생중인 몽타주 멈춤
 	MyBoss->AnimInstance->StopAllMontages(0.0f);
 	MyBoss->FSMComponent->AttackState = EBossATTACKState::NONE;
-
+	
 	MyBoss->AnimInstance->Montage_Play(MyBoss->AM_ParringInteraction);
 }
 

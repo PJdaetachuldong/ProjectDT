@@ -167,4 +167,5 @@ private:
 public:
 	bool bGuardHit =false;
 	
+	bool PlayerDead = false;
 };

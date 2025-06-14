@@ -4,6 +4,7 @@
 #include "Boss/Notify/CBossAnimNotify_Backstep.h"
 #include "Global.h"
 #include "Boss/CBossEnemy.h"
+#include "Boss/CBossAnim.h"
 
 FString UCBossAnimNotify_Backstep::GetNotifyName_Implementation() const
 {

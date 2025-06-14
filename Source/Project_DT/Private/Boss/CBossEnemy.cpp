@@ -23,6 +23,7 @@
 #include "Weapons/CWeaponComponent.h"
 #include "Weapons/CDoAction.h"
 #include "Components/ArrowComponent.h"
+#include "Component/CMointageComponent.h"
 
 ACBossEnemy::ACBossEnemy()
 {
@@ -173,7 +174,7 @@ void ACBossEnemy::BeginPlay()
 		SpawnSpColli->SetActive(false, GetActorLocation());
 	}
 
-	AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance = Cast<UCBossAnim>(GetMesh()->GetAnimInstance());
 
 	LoadStatsFromAsset();
 
@@ -196,6 +197,9 @@ void ACBossEnemy::BeginPlay()
 			SpawnBarrier->SetActorHiddenInGame(true);
 		}
 	}
+
+	FirstLocation = GetActorLocation();
+	FirstRotation = GetActorRotation();
 }
 
 void ACBossEnemy::InitializeMontageMap()
@@ -308,6 +312,11 @@ void ACBossEnemy::Tick(float DeltaTime)
 			//맞은 횟수 초기화
 			ShieldHitCount = 0;
 		}
+	}
+
+	if (Cast<ACPlayer>(Target)->GetComponentByClass<UCMointageComponent>()->isDead)
+	{
+		RestartGame();
 	}
 }
 
@@ -1488,7 +1497,7 @@ void ACBossEnemy::Start(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 	{
 		BossStart = true;;
 		if(AnimInstance)
-			Cast<UCBossAnim>(AnimInstance)->IsStartBoss = true;
+			AnimInstance->IsStartBoss = true;
 		
 		if (!BossUIClass)return;
 		BossUI=CreateWidget<UBossWidget>(GetWorld(),BossUIClass);
@@ -1538,6 +1547,66 @@ void ACBossEnemy::SetShieldAmount(float value)
 	CurShieldAmount = CurShieldAmount - value;
 
 	OnDelegateShield.Broadcast(CurShieldAmount);
+}
+
+void ACBossEnemy::RestartGame()
+{
+	if (BossUI->IsInViewport())
+	{
+		BossUI->RemoveFromParent();
+	}
+
+	/*SpawnWeapon->SetActorEnableCollision(ECollisionEnabled::NoCollision);*/
+
+	SetActorLocation(FirstLocation);
+	SetActorRotation(FirstRotation);
+
+	StartCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	BossStart = false;
+
+	FSMComponent->State = EBossState::IDLE;
+	FSMComponent->AttackState = EBossATTACKState::NONE;
+	FSMComponent->SetATKState = ESetATKState::SETATKNONE;
+
+	//모든 몽타주 재생을 멈춤
+	AnimInstance->StopAllMontages(0.4f);
+	
+	AnimInstance->IsStartBoss = false;
+	AnimInstance->IsPlayingIdle = false;
+	AnimInstance->MoveDirection = 0;
+	AnimInstance->Speed = 0;
+
+	const FCEnemyStats& Stats = StatsAsset->Stats;
+
+	CurHP = Stats.MaxHP;
+	CurShieldAmount = Stats.ShieldAmount;
+	CurBreakTime = 0.0f;
+	IsDashAttackHit = false;
+	GuardGage = 0.0f;
+	IsGuardSucssess = false;
+	IsReadySPAttack = false;
+	ShieldHitCount = 0;
+	ShieldBreakHit = 0;
+	IsSPRun = false;
+	IsSPFirstATKHit = false;
+	GuardingTime = 0.0f;
+	BackstepPercent = 60;
+
+	FSMComponent->CurChaseTime = 0.0f;
+	FSMComponent->TotalMoveDistance = 0.0f;
+	FSMComponent->LastLocation = GetActorLocation();
+	FSMComponent->IsSideMoveSetting = false;
+	FSMComponent->RangedAttackCount = 0;
+	FSMComponent->IsSetDashAttackLocation = false;
+	FSMComponent->IsReadyDashAttack = false;
+	FSMComponent->IsLowDist = false;
+	FSMComponent->DashTimer = 0.0f;
+	FSMComponent->OnSpDamageAmount = 0.0f;
+	FSMComponent->IsFirstSPAttack = false;
+	FSMComponent->CurAttackStack = 0;
+	FSMComponent->CurComboAttackTime = 0.0f;
+	FSMComponent->CurSideMoveTime = 0.0f;
+	FSMComponent->SideDirection = 0.0f;
 }
 
 void ACBossEnemy::LoadStatsFromAsset ( )

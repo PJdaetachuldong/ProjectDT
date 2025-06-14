@@ -105,7 +105,7 @@ public:
 	class UArrowComponent* ThrowPosition;
 	//일단 임시로 하는 발사 위치 설정
 	UPROPERTY()
-	class UAnimInstance* AnimInstance;
+	class UCBossAnim* AnimInstance;
 	
 	void ReadyDashAttack();
 
@@ -252,6 +252,11 @@ public:
 	virtual void SetHP(float value) override;
 
 	virtual void SetShieldAmount(float value) override;
+
+	FVector FirstLocation;
+	FRotator FirstRotation;
+
+	void RestartGame();
 };
 
 USTRUCT(BlueprintType)

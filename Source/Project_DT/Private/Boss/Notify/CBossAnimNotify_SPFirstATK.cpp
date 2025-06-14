@@ -5,6 +5,7 @@
 #include "Global.h"
 #include "Boss/CBossEnemy.h"
 #include "Boss/FSM/CBossFSM.h"
+#include "Boss/CBossAnim.h"
 
 FString UCBossAnimNotify_SPFirstATK::GetNotifyName_Implementation() const
 {

@@ -92,6 +92,7 @@ void UCMointageComponent::PlayDeadMode ( )
 	GameOver->AddToViewport();
 	GameOver->PlayGameOverAnimation();
 	
+	
 }
 
 void UCMointageComponent::PlayEquipMode ( )

@@ -23,7 +23,7 @@ void UCBossAnimNotify_IDLE::Notify ( USkeletalMeshComponent* MeshComp , UAnimSeq
 
 	CheckNull ( My );
 
-	UCBossAnim* MyAnim = Cast<UCBossAnim>(My->AnimInstance);
+	UCBossAnim* MyAnim = My->AnimInstance;
 	CheckNull ( MyAnim );
 
 	MyAnim->IsPlayingIdle = true;

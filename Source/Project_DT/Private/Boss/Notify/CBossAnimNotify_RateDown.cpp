@@ -5,6 +5,7 @@
 #include "Global.h"
 #include "Boss/CBossEnemy.h"
 #include "Boss/CBossWeapon.h"
+#include "Boss/CBossAnim.h"
 
 FString UCBossAnimNotify_RateDown::GetNotifyName_Implementation() const
 {

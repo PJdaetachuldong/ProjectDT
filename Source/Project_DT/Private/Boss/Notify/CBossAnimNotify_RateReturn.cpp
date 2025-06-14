@@ -4,6 +4,7 @@
 #include "Boss/Notify/CBossAnimNotify_RateReturn.h"
 #include "Global.h"
 #include "Boss/CBossEnemy.h"
+#include "Boss/CBossAnim.h"
 
 FString UCBossAnimNotify_RateReturn::GetNotifyName_Implementation() const
 {
