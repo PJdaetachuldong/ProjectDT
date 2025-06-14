@@ -27,7 +27,10 @@ public:
 	class ACBossEnemy* MyBoss;
 
 	UPROPERTY(EditAnywhere, Category = Effect)
-	UNiagaraSystem* HitEffect;
+	UNiagaraSystem* ParringEffect;
+
+	UPROPERTY(EditAnywhere, Category = Effect)
+	UNiagaraSystem* SlashEffect;
 
 	//보스 공격 종류에 따라 피격 불러오는 Hit Data가 다름
 	int32 HitNumber = 0;
@@ -48,6 +51,8 @@ public:
 	FRotator OverlapRotator;
 
 	void PlayerDamage();
+
+	void DashAttackHitCheck();
 
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* SwordMesh;

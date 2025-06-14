@@ -78,12 +78,11 @@ void ACBossWeapon::PlayerDamage()
 	//만약 플레이어가 패링 감지중이면
 	if (IsPlayerParring)
 	{
-		GEngine->AddOnScreenDebugMessage(111, 10.0f, FColor::White, TEXT("PlayerParrying"));
-		IsPlayerParring = false;
+		OverlapRotator = FRotator::ZeroRotator;
 
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			GetWorld(),
-			HitEffect,
+			ParringEffect,
 			OverlapLocation, // 충돌 지점
 			OverlapRotator, // 충돌 방향
 			FVector(1.0f), // 스케일
@@ -91,10 +90,63 @@ void ACBossWeapon::PlayerDamage()
 			true // Auto Activate
 		);
 
+		IsPlayerParring = false;
+
 		return;
 	}
+
+	//슬래쉬 이펙트 생성
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		SlashEffect,
+		OverlapLocation,
+		OverlapRotator,
+		FVector(1.0f),
+		true,
+		true
+	);
+
 	// 사용자 정의 데미지 이벤트 생성
 	MyBoss->HitData->HitDatas[HitNumber].SendDamage(MyBoss, this, MyBoss->Target);
+}
+
+void ACBossWeapon::DashAttackHitCheck()
+{
+	OverlapLocation = MyBoss->Target->GetActorLocation();
+
+	GetWorld()->GetTimerManager().SetTimer(ParringCheckTimer, this, &ACBossWeapon::PlayerDamage, 0.01f, false);
+
+// 	//만약 플레이어가 패링 감지중이면
+// 	if (IsPlayerParring)
+// 	{
+// 		OverlapRotator = FRotator::ZeroRotator;
+// 
+// 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+// 			GetWorld(),
+// 			ParringEffect,
+// 			OverlapLocation, // 충돌 지점
+// 			OverlapRotator, // 충돌 방향
+// 			FVector(1.0f), // 스케일
+// 			true, // Auto Destroy
+// 			true // Auto Activate
+// 		);
+// 
+// 		return;
+// 	}
+// 
+// 	//슬래쉬 이펙트 생성
+// 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+// 		GetWorld(),
+// 		SlashEffect,
+// 		OverlapLocation,
+// 		OverlapRotator,
+// 		FVector(1.0f),
+// 		true,
+// 		true
+// 	);
+// 
+// 	// 사용자 정의 데미지 이벤트 생성
+// 	MyBoss->HitData->HitDatas[HitNumber].SendDamage(MyBoss, this, MyBoss->Target);
 }
 
 void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -103,12 +155,43 @@ void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 
 	if (Player)
 	{
+		OverlapLocation = bFromSweep ? FVector(SweepResult.ImpactPoint) : OtherActor->GetActorLocation();
+
+		OverlapRotator = bFromSweep ? SweepResult.ImpactNormal.Rotation() : FRotator::ZeroRotator;
+		
 		//가드가 가능한 공격일 경우
 		if (IsGuard)
 		{
-			OverlapLocation = bFromSweep ? FVector(SweepResult.ImpactPoint) : OtherActor->GetActorLocation();
-			OverlapRotator = bFromSweep ? SweepResult.ImpactNormal.Rotation() : FRotator::ZeroRotator;
+			
 
+// 			FVector ImpactNormal = FVector::ZeroVector;
+// 			if (bFromSweep && SweepResult.IsValidBlockingHit())
+// 			{
+// 				ImpactNormal = SweepResult.ImpactNormal;
+// 			}
+// 			else
+// 			{
+// 				// 스윕 데이터가 없으면 무기의 이동 방향 또는 기본 방향 사용
+// 				ImpactNormal = GetActorForwardVector().GetSafeNormal();
+// 				UE_LOG(LogTemp, Warning, TEXT("Sweep data invalid, using Forward Vector: %s"), *ImpactNormal.ToString());
+// 			}
+// 
+// 			// (0, 0, 0) 방지
+// 			if (ImpactNormal.IsNearlyZero())
+// 			{
+// 				ImpactNormal = FVector(0, 0, 1); // 기본값으로 위쪽 방향
+// 				UE_LOG(LogTemp, Warning, TEXT("ImpactNormal is zero, defaulting to (0, 0, 1)"));
+// 			}
+// 
+// 			// 회전 계산
+// 			if (FMath::Abs(ImpactNormal.Z) > FMath::Abs(ImpactNormal.X)) // 세로 방향
+// 			{
+// 				OverlapRotator = ImpactNormal.Rotation();
+// 			}
+// 			else // 가로 방향
+// 			{
+// 				OverlapRotator = FRotator(0.0f, ImpactNormal.Rotation().Yaw, 0.0f);
+// 			}
 			GetWorld()->GetTimerManager().SetTimer(ParringCheckTimer,this, &ACBossWeapon::PlayerDamage,0.1f,false);
 
 // 			//만약 플레이어가 패링 감지중이면
@@ -152,6 +235,28 @@ void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 			{
 				MyBoss->IsSPFirstATKHit = true;
 			}
+
+// 			FVector ImpactNormal = SweepResult.ImpactNormal;
+// 			// Impact Normal을 Y축(세로)과 X축(가로) 방향으로 비교
+// 			if (FMath::Abs(ImpactNormal.Z) > FMath::Abs(ImpactNormal.X)) // 세로 방향(위/아래) 충돌
+// 			{
+// 				OverlapRotator = ImpactNormal.Rotation(); // 세로 방향에 맞게 회전
+// 			}
+// 			else // 가로 방향(좌/우) 충돌
+// 			{
+// 				OverlapRotator = FRotator(0.0f, ImpactNormal.Rotation().Yaw, 0.0f); // Yaw로 가로 회전
+// 			}
+
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				SlashEffect,
+				OverlapLocation,
+				OverlapRotator,
+				FVector(1.0f),
+				true,
+				true
+			);
+
 
 // 			FVector HitLocation = bFromSweep ? FVector(SweepResult.ImpactPoint) : OtherActor->GetActorLocation();
 // 			FRotator HitRotation = bFromSweep ? SweepResult.ImpactNormal.Rotation() : FRotator::ZeroRotator;

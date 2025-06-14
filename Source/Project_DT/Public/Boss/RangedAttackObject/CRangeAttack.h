@@ -46,6 +46,9 @@ public:
 	//타겟을 향해 날아가는 방향을 저장하는 변수
 	FVector Direction;
 
+	FVector OverlapLocation;
+	FRotator OverlapRotator;
+
 // 	//콜리전과 외형을 비활성화 변환 시켜주는 함수 
 // 	void SetActive(bool Value, FVector DirectionToTarget);
 

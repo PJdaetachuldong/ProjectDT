@@ -24,6 +24,7 @@
 #include "Weapons/CDoAction.h"
 #include "Components/ArrowComponent.h"
 #include "Component/CMointageComponent.h"
+#include "Boss/CBossDashATKCollision.h"
 
 ACBossEnemy::ACBossEnemy()
 {
@@ -120,13 +121,12 @@ ACBossEnemy::ACBossEnemy()
 	StartCollision->SetCollisionProfileName(L"BossWeapon");
 	StartCollision->OnComponentBeginOverlap.AddDynamic(this, &ACBossEnemy::Start);
 
-	DashATKCollision = CreateDefaultSubobject<UBoxComponent>(L"DashColli");
-	DashATKCollision->SetupAttachment(GetMesh());
-	DashATKCollision->SetCollisionProfileName(L"BossWeapon");
-	DashATKCollision->OnComponentBeginOverlap.AddDynamic(this, &ACBossEnemy::DashPlayerHit);
-	DashATKCollision->SetRelativeLocation(FVector(0, 59, 100));
-	DashATKCollision->SetBoxExtent(FVector(41,29,80));
-	DashATKCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+// 	DashATKCollision = CreateDefaultSubobject<UBoxComponent>(L"DashColli");
+// 	DashATKCollision->SetupAttachment(GetMesh());
+// 	DashATKCollision->SetCollisionProfileName(L"BossWeapon");
+// 	DashATKCollision->OnComponentBeginOverlap.AddDynamic(this, &ACBossEnemy::DashPlayerHit);
+// 	DashATKCollision->SetRelativeLocation(FVector(0, 59, 100));
+// 	DashATKCollision->SetBoxExtent(FVector(41,29,80));
 
 	CHelpers::GetClass(&BossUIClass,AssetPaths::BossUI);
 }
@@ -159,6 +159,23 @@ void ACBossEnemy::BeginPlay()
 		if (SpawnWeapon)
 		{
 			SpawnWeapon->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Weapon_Socket"));
+		}
+	}
+
+	if (DashATKColli)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = GetInstigator();
+
+		SpawnDashATKColli = GetWorld()->SpawnActor<ACBossDashATKCollision>(DashATKColli, GetActorLocation(), GetActorRotation(), SpawnParams);
+
+		if (SpawnDashATKColli)
+		{
+			// 스폰한 엑터를 부모의 루트 컴포넌트에 붙이기
+			SpawnDashATKColli->AttachToComponent(RootComponent,FAttachmentTransformRules::KeepWorldTransform );
+
+			SpawnDashATKColli->GetMyBoss(this);
 		}
 	}
 
@@ -200,6 +217,8 @@ void ACBossEnemy::BeginPlay()
 
 	FirstLocation = GetActorLocation();
 	FirstRotation = GetActorRotation();
+
+	/*DashATKCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);*/
 }
 
 void ACBossEnemy::InitializeMontageMap()
@@ -233,14 +252,12 @@ void ACBossEnemy::InitializeMontageMap()
 		MontageScaleMap.Add(AM_DashAttack, DashAttackRates);
 	}
 
-// 	if (AM_RangedAttack)
-// 	{
-// 		TArray<FMontageRateScale> RangedAttackRates;
-// 		RangedAttackRates.Add(FMontageRateScale{ FName("DashAttackReady"), 0.7f });
-// 		RangedAttackRates.Add(FMontageRateScale{ FName("Run"), 0.7f });
-// 		RangedAttackRates.Add(FMontageRateScale{ FName("DashAttack"), 0.7f });
-//		MontageScaleMap.Add(AM_RangedAttack, RangedAttackRates);
-// 	}
+	if (AM_RangedAttack)
+	{
+		TArray<FMontageRateScale> RangedAttackRates;
+		RangedAttackRates.Add(FMontageRateScale{ FName("Default"), 1.0f, false });
+		MontageScaleMap.Add(AM_RangedAttack, RangedAttackRates);
+	}
 
 	if (AM_Guard)
 	{
@@ -277,6 +294,8 @@ void ACBossEnemy::InitializeMontageMap()
 void ACBossEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+/*	DrawDebugBox(GetWorld(), DashATKCollision->GetComponentLocation(), DashATKCollision->GetScaledBoxExtent(), FColor::Red, false, 0.1f);*/
 
 	if(!BossStart) return;
 
@@ -394,17 +413,21 @@ void ACBossEnemy::OffSwordCollision()
 
 void ACBossEnemy::OnDashCollision()
 {
-	if (DashATKCollision)
+	if (SpawnDashATKColli)
 	{
-		DashATKCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		SpawnDashATKColli->OnDashCollision();
+		
+		/*DashATKCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);*/
 	}
 }
 
 void ACBossEnemy::OffDashCollision()
 {
-	if (DashATKCollision)
+	if (SpawnDashATKColli)
 	{
-		DashATKCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		SpawnDashATKColli->OffDashCollision();
+
+		/*DashATKCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);*/
 	}
 }
 
@@ -1511,29 +1534,17 @@ void ACBossEnemy::Start(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 }
 
 
-void ACBossEnemy::DashPlayerHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (Target == Cast<ACPlayer>(OtherActor))
-	{
-		UCWeaponComponent* Weapon = CHelpers::GetComponent<UCWeaponComponent>(Target);
-
-		//만약 플레이어가 패링 감지중이면
-		if (Weapon->GetDoAction() && Weapon->GetDoAction()->RetrunParry())
-		{
-			return;
-		}
-
-		// 사용자 정의 데미지 이벤트 생성
-		HitData->HitDatas[SpawnWeapon->HitNumber].SendDamage(this, SpawnWeapon, Target);
-	}
-
-	//가드 불가능 공격일 경우
-	else
-	{
-		//무조건 사용자 정의 데미지 이벤트 생성
-		HitData->HitDatas[SpawnWeapon->HitNumber].SendDamage(this, SpawnWeapon, Target);
-	}
-}
+// void ACBossEnemy::DashPlayerHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+// {
+// 	UE_LOG(LogTemp, Warning, TEXT("OtherActor Class: %s"), *GetNameSafe(OtherActor));
+// 
+// 	ACPlayer* Player = Cast<ACPlayer>(OtherActor);
+// 
+// 	if (Player)
+// 	{
+// 		SpawnWeapon->DashAttackHitCheck();
+// 	}
+// }
 
 void ACBossEnemy::SetHP(float value)
 {

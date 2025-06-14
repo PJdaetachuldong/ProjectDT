@@ -243,11 +243,11 @@ public:
 	TSubclassOf<UUserWidget>BossUIClass;
 	class UBossWidget* BossUI;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DashATK)
-	class UBoxComponent* DashATKCollision;
+// 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DashATK)
+// 	class UBoxComponent* DashATKCollision;
 
-	UFUNCTION()
-	void DashPlayerHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+// 	UFUNCTION()
+// 	void DashPlayerHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	virtual void SetHP(float value) override;
 
@@ -257,6 +257,11 @@ public:
 	FRotator FirstRotation;
 
 	void RestartGame();
+
+	UPROPERTY(EditAnywhere, Category = Collision)
+	TSubclassOf<class ACBossDashATKCollision> DashATKColli;
+
+	class ACBossDashATKCollision* SpawnDashATKColli;
 };
 
 USTRUCT(BlueprintType)

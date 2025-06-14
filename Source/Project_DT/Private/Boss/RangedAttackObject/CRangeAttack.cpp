@@ -115,6 +115,10 @@ void ACRangeAttack::HitPlayer()
 {
 	if (MyBoss)
 	{
+		OverlapLocation = MyBoss->Target->GetActorLocation();
+
+		OverlapRotator = FRotator::ZeroRotator;
+
 		//가드가 가능한 공격일 경우
 		if (MyBoss->SpawnWeapon->IsGuard)
 		{
@@ -126,6 +130,16 @@ void ACRangeAttack::HitPlayer()
 				return;
 			}
 
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				MyBoss->SpawnWeapon->SlashEffect,
+				OverlapLocation,
+				OverlapRotator,
+				FVector(1.0f),
+				true,
+				true
+			);
+
 			// 사용자 정의 데미지 이벤트 생성
 			MyBoss->HitData->HitDatas[MyBoss->SpawnWeapon->HitNumber].SendDamage(MyBoss, MyBoss->SpawnWeapon, MyBoss->Target);
 		}
@@ -133,6 +147,16 @@ void ACRangeAttack::HitPlayer()
 		//가드 불가능 공격일 경우
 		else
 		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				MyBoss->SpawnWeapon->SlashEffect,
+				OverlapLocation,
+				OverlapRotator,
+				FVector(1.0f),
+				true,
+				true
+			);
+
 			//무조건 사용자 정의 데미지 이벤트 생성
 			MyBoss->HitData->HitDatas[MyBoss->SpawnWeapon->HitNumber].SendDamage(MyBoss, MyBoss->SpawnWeapon, MyBoss->Target);
 		}
