@@ -18,6 +18,8 @@ public:
 	FWidgetAnimationDynamicEvent FCompleteFadeInAnimation;
 public:
 	virtual void NativeConstruct() override;
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+	
 private:
 	UFUNCTION()
 	void EndFadeOut();
@@ -40,9 +42,13 @@ public:
 	class UButton* Button;
 	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
 	class UTextBlock* TypeText;
+	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
+	class UImage* Arrow;
 
 private:
 	FString FullText;
 	FTimerHandle TypingTimerHandle;
+	UPROPERTY()
+	bool bIsTypingEffectActive=false; // 타이핑 효과가 진행 중인지 나타내는 변수
 	
 };

@@ -79,7 +79,11 @@ void UCStateComponent::SetParryMode()
 void UCStateComponent::SetCounterMode()
 {
 	ChangeType(EStateType::Counter);
-	
+}
+
+void UCStateComponent::SetStartMode()
+{
+	ChangeType(EStateType::Start);
 }
 
 void UCStateComponent::OnSubActionMode ( )

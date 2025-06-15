@@ -35,7 +35,7 @@ void UCAnimNotify_EndState::Notify ( USkeletalMeshComponent* Meshcomp , UAnimSeq
 		break;
 	case EStateType::Hitted:
 		break;
-	case EStateType::Dead:
+	case EStateType::Dead:{ State->SetIdleMode(); }
 		break;
 	case EStateType::Action:
 		break;

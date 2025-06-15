@@ -149,5 +149,7 @@ void UCMovementComponent::Move ( )
 void UCMovementComponent::Stop ( )
 {
 	bCanMove = false;
+	RightScale=0;
+	ForwardScale=0;
 }
 

@@ -29,6 +29,9 @@ public:
 
 private:
 	class ACharacter* OwnerCharacter;
+	UPROPERTY()
+	FTimerHandle Handler;
+	
 	
 	
 };

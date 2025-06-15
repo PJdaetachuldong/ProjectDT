@@ -21,6 +21,9 @@ namespace AssetPaths
     constexpr const TCHAR* IA_SpecialClick = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Ctrl.IA_Ctrl'" );
     constexpr const TCHAR* IA_GuardBtn = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Guard.IA_Guard'" );
     constexpr const TCHAR* IA_Heal = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_E.IA_E'" );
+    constexpr const TCHAR* IA_Cheat = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Cheat.IA_Cheat'" );
+    constexpr const TCHAR* IA_Cheat2 = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Cheat2.IA_Cheat2'" );
+    constexpr const TCHAR* IA_ESC = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_ESC.IA_ESC'" );
 
     constexpr const TCHAR* IMC = TEXT ( "/Script/EnhancedInput.InputMappingContext'/Game/LHW/Input/IMC_Player.IMC_Player'" );
     constexpr const TCHAR* IA_Test = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Test.IA_Test'" );
@@ -36,6 +39,7 @@ namespace AssetPaths
     constexpr const TCHAR* MapWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_MapWidget.WBP_MapWidget_C'" );
     constexpr const TCHAR* GameOverWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_GameOverWidget.WBP_GameOverWidget_C'" );
     constexpr const TCHAR* QuestWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_Quest.WBP_Quest_C'" );
+    constexpr const TCHAR* OptionWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_Option.WBP_Option_C'" );
 
     //보스
     constexpr const TCHAR* BossAnim = TEXT ("/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Boss/ABP_BossAnim.ABP_BossAnim_C'" );

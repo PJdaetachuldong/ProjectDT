@@ -5,8 +5,11 @@
 #include "GameFramework/Character.h"
 #include "Global.h"
 #include "LHW_GameModeBase.h"
+#include "Component/CProductionComponent.h"
 #include "Component/CStateComponent.h"
 #include "Component/CStatusComponent.h"
+#include "Component/CTargetingComponent.h"
+#include "Dummy/CTargetActor.h"
 #include "GameFramework/GameModeBase.h"
 #include "Widget/CGameOverWidget.h"
 
@@ -34,6 +37,8 @@ void UCMointageComponent::BeginPlay ( )
 	OwnerCharacter = Cast<ACharacter> ( GetOwner ( ) );
 	State = CHelpers::GetComponent<UCStateComponent>(OwnerCharacter);
 	Status = CHelpers::GetComponent<UCStatusComponent>(OwnerCharacter);
+	Target = CHelpers::GetComponent<UCTargetingComponent>(OwnerCharacter);
+	Production = CHelpers::GetComponent<UCProductionComponent>(OwnerCharacter);
 	GameOver=CreateWidget<UCGameOverWidget>(GetWorld(),GameOverClass);
 
 
@@ -50,24 +55,8 @@ void UCMointageComponent::BeginPlay ( )
 
 				continue;
 			}
-		}//for(data)
-	}//for(i)
-
-
-//#if LOG_UCMontagesComponent
-//	for (FMontagesData* data : datas)
-//	{
-//		if (data == nullptr)
-//			continue;
-//
-//		FString str;
-//		str.Append(StaticEnum<EStateType>()->GetValueAsString(data->Type));
-//		str.Append(" / ");
-//		str.Append(data->Montage->GetPathName());
-//
-//		CLog::Log(str);
-//	}
-//#endif
+		}
+	}
 }
 
 
@@ -84,7 +73,6 @@ void UCMointageComponent::PlayBackStepMode (EActState InType)
 void UCMointageComponent::PlayDeadMode ( )
 {
 	PlayAnimMontage ( EActState::Dead );
-	FTimerHandle handler;
 
 	OwnerCharacter->DisableInput(nullptr);
 	isDead=true;
@@ -120,6 +108,11 @@ void UCMointageComponent::PlayPerfectDodge()
 	PlayAnimMontage(EActState::PDodge);
 }
 
+void UCMointageComponent::PlayIntro()
+{
+	PlayAnimMontage(EActState::Intro);
+}
+
 void UCMointageComponent::Dead()
 {
 	PlayAnimMontage(EActState::Dead);
@@ -128,14 +121,17 @@ void UCMointageComponent::Dead()
 void UCMointageComponent::Respawn()
 {
 	if(OwnerCharacter&&State&& Status){
+		Target->ResetLockOn();
 	OwnerCharacter->SetActorLocation(RespawnPosition);
-	OwnerCharacter->EnableInput(nullptr);
-	State->SetIdleMode();
 	Status->Heal(100);
 	Status->UseMana(100);
 	isDead=false;
-	PlayAnimMontage(EActState::Getup);
-		
+		GetWorld()->GetTimerManager().SetTimer(handler,[this]()
+			{
+				OwnerCharacter->EnableInput(nullptr);
+				PlayAnimMontage(EActState::Getup);
+				Production->SetCameraLookAtNearestTarget();
+			},2.0f,false,2.0f);
 	}
 }
 
@@ -152,4 +148,3 @@ void UCMointageComponent::PlayAnimMontage ( EActState InType )
 	}
 	OwnerCharacter->PlayAnimMontage ( data->Montage , data->PlayRate );
 }
-

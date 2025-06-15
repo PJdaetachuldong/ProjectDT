@@ -37,6 +37,8 @@ public:
 	UFUNCTION()
 	void CreateMapUI();
 
+	void SwitchOption();
+
 private:
 	bool CheckMap=true;
 
@@ -74,6 +76,12 @@ private:
 	
 	UPROPERTY(EditAnywhere)
 	class UCQuestWidget* QuestWidget;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget>OptionWidgetClass;
+	
+	UPROPERTY(EditAnywhere)
+	class UCOptionWidget* OptionWidget;
 
 
 	

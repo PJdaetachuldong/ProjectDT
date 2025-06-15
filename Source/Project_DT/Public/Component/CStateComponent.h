@@ -9,7 +9,7 @@
 UENUM(BlueprintType)
 enum class EStateType : uint8
 {
-	Idle = 0, BackStep, Equip, Hitted, Dead, Action,Cancel,Guard,Heal,Parry,Counter, Max,
+	Idle = 0, BackStep, Equip, Hitted, Dead, Action,Cancel,Guard,Heal,Parry,Counter,Start, Max,
 };
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FStateTypeChanged, EStateType, InPrevType, EStateType, InNewType);
 
@@ -31,6 +31,7 @@ public:
 	FORCEINLINE bool IsHealMode ( ) { return Type == EStateType::Heal; }
 	FORCEINLINE bool IsParryMode ( ) { return Type == EStateType::Parry; }
 	FORCEINLINE bool IsCounterMode ( ) { return Type == EStateType::Counter; }
+	FORCEINLINE bool IsStartMode ( ) { return Type == EStateType::Start; }
 
 
 	FORCEINLINE bool IsSubActionMode ( ) { return bInSubActionMode; }
@@ -59,6 +60,7 @@ public:
 	void SetHealMode ( );
 	void SetParryMode ( );
 	void SetCounterMode ( );
+	void SetStartMode ( );
 
 	void OnSubActionMode ( );
 	void OffSubActionMode ( );

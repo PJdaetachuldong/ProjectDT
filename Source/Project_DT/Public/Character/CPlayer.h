@@ -39,6 +39,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	class UMotionWarpingComponent* MotionWarping;
+
+	UPROPERTY(VisibleAnywhere)
+	class UCProductionComponent* Production;
 	
 public:
 	UPROPERTY(VisibleAnywhere)
@@ -98,6 +101,14 @@ public:
 	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
 	class UInputAction* IA_Select;
 
+	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
+	class UInputAction* IA_Cheat;
+	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
+	class UInputAction* IA_Cheat2;
+
+	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
+	class UInputAction* IA_ESC;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UInputMappingContext* IMC;
@@ -137,6 +148,14 @@ private:
 private:
 	UFUNCTION()
 	void OnParryDetected(EParryState ParryDirection);
+	
+	UFUNCTION()
+	void TestHandler();
+	UFUNCTION()
+	void TestHandler2();
+
+	UFUNCTION()
+	void EscapeHandler();
 
 private:
 	void OnGuard();

@@ -9,7 +9,7 @@
 UENUM ( )
 enum class EActState : uint8
 {
-	Healing,DodgeF, DodgeB , DodgeL, DodgeR, DodgeFL, DodgeFR, DodgeBL, DodgeBR , PDodgeL, PDodgeR,Dead, PDodge,Getup, Max
+	Healing,DodgeF, DodgeB , DodgeL, DodgeR, DodgeFL, DodgeFR, DodgeBL, DodgeBR , PDodgeL, PDodgeR,Dead, PDodge,Getup,Intro, Max
 };
 
 USTRUCT()
@@ -58,17 +58,24 @@ public:
 	void PlayPerfectDodgeL ( );
 	void PlayPerfectDodgeR ( );
 	void PlayPerfectDodge ( );
+	void PlayIntro ( );
 	void Dead();
 	void Respawn();
 
 private:
 	void PlayAnimMontage( EActState InType);
-
 private:
 	class ACharacter* OwnerCharacter;
 	FMontagesData* Datas[(int32)EActState::Max];
+	UPROPERTY()
 	class UCStateComponent* State;
+	UPROPERTY()
 	class UCStatusComponent* Status;
+
+	UPROPERTY()
+	class UCTargetingComponent* Target;
+	UPROPERTY()
+	class UCProductionComponent* Production;
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FVector RespawnPosition=FVector::ZeroVector;
@@ -82,5 +89,9 @@ public:
 
 public:
 	bool isDead=false;
+	
+	UPROPERTY()
+	FTimerHandle handler;
+	
 
 };

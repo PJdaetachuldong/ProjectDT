@@ -2,8 +2,12 @@
 
 
 #include "Widget/CScriptWidget.h"
+
+#include "Component/CMovementComponent.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Utilities/CHelper.h"
 
 void UCScriptWidget::NativeConstruct()
 {
@@ -12,23 +16,48 @@ void UCScriptWidget::NativeConstruct()
 
 	FCompleteFadeInAnimation.BindDynamic(this,&UCScriptWidget::StartTypingEffect);
 	BindToAnimationFinished(FadeIn, FCompleteFadeInAnimation);
-	
+	Arrow->SetRenderOpacity(0);
 
+}
+
+FReply UCScriptWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	// === 1. 눌린 키가 'F' 키인지 확인 ===
+	if (InKeyEvent.GetKey() == EKeys::F)
+	{
+		EndFadeOut();
+		return FReply::Handled(); 
+	}
+	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
 
 void UCScriptWidget::EndFadeOut()
 {
+	if (bIsTypingEffectActive)return;
 	APlayerController* C=Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	UCMovementComponent* Movement= CHelpers::GetComponent<UCMovementComponent>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (Movement)
+		Movement->Move();
 	C->bShowMouseCursor=false;
+	FInputModeGameOnly InputMode;
+	C->SetInputMode(InputMode);
 	PlayAnimation(FadeOut, 0.f, 1, EUMGSequencePlayMode::Forward, 1.0f);
 	FullText="";
+	TypeText->SetText(FText::FromString(FullText));
+	Arrow->SetRenderOpacity(0);
 
+	
 }
 
 void UCScriptWidget::StartFadeInAnimation()
 {
 	APlayerController* C=Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-	C->bShowMouseCursor=true;
+	UCMovementComponent* Movement= CHelpers::GetComponent<UCMovementComponent>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (Movement)
+		Movement->Stop();
+	FInputModeUIOnly InputMode;
+	InputMode.SetWidgetToFocus(TakeWidget());
+	C->SetInputMode(InputMode);
 	PlayAnimation(FadeIn, 0.f, 1, EUMGSequencePlayMode::Forward, 1.0f);
 }
 
@@ -50,12 +79,15 @@ void UCScriptWidget::StartTypingEffect()
 	TypeText->SetText(FText::FromString(TEXT("")));
 
 	int32 CurrentIndex = 0;
-
+	bIsTypingEffectActive = true; 
 	GetWorld()->GetTimerManager().SetTimer(TypingTimerHandle, FTimerDelegate::CreateLambda([this, CurrentIndex]() mutable {
 
 		if (CurrentIndex >= FullText.Len())
 		{
 			GetWorld()->GetTimerManager().ClearTimer(TypingTimerHandle); // 클래스 멤버로 선언된 거!
+			bIsTypingEffectActive = false;
+			Arrow->SetRenderOpacity(1);
+			
 			return;
 		}
 

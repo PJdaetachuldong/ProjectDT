@@ -3,6 +3,7 @@
 
 #include "Character/CPlayer.h"
 #include "Global.h"
+#include "LHW_GameModeBase.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
@@ -24,6 +25,7 @@
 #include "Weapons/CWeaponStuctures.h"
 #include "Enemy/EnemyBase/CEnemyBase.h"
 #include "Boss/CBossWeapon.h"
+#include "Component/CProductionComponent.h"
 #include "Weapons/CDoAction.h"
 #include "Components/WidgetComponent.h"
 #include "Widget/CPlayerWidget.h"
@@ -106,6 +108,7 @@ ACPlayer::ACPlayer()
 	CHelpers::CreateActorComponent<UCStatusComponent>(this, &Status, "Status");
 	CHelpers::CreateActorComponent<UCCameraActionComponent>(this, &CameraAction, "CameraAction");
 	CHelpers::CreateActorComponent<UMotionWarpingComponent>(this, &MotionWarping, "MotionWarping");
+	CHelpers::CreateActorComponent<UCProductionComponent>(this, &Production, "Production");
 	
 
 	//인풋 받기
@@ -126,10 +129,12 @@ ACPlayer::ACPlayer()
 	CHelpers::GetAsset(&IA_TestBtn, AssetPaths::IA_Test);
 	CHelpers::GetAsset(&IA_TestBtn2, AssetPaths::IA_Test2);
 	CHelpers::GetAsset(&IA_Select, AssetPaths::Select);
+	CHelpers::GetAsset(&IA_Cheat, AssetPaths::IA_Cheat);
+	CHelpers::GetAsset(&IA_Cheat2, AssetPaths::IA_Cheat2);
+	CHelpers::GetAsset(&IA_ESC, AssetPaths::IA_ESC);
 	//위젯
 	CHelpers::GetClass(&WidgetClass, AssetPaths::PlayerWidget);
 }
-
 void ACPlayer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -142,7 +147,6 @@ void ACPlayer::BeginPlay()
 	if (WidgetClass)
 	{
 		UWidget = CreateWidget<UCPlayerWidget>(GetWorld(), WidgetClass);
-		// UWidget->AddToViewport();
 	}
 
 	State->OnStateTypeChanged.AddDynamic(this, &ACPlayer::OnStateTypeChanged);
@@ -190,6 +194,10 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		
 		playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Started, this, &ACPlayer::SelectWidgetOn);
 		playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Completed, this, &ACPlayer::SelectGreatSword);
+		playerInput->BindAction(IA_Cheat, ETriggerEvent::Started, Montages, &UCMointageComponent::PlayDeadMode);
+		playerInput->BindAction(IA_Cheat2, ETriggerEvent::Started, this, &ACPlayer::TestHandler);
+		playerInput->BindAction(IA_Select, ETriggerEvent::Started, this, &ACPlayer::TestHandler2);
+		playerInput->BindAction(IA_ESC, ETriggerEvent::Started, this, &ACPlayer::EscapeHandler);
 	}
 }
 
@@ -301,6 +309,25 @@ void ACPlayer::Jump()
 void ACPlayer::OnParryDetected(EParryState ParryDirection)
 {
 	Weapon->OnParry(ParryDirection);
+}
+
+void ACPlayer::TestHandler()
+{
+	// State->SetStartMode();
+	Montages->PlayIntro();
+	Production->SetViewToCineCameraByIndex(0,1.5f);
+}
+
+void ACPlayer::TestHandler2()
+{
+	Production->SetViewToCharacterCamera(1.0f);
+}
+
+void ACPlayer::EscapeHandler()
+{
+	ALHW_GameModeBase* Gamemode=Cast<ALHW_GameModeBase>(GetWorld()->GetAuthGameMode());
+	CheckNull(Gamemode);
+	Gamemode->SwitchOption();
 }
 
 void ACPlayer::OnGuard()
