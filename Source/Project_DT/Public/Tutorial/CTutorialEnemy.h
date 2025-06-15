@@ -83,4 +83,7 @@ protected:
 	virtual void Hitted();
 public:
 	float TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	float CurAttackTime = 0.0f;
+	float AttackLimitTime = 3.4f;
 };

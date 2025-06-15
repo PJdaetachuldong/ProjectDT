@@ -12,7 +12,11 @@ ACTutoWeapon::ACTutoWeapon()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	SceneComp = CreateDefaultSubobject<USceneComponent>(L"SceneComp");
+	SetRootComponent(SceneComp);
+
 	WeaponCollComp = CreateDefaultSubobject<UBoxComponent>(L"WeaponCollision");
+	WeaponCollComp->SetupAttachment(SceneComp);
 	WeaponCollComp->SetBoxExtent(FVector(30));
 	WeaponCollComp->OnComponentBeginOverlap.AddDynamic(this, &ACTutoWeapon::TutoWeaponOverlap);
 	WeaponCollComp->SetCollisionProfileName(FName("BossWeapon"));
@@ -36,9 +40,17 @@ void ACTutoWeapon::Tick(float DeltaTime)
 void ACTutoWeapon::PlayParringAnim()
 {
 	//현재 재생중인 몽타주 멈춤
-	MyOwner->AnimInstance->StopAllMontages(0.0f);
+	MyOwner->AnimInstance->AnimState = ETutoState::CHASE;
+	MyOwner->State = ETutoState::CHASE;
 	
 	IsTutoPlayerParring = true;
+
+	
+}
+
+bool ACTutoWeapon::CheckGuardBool()
+{
+	return true;
 }
 
 void ACTutoWeapon::SetTutoOwner(ACTutorialEnemy* WHO)
@@ -65,6 +77,8 @@ void ACTutoWeapon::TutoWeaponOverlap(UPrimitiveComponent* OverlappedComponent, A
 
 	if (Player)
 	{
+		GEngine->AddOnScreenDebugMessage(111, 1.0f, FColor::White, TEXT("Counter Attack!!!"));
+
 		//가드가 가능한 공격일 경우
 		if (MyOwner->IsParry)
 		{

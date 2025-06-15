@@ -40,6 +40,8 @@ ACBossWeapon::ACBossWeapon()
 void ACBossWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if(IsTutoWeapon) return;
 		SwordCollComp->AttachToComponent(SwordMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Collision_Socket"));
 		SwordCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
@@ -50,6 +52,8 @@ void ACBossWeapon::BeginPlay()
 void ACBossWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (IsTutoWeapon) return;
 
 	if (GetOwner())
 	{

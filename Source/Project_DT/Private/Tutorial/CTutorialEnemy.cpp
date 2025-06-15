@@ -8,6 +8,7 @@
 #include "Tutorial/CTutoAnim.h"
 #include "Tutorial/CTutoWeapon.h"
 #include "Components/BoxComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ACTutorialEnemy::ACTutorialEnemy()
@@ -24,6 +25,8 @@ ACTutorialEnemy::ACTutorialEnemy()
 void ACTutorialEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetCharacterMovement()->MaxWalkSpeed = 200.0f;
 	
 	AI = Cast<AAIController>(GetController());
 	Target = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
@@ -35,7 +38,7 @@ void ACTutorialEnemy::BeginPlay()
 	//무기 생성
 	if (TutoWeapon)
 	{
-		FTransform SocketTransform = GetMesh()->GetSocketTransform(FName("Weapon_Socket"));
+		FTransform SocketTransform = GetMesh()->GetSocketTransform(FName("TutoWeapon_Socket"));
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this;
@@ -45,7 +48,7 @@ void ACTutorialEnemy::BeginPlay()
 
 		if (SpawnTutoWeapon)
 		{
-			SpawnTutoWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("Weapon_Socket"));
+			SpawnTutoWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("TutoWeapon_Socket"));
 			SpawnTutoWeapon->SetTutoOwner(this);
 		}
 	}
@@ -56,15 +59,23 @@ void ACTutorialEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (State == ETutoState::BREAK || State == ETutoState::DIE) return;
+
 	//패링 튜토일때 양식
 	if (IsParry)
 	{	
 		//거리가 공격범위 아래일 경우
 		if (FVector::Dist(Target->GetActorLocation(), GetActorLocation()) <= AttackRange)
 		{
-			//공격 상태로 변환
-			State = ETutoState::ATTACK;
-			AnimInstance->AnimState = ETutoState::ATTACK;
+			CurAttackTime += DeltaTime;
+			if (CurAttackTime >= AttackLimitTime)
+			{
+				//공격 상태로 변환
+				State = ETutoState::ATTACK;
+				AnimInstance->AnimState = ETutoState::ATTACK;
+
+				CurAttackTime = 0.0f;
+			}
 		}
 
 		else if (FVector::Dist(Target->GetActorLocation(), GetActorLocation()) > AttackRange)
@@ -116,7 +127,7 @@ void ACTutorialEnemy::SetShieldAmount(float value)
 void ACTutorialEnemy::Hitted()
 {
 	//사망 상태면 안되게 막음
-	if (State == ETutoState::DIE) return;
+	if (State == ETutoState::BREAK || State == ETutoState::DIE) return;
 
 	if (!!Damage.Event && !!Damage.Event->HitData) 
 	{

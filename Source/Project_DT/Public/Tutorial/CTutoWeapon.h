@@ -25,9 +25,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USceneComponent* SceneComp;
+
 	ACTutorialEnemy* MyOwner;
 
 	virtual void PlayParringAnim() override;
+	virtual bool CheckGuardBool() override;
 
 	void SetTutoOwner(ACTutorialEnemy* WHO);
 
