@@ -134,6 +134,7 @@ void UCMointageComponent::Respawn()
 	Status->Heal(100);
 	Status->UseMana(100);
 	isDead=false;
+	PlayAnimMontage(EActState::Getup);
 		
 	}
 }

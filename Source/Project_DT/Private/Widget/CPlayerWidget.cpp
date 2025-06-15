@@ -157,8 +157,3 @@ void UCPlayerWidget::ShowStatusUI()
 {
 	PlayAnimation(StatusFadeIn, 0.f, 1, EUMGSequencePlayMode::Forward, 1.0f);
 }
-
-void UCPlayerWidget::ShowQuestUI()
-{
-		PlayAnimation(QuestFadeIn, 0.f, 1, EUMGSequencePlayMode::Forward, 1.0f);
-}

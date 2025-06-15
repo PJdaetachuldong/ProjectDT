@@ -9,7 +9,7 @@
 UENUM ( )
 enum class EActState : uint8
 {
-	Healing,DodgeF, DodgeB , DodgeL, DodgeR, DodgeFL, DodgeFR, DodgeBL, DodgeBR , PDodgeL, PDodgeR,Dead, PDodge, Max
+	Healing,DodgeF, DodgeB , DodgeL, DodgeR, DodgeFL, DodgeFR, DodgeBL, DodgeBR , PDodgeL, PDodgeR,Dead, PDodge,Getup, Max
 };
 
 USTRUCT()

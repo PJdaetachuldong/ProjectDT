@@ -16,7 +16,6 @@ void UCGameOverWidget::NativeConstruct()
 void UCGameOverWidget::PlayGameOverAnimation()
 {
 	PlayAnimation(GameOverPadeIn);
-
 }
 
 void UCGameOverWidget::EndGameOverAnimation()

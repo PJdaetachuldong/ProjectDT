@@ -42,7 +42,6 @@ public:
 	void TurnOnLight();
 
 	void ShowStatusUI();
-	void ShowQuestUI();
 
 private:
 	UPROPERTY()
@@ -90,9 +89,7 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
 	class UWidgetAnimation* StatusFadeIn;
-
-	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
-	class UWidgetAnimation* QuestFadeIn;
+	
 	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
 	class UWidgetAnimation* LightOnOff;
 
@@ -127,5 +124,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	float ManaLerpSpeed = 4.0f;
+public:
+	UPROPERTY()
+	bool AllowChange=false;
 
 };

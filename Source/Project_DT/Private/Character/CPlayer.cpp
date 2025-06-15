@@ -366,6 +366,8 @@ float ACPlayer::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& Da
 
 void ACPlayer::SelectWidgetOn()
 {
+	CheckNull(UWidget);
+	if (!UWidget->AllowChange)return;
 	CheckFalse(State->IsIdleMode());
 	UWidget->FadeInSelectWindow();
 	UGameplayStatics::SetGlobalTimeDilation(GetOwner(), 0.2f);
@@ -373,6 +375,8 @@ void ACPlayer::SelectWidgetOn()
 
 void ACPlayer::SelectWidgetOff()
 {
+	CheckNull(UWidget);
+	if (!UWidget->AllowChange)return;
 	if (UWidget->GetIsCancelWidget())return;
 	UGameplayStatics::SetGlobalTimeDilation(GetOwner(), 1.0f);
 }
@@ -380,6 +384,7 @@ void ACPlayer::SelectWidgetOff()
 void ACPlayer::SelectKatana()
 {
 	CheckNull(UWidget);
+	if (!UWidget->AllowChange)return;
 	if(Weapon->GetWeaponType()==EWeaponType::Katana)
 		UWidget->FadeOutSelectWindow();
 		
@@ -390,6 +395,7 @@ void ACPlayer::SelectKatana()
 void ACPlayer::SelectGreatSword()
 {
 	CheckNull(UWidget);
+	if (!UWidget->AllowChange)return;
 	if(Weapon->GetWeaponType()==EWeaponType::GreatSword)
 		UWidget->FadeOutSelectWindow();
 	SelectWidgetOff();

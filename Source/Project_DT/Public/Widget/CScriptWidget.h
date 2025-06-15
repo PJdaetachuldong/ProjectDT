@@ -15,6 +15,7 @@ class PROJECT_DT_API UCScriptWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 	FWidgetAnimationDynamicEvent FCompleteFadeOutAnimation;
+	FWidgetAnimationDynamicEvent FCompleteFadeInAnimation;
 public:
 	virtual void NativeConstruct() override;
 private:
@@ -24,6 +25,10 @@ public:
 	void StartFadeInAnimation();
 	UFUNCTION()
 	void CreateScriptWidget();
+	UFUNCTION(BlueprintCallable)
+	void SetText(const FString& FullText);
+	UFUNCTION()
+	void StartTypingEffect();
 public:
 	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
 	class UWidgetAnimation* FadeIn;
@@ -33,5 +38,11 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
 	class UButton* Button;
+	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
+	class UTextBlock* TypeText;
+
+private:
+	FString FullText;
+	FTimerHandle TypingTimerHandle;
 	
 };

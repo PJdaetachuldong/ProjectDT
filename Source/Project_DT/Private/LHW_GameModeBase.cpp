@@ -11,6 +11,7 @@
 #include "Widget/CPlayerWidget.h"
 #include "Widget/CScriptWidget.h"
 #include "Widget/CMapWidget.h"
+#include "Widget/CQuestWidget.h"
 
 ALHW_GameModeBase::ALHW_GameModeBase()
 {
@@ -18,6 +19,7 @@ ALHW_GameModeBase::ALHW_GameModeBase()
 	CHelpers::GetClass(&LoadingWidgetClass,AssetPaths::LoadingUI);
 	CHelpers::GetClass(&ScriptWidgetClass,AssetPaths::ScriptUI);
 	CHelpers::GetClass(&MapWidgetClass,AssetPaths::MapWidget);
+	CHelpers::GetClass(&QuestWidgetClass,AssetPaths::QuestWidget);
 }
 
 void ALHW_GameModeBase::BeginPlay()
@@ -28,6 +30,7 @@ void ALHW_GameModeBase::BeginPlay()
 	LoadingWidget=CreateWidget<UCLoadingWidget>(GetWorld(),LoadingWidgetClass);
 	ScriptWidget=CreateWidget<UCScriptWidget>(GetWorld(),ScriptWidgetClass);
 	MapWidget=CreateWidget<UCMapWidget>(GetWorld(),MapWidgetClass);
+	QuestWidget=CreateWidget<UCQuestWidget>(GetWorld(),QuestWidgetClass);
 	//인트로 시작
 	IntroWidget->AddToViewport();
 	IntroWidget->FPadeInEndDelegate.BindDynamic(this,&ALHW_GameModeBase::CreateLoadingUI);
@@ -51,17 +54,21 @@ void ALHW_GameModeBase::CreateLoadingUI()
 	IntroWidget->RemoveFromParent();
 	IntroWidget->IsClick=true;
 	LoadingWidget->AddToViewport();
+	APlayerController* C=Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	C->bShowMouseCursor=false;
 }
 
 void ALHW_GameModeBase::EndLoading()
 {
 	LoadingWidget->RemoveFromParent();
-	CreateCharacterUI();
+	
+	// CreateCharacterUI();
 }
 
 void ALHW_GameModeBase::CreateCharacterUI()
 {
 	PlayerWidget= CHelpers::GetWidget<UCPlayerWidget>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	PlayerWidget->AllowChange=true;
 	PlayerWidget->AddToViewport();
 
 	auto* Status= CHelpers::GetComponent<UCStatusComponent>(GetWorld()->GetFirstPlayerController()->GetPawn());
@@ -70,17 +77,19 @@ void ALHW_GameModeBase::CreateCharacterUI()
 	Status->UseMana(100);
 	
 	FTimerHandle Handler;
-	// GetWorld()->GetTimerManager().SetTimer(Handler,[this](){CreateScriptUI();},20,false,false);
 }
 
-void ALHW_GameModeBase::CreateScriptUI()
+void ALHW_GameModeBase::CreateScriptUI(const FString& Text)
 {
+	ScriptWidget->SetText(Text);
 	ScriptWidget->CreateScriptWidget();
 }
 
 void ALHW_GameModeBase::CreateMapUI()
 {
 	ScriptWidget->RemoveFromParent();
-	PlayerWidget->ShowQuestUI();
+	if (!CheckMap)return;
+	CheckMap=false;
+	QuestWidget->ShowQuest();
 	MapWidget->MapUIAnimation();
 }

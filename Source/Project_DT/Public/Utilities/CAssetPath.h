@@ -35,6 +35,7 @@ namespace AssetPaths
     constexpr const TCHAR* ScriptUI = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_Script.WBP_Script_C'" );
     constexpr const TCHAR* MapWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_MapWidget.WBP_MapWidget_C'" );
     constexpr const TCHAR* GameOverWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_GameOverWidget.WBP_GameOverWidget_C'" );
+    constexpr const TCHAR* QuestWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_Quest.WBP_Quest_C'" );
 
     //보스
     constexpr const TCHAR* BossAnim = TEXT ("/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Boss/ABP_BossAnim.ABP_BossAnim_C'" );
