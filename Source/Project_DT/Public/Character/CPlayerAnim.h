@@ -61,10 +61,10 @@ public:
 	FName RightFootBoneName="foot_r"; // 오른발 본 이름 (예: "foot_r")
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Footstep")
-	float TraceZOffset=10.0f; // 트레이스 시작점의 Z 오프셋 (발목 위로)
+	float TraceZOffset=20.0f; // 트레이스 시작점의 Z 오프셋 (발목 위로)
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Footstep")
-	float TraceLength=10.0f; // 트레이스 길이 (발 아래로)
+	float TraceLength=35.0f; // 트레이스 길이 (발 아래로)
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Footstep")
 	TEnumAsByte<ECollisionChannel> TraceChannel = ECC_EngineTraceChannel5; // 트레이스에 사용할 콜리전 채널 (예: ECC_WorldStatic)
