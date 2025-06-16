@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "LHW_GameModeBase.h"
@@ -14,6 +14,8 @@
 #include "Widget/CMapWidget.h"
 #include "Widget/COptionWidget.h"
 #include "Widget/CQuestWidget.h"
+#include "Widget/CTutorialWidget.h"
+
 
 ALHW_GameModeBase::ALHW_GameModeBase()
 {
@@ -24,6 +26,8 @@ ALHW_GameModeBase::ALHW_GameModeBase()
 	CHelpers::GetClass(&QuestWidgetClass,AssetPaths::QuestWidget);
 	CHelpers::GetClass(&QuestWidgetClass,AssetPaths::QuestWidget);
 	CHelpers::GetClass(&OptionWidgetClass,AssetPaths::OptionWidget);
+	CHelpers::GetClass(&TutorialWidgetClass, AssetPaths::Tutorial);
+
 }
 
 void ALHW_GameModeBase::BeginPlay()
@@ -36,6 +40,8 @@ void ALHW_GameModeBase::BeginPlay()
 	MapWidget=CreateWidget<UCMapWidget>(GetWorld(),MapWidgetClass);
 	QuestWidget=CreateWidget<UCQuestWidget>(GetWorld(),QuestWidgetClass);
 	OptionWidget=CreateWidget<UCOptionWidget>(GetWorld(),OptionWidgetClass);
+	TutorialWidget = CreateWidget<UCTutorialWidget>(GetWorld(), TutorialWidgetClass);
+
 	//인트로 시작
 	IntroWidget->AddToViewport();
 
@@ -47,12 +53,12 @@ void ALHW_GameModeBase::BeginPlay()
 
 	ScriptWidget->FCompleteFadeOutAnimation.BindDynamic(this,&ALHW_GameModeBase::CreateMapUI);
 	ScriptWidget->BindToAnimationFinished(ScriptWidget->FadeOut, ScriptWidget->FCompleteFadeOutAnimation);
-	
+
 	APlayerController* C=Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 	C->bShowMouseCursor=false;
-	FInputModeUIOnly InputMode; 
-	InputMode.SetWidgetToFocus(IntroWidget->TakeWidget()); 
-	C->SetInputMode(InputMode); 
+	FInputModeUIOnly InputMode;
+	InputMode.SetWidgetToFocus(IntroWidget->TakeWidget());
+	C->SetInputMode(InputMode);
 }
 
 void ALHW_GameModeBase::Tick(float DeltaTime)
@@ -76,6 +82,7 @@ void ALHW_GameModeBase::EndLoading()
 	LoadingWidget->RemoveFromParent();
 	OptionWidget->AddToViewport();
 	OptionWidget->SetSwitcherIndex(0);
+	TutorialWidget->AddToViewport();
 }
 
 void ALHW_GameModeBase::CreateCharacterUI()
@@ -88,7 +95,7 @@ void ALHW_GameModeBase::CreateCharacterUI()
 	Status->Heal(100);
 	// Status->Damage(100);
 	Status->UseMana(100);
-	
+
 	FTimerHandle Handler;
 }
 

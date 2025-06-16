@@ -31,7 +31,7 @@ namespace AssetPaths
     constexpr const TCHAR* ChostTrail = TEXT ("/Script/Engine.MaterialInstanceConstant'/Game/LHW/Material/M_GhostTrail_Inst.M_GhostTrail_Inst'" );
     constexpr const TCHAR* PlayerWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_PlayerWidget.WBP_PlayerWidget_C'" );
     constexpr const TCHAR* Select = TEXT ("/Script/EnhancedInput.InputAction'/Game/LHW/Input/IA_Select.IA_Select'" );
-    
+
     constexpr const TCHAR* BossUI = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_BossWidget.WBP_BossWidget_C'" );
     constexpr const TCHAR* LoadingUI = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_Loading.WBP_Loading_C'" );
     constexpr const TCHAR* IntroUI = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_Intro.WBP_Intro_C'" );
@@ -40,6 +40,7 @@ namespace AssetPaths
     constexpr const TCHAR* GameOverWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_GameOverWidget.WBP_GameOverWidget_C'" );
     constexpr const TCHAR* QuestWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_Quest.WBP_Quest_C'" );
     constexpr const TCHAR* OptionWidget = TEXT ("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_Option.WBP_Option_C'" );
+    constexpr const TCHAR* Tutorial = TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/LHW/Widget/WBP_Tutorial.WBP_Tutorial_C'");
 
     //보스
     constexpr const TCHAR* BossAnim = TEXT ("/Script/Engine.AnimBlueprint'/Game/ODH/Animation/Boss/ABP_BossAnim.ABP_BossAnim_C'" );
