@@ -6,9 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "CTutorialWidget.generated.h"
 
-/**
- *
- */
 UCLASS()
 class PROJECT_DT_API UCTutorialWidget : public UUserWidget
 {
@@ -16,6 +13,4 @@ class PROJECT_DT_API UCTutorialWidget : public UUserWidget
 
 protected:
 	virtual void NativeConstruct() override;
-
-
 };

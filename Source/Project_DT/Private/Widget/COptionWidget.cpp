@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Widget/COptionWidget.h"
@@ -6,6 +6,7 @@
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
 #include "Kismet/GameplayStatics.h"
+#include <Character/CPlayer.h>
 
 void UCOptionWidget::NativeConstruct()
 {
@@ -22,7 +23,7 @@ FReply UCOptionWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEv
 	if (InKeyEvent.GetKey() == EKeys::Escape)
 	{
 		SetSwitcher();
-		return FReply::Handled(); 
+		return FReply::Handled();
 	}
 	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
@@ -39,6 +40,8 @@ void UCOptionWidget::KeyHandler()
 
 void UCOptionWidget::TeleportHandler()
 {
+	ACPlayer* player = Cast<ACPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	player->SetActorLocation(Position);
 }
 
 void UCOptionWidget::ExitHandler()
@@ -57,9 +60,7 @@ void UCOptionWidget::SetSwitcher()
 {
 
 	switch (Switcher->GetActiveWidgetIndex())
-
 	{
-
 	case 0:
 
 		{

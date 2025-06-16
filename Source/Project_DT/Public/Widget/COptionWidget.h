@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,7 +7,7 @@
 #include "COptionWidget.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class PROJECT_DT_API UCOptionWidget : public UUserWidget
@@ -17,7 +17,7 @@ class PROJECT_DT_API UCOptionWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
-	
+
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -50,5 +50,8 @@ public:
 	class UCanvasPanel* KeyTutorial;
 	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
 	class UWidgetSwitcher* Switcher;
-	
+
+	UPROPERTY(BlueprintReadOnly, Category = "Position", meta = (BindWidget))
+	FVector Position= FVector::ZeroVector;
+
 };

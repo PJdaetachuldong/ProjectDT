@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Widget/CScriptWidget.h"
@@ -26,7 +26,7 @@ FReply UCScriptWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEv
 	if (InKeyEvent.GetKey() == EKeys::F)
 	{
 		EndFadeOut();
-		return FReply::Handled(); 
+		return FReply::Handled();
 	}
 	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
@@ -46,7 +46,7 @@ void UCScriptWidget::EndFadeOut()
 	TypeText->SetText(FText::FromString(FullText));
 	Arrow->SetRenderOpacity(0);
 
-	
+
 }
 
 void UCScriptWidget::StartFadeInAnimation()
@@ -79,15 +79,13 @@ void UCScriptWidget::StartTypingEffect()
 	TypeText->SetText(FText::FromString(TEXT("")));
 
 	int32 CurrentIndex = 0;
-	bIsTypingEffectActive = true; 
+	bIsTypingEffectActive = true;
 	GetWorld()->GetTimerManager().SetTimer(TypingTimerHandle, FTimerDelegate::CreateLambda([this, CurrentIndex]() mutable {
 
 		if (CurrentIndex >= FullText.Len())
 		{
-			GetWorld()->GetTimerManager().ClearTimer(TypingTimerHandle); // 클래스 멤버로 선언된 거!
 			bIsTypingEffectActive = false;
 			Arrow->SetRenderOpacity(1);
-			
 			return;
 		}
 
@@ -96,4 +94,14 @@ void UCScriptWidget::StartTypingEffect()
 		CurrentIndex++;
 
 	}), 0.05f, true); // 속도는 조절 가능
+}
+void UCScriptWidget::NativeDestruct()
+{
+	Super::NativeDestruct(); // 부모 함수 호출
+
+	// 위젯이 파괴될 때 타이머를 명시적으로 클리어합니다.
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().ClearTimer(TypingTimerHandle);
+	}
 }
