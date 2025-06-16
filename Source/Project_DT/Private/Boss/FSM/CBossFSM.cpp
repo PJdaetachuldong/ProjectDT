@@ -33,6 +33,8 @@ void UCBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 	if(!MyBoss->BossStart) return;
 
+	if(State == EBossState::DIE) return;
+
 	//플레이어와의 거리 체크는 후 공격을 정하던가, 후속타 여부를 위해 체크가 지속적으로 일어나야함
 	//아니면 함수로 빼서 특정 상황일때만 체크를 해서 여부를 체크하는 것도 나쁘지 않을것 같음
 
@@ -684,6 +686,8 @@ void UCBossFSM::SideMove()
 		SetATKState = ESetATKState::SETATKNONE;
 		AttackState = EBossATTACKState::NONE;
 		State = EBossState::ATTACK;
+
+		TotalMoveDistance = 0.0f;
 
 		LastLocation = MyBoss->GetActorLocation();
 

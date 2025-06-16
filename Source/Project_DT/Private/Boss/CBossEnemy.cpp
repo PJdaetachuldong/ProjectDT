@@ -129,6 +129,9 @@ ACBossEnemy::ACBossEnemy()
 // 	DashATKCollision->SetBoxExtent(FVector(41,29,80));
 
 	CHelpers::GetClass(&BossUIClass,AssetPaths::BossUI);
+
+	EffectTrans = CreateDefaultSubobject<USceneComponent>(L"EffectTransform");
+	EffectTrans->SetupAttachment(GetCapsuleComponent());
 }
 
 void ACBossEnemy::BeginPlay()
@@ -1499,7 +1502,7 @@ void ACBossEnemy::OnPlayerHealed()
 {
 	CLog::Log("OnPlayerHealed");
 
-	if(FSMComponent->State == EBossState::IDLE) return;
+	if(!BossStart) return;
 
 	//다른 공격 모션을 하고 있다면 실행 안되게 막아주기
 	if(FSMComponent->AttackState == EBossATTACKState::NONE || FSMComponent->SetATKState == ESetATKState::SETATKNONE)
