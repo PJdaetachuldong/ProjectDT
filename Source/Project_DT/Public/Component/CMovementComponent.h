@@ -90,9 +90,10 @@ private:
 
 	// 우측 입력 스케일
 	float RightScale;
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Look")
+	float LookInputDeadZone = 0.07f; 
 public:
     UPROPERTY(BlueprintReadOnly, Category = "Movement")
     FVector LastInputDirection=FVector::ZeroVector;
-
-
 };

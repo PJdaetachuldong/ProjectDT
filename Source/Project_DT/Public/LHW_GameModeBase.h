@@ -27,12 +27,20 @@ public:
 
 	UFUNCTION()
 	void EndLoading();
-
+	
+	UFUNCTION(BlueprintCallable)
 	void CreateCharacterUI();
-
-	void CreateScriptUI();
+	
+	UFUNCTION(BlueprintCallable)
+	void CreateScriptUI(const FString& Text);
+	
 	UFUNCTION()
 	void CreateMapUI();
+
+	void SwitchOption();
+
+private:
+	bool CheckMap=true;
 
 	
 private:
@@ -62,6 +70,18 @@ private:
 	
 	UPROPERTY(EditAnywhere)
 	class UCMapWidget* MapWidget;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget>QuestWidgetClass;
+	
+	UPROPERTY(EditAnywhere)
+	class UCQuestWidget* QuestWidget;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget>OptionWidgetClass;
+	
+	UPROPERTY(EditAnywhere)
+	class UCOptionWidget* OptionWidget;
 
 
 	

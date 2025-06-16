@@ -42,7 +42,6 @@ public:
 	void TurnOnLight();
 
 	void ShowStatusUI();
-	void ShowQuestUI();
 
 private:
 	UPROPERTY()
@@ -51,6 +50,8 @@ private:
 	class UCStatusComponent* Status;
 	UPROPERTY()
 	class UCWeaponComponent* Weapon;
+	UPROPERTY()
+	class UCStateComponent* State;
 
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
@@ -88,9 +89,7 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
 	class UWidgetAnimation* StatusFadeIn;
-
-	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
-	class UWidgetAnimation* QuestFadeIn;
+	
 	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
 	class UWidgetAnimation* LightOnOff;
 
@@ -125,5 +124,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	float ManaLerpSpeed = 4.0f;
+public:
+	UPROPERTY()
+	bool AllowChange=false;
 
 };

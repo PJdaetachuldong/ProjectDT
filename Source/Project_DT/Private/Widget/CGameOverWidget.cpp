@@ -10,17 +10,21 @@ void UCGameOverWidget::NativeConstruct()
 	
 	GameOverUIEnd.BindDynamic(this,&UCGameOverWidget::EndGameOverAnimation);
 	
-	BindToAnimationFinished(GameOverPadeIn, GameOverUIEnd);
+	BindToAnimationStarted(GameOverPadeIn, GameOverUIEnd);
 }
 
 void UCGameOverWidget::PlayGameOverAnimation()
 {
 	PlayAnimation(GameOverPadeIn);
-
 }
 
 void UCGameOverWidget::EndGameOverAnimation()
 {
-	UCMointageComponent* Montage= CHelpers::GetComponent<UCMointageComponent>(OwnerCharacter);
-	Montage->Respawn();
+	GetWorld()->GetTimerManager().SetTimer(Handler,[this]()
+	{
+		UCMointageComponent* Montage= CHelpers::GetComponent<UCMointageComponent>(OwnerCharacter);
+		Montage->Respawn();	
+	},7.0f,false,7.0f);
+
+	
 }

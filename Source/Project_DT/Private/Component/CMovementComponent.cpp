@@ -110,19 +110,37 @@ void UCMovementComponent::OnMoveRight ( const FInputActionValue& Value )
 	OwnerCharacter->AddMovementInput ( RightVector , RightScale );
 }
 
-void UCMovementComponent::OnHorizontalLook ( const FInputActionValue& Value )
+void UCMovementComponent::OnHorizontalLook(const FInputActionValue& Value)
 {
-	float Scale = Value.Get<float> ( );
+	if (!OwnerCharacter) return; // OwnerCharacter가 유효한지 확인
 
+	float Scale = Value.Get<float>();
 
-	OwnerCharacter->AddControllerYawInput ( Scale * HorizontalLook * GetWorld ( )->GetDeltaSeconds ( ) );
+	// === Dead Zone 로직 적용 ===
+	if (FMath::Abs(Scale) < LookInputDeadZone)
+	{
+		Scale = 0.0f; // 데드존 안에 있다면 입력을 무시
+	}
+	// ===========================
+
+	// 민감도 조절
+	OwnerCharacter->AddControllerYawInput(Scale * HorizontalLook * GetWorld()->GetDeltaSeconds());
 }
 
-void UCMovementComponent::OnVerticalLook ( const FInputActionValue& Value )
+void UCMovementComponent::OnVerticalLook(const FInputActionValue& Value)
 {
-	float Scale = Value.Get<float> ( );
+	if (!OwnerCharacter) return; // OwnerCharacter가 유효한지 확인
 
-	OwnerCharacter->AddControllerPitchInput ( Scale * VerticalLook * GetWorld ( )->GetDeltaSeconds ( ) );
+	float Scale = Value.Get<float>();
+
+	// === Dead Zone 로직 적용 ===
+	if (FMath::Abs(Scale) < LookInputDeadZone)
+	{
+		Scale = 0.0f; // 데드존 안에 있다면 입력을 무시
+	}
+
+	// 민감도 조절
+	OwnerCharacter->AddControllerPitchInput(Scale * VerticalLook * GetWorld()->GetDeltaSeconds());
 }
 void UCMovementComponent::Move ( )
 {
@@ -131,5 +149,7 @@ void UCMovementComponent::Move ( )
 void UCMovementComponent::Stop ( )
 {
 	bCanMove = false;
+	RightScale=0;
+	ForwardScale=0;
 }
 

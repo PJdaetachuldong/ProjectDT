@@ -10,5 +10,7 @@
 9,DodgeBR,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/Dodge_BR.Dodge_BR',1
 10,PDodgeL,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/MT_PerfectDodge_L.MT_PerfectDodge_L',1
 11,PDodgeR,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/MT_PerfectDodge_R.MT_PerfectDodge_R',1
-12,Dead,AnimMontage'/Game/LHW/Asset/GhostSamurai_Bundle/GhostSamurai_Bundle/GhostSamurai/Katana/Apose/Die/Root/GhostSamurai_APose_Die05_Root_Montage.GhostSamurai_APose_Die05_Root_Montage',1
+12,Dead,AnimMontage'/Game/LHW/Asset/secondRetarget/Idle/AS_dead_Montage.AS_dead_Montage',1
 13,PDodge,AnimMontage'/Game/LHW/LittleGirlEllie/Animation/Default/Dodge/MT_PerfectDodge.MT_PerfectDodge',1
+14,Getup,AnimMontage'/Game/LHW/Asset/Down_01_Getup_Anim_Montage.Down_01_Getup_Anim_Montage',1
+15,Intro,AnimMontage'/Game/LHW/Asset/walkSound/Sleep_FloorSit_Lean_Exit_Montage.Sleep_FloorSit_Lean_Exit_Montage',1
