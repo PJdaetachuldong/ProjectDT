@@ -14,6 +14,7 @@ enum class ETutoState : uint8
 {
 	IDLE UMETA(DisplayName = "IDLE"),
 	CHASE UMETA(DisplayName = "CHASE"),
+	ATTACKREADY UMETA(DisplayName = "ATTACKREADY"),
 	ATTACK UMETA(DisplayName = "ATTACK"),
 	BREAK UMETA ( DisplayName = "BREAK" ),
 	DIE UMETA(DisplayName = "DIE")
@@ -42,11 +43,18 @@ public:
 
 	class UCTutoAnim* AnimInstance;
 
+	class ACTutoManager* Manager;
+
+	void SettingManager(ACTutoManager* LevelManager);
+
 	UPROPERTY(EditAnywhere, Category = DataAsset)
 	UHitDataAsset_BossToPlayer* TutoHitData;
 
 	UPROPERTY(EditAnywhere, Category = Weapon)
 	TSubclassOf<class ACTutoWeapon> TutoWeapon;
+
+	UPROPERTY(EditAnywhere, Category = Montage)
+	class UAnimMontage* AM_TutoParryInter;
 
 	class ACTutoWeapon* SpawnTutoWeapon;
 
@@ -56,9 +64,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = Tutorial)
 	bool IsParry = false;
 
-	UPROPERTY(EditAnywhere, Category = Tutorial)
-	bool IsJustVoid = false;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category =FSM)
 	ETutoState State = ETutoState::IDLE;
 
@@ -67,6 +72,8 @@ public:
 	virtual void SetHP(float value) override;
 
 	virtual void SetShieldAmount(float value) override;
+
+	void AttackTurn();
 
 	////////플레이어 데미지 부분////////////
 private:
@@ -85,5 +92,9 @@ public:
 	float TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	float CurAttackTime = 0.0f;
-	float AttackLimitTime = 3.4f;
+	float AttackLimitTime = 2.5f;
+
+	void IDLEEnd();
+
+	void ATKEnd();
 };

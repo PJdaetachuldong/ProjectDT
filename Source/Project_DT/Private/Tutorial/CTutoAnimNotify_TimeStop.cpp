@@ -3,7 +3,7 @@
 
 #include "Tutorial/CTutoAnimNotify_TimeStop.h"
 #include "Global.h"
-#include "Boss/CBossEnemy.h"
+#include "Tutorial/CTutorialEnemy.h"
 
 FString UCTutoAnimNotify_TimeStop::GetNotifyName_Implementation() const
 {
@@ -17,10 +17,10 @@ void UCTutoAnimNotify_TimeStop::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 	CheckNull(MeshComp);
 	CheckNull(MeshComp->GetOwner());
 
-	ACBossEnemy* My = Cast<ACBossEnemy>(MeshComp->GetOwner());
+	ACTutorialEnemy* My = Cast<ACTutorialEnemy>(MeshComp->GetOwner());
 
 	CheckNull(My);
 
 	// 글로벌 타임 스케일을 0으로 설정하여 시간 정지 효과 구현
-	UGameplayStatics::SetGlobalTimeDilation(My->Target->GetController()->GetWorld(), 0.0f);
+	//UGameplayStatics::SetGlobalTimeDilation(My->Target->GetController()->GetWorld(), 0.0f);
 }

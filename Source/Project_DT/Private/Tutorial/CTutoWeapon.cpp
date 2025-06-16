@@ -45,12 +45,12 @@ void ACTutoWeapon::PlayParringAnim()
 	
 	IsTutoPlayerParring = true;
 
-	
+	MyOwner->AnimInstance->Montage_Play(MyOwner->AM_TutoParryInter);
 }
 
 bool ACTutoWeapon::CheckGuardBool()
 {
-	return true;
+	return MyOwner->IsParry;
 }
 
 void ACTutoWeapon::SetTutoOwner(ACTutorialEnemy* WHO)
@@ -87,7 +87,7 @@ void ACTutoWeapon::TutoWeaponOverlap(UPrimitiveComponent* OverlappedComponent, A
 			GetWorld()->GetTimerManager().SetTimer(TutoParringCheckTimer, this, &ACTutoWeapon::TutoPlayerDamage, 0.1f, false);
 		}
 
-		else if(MyOwner->IsJustVoid)
+		else if(!MyOwner->IsParry)
 		{
 			//무조건 사용자 정의 데미지 이벤트 생성
 			MyOwner->TutoHitData->HitDatas[TutoHitNumber].SendDamage(MyOwner, this, Player);

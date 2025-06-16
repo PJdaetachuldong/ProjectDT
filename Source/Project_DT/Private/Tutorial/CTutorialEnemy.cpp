@@ -9,6 +9,7 @@
 #include "Tutorial/CTutoWeapon.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Tutorial/CTutoManager.h"
 
 // Sets default values
 ACTutorialEnemy::ACTutorialEnemy()
@@ -28,7 +29,7 @@ void ACTutorialEnemy::BeginPlay()
 
 	GetCharacterMovement()->MaxWalkSpeed = 200.0f;
 	
-	AI = Cast<AAIController>(GetController());
+	
 	Target = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 
 	AnimInstance = Cast<UCTutoAnim>(GetMesh()->GetAnimInstance());
@@ -59,38 +60,64 @@ void ACTutorialEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (State == ETutoState::BREAK || State == ETutoState::DIE) return;
+	if(State == ETutoState::DIE ) return;
 
-	//패링 튜토일때 양식
-	if (IsParry)
-	{	
-		//거리가 공격범위 아래일 경우
-		if (FVector::Dist(Target->GetActorLocation(), GetActorLocation()) <= AttackRange)
+	if (State == ETutoState::IDLE || State == ETutoState::BREAK) 
+	{
+		if(AI)
 		{
-			CurAttackTime += DeltaTime;
-			if (CurAttackTime >= AttackLimitTime)
-			{
-				//공격 상태로 변환
-				State = ETutoState::ATTACK;
-				AnimInstance->AnimState = ETutoState::ATTACK;
-
-				CurAttackTime = 0.0f;
-			}
+			AI->StopMovement();
 		}
+		return;
+	}
+	else if (State == ETutoState::ATTACKREADY)
+	{
+		AI->StopMovement();
 
-		else if (FVector::Dist(Target->GetActorLocation(), GetActorLocation()) > AttackRange)
+		CurAttackTime += DeltaTime;
+
+		if (FVector::Dist(Target->GetActorLocation(), GetActorLocation()) > AttackRange)
 		{
-			AI->MoveToLocation(Target->GetActorLocation());
 			State = ETutoState::CHASE;
 			AnimInstance->AnimState = ETutoState::CHASE;
+
+			/*AI->MoveToLocation(Target->GetActorLocation());*/
+		}
+
+		if (CurAttackTime >= AttackLimitTime)
+		{
+			//공격 상태로 변환
+			State = ETutoState::ATTACK;
+			AnimInstance->AnimState = ETutoState::ATTACK;
+
+			CurAttackTime = 0.0f;
 		}
 	}
 
-	//저스트 회피 튜토일때 양식
-	if (IsJustVoid)
+	else if (State == ETutoState::CHASE)
 	{
+		if (FVector::Dist(Target->GetActorLocation(), GetActorLocation()) > AttackRange)
+		{
+			AI->MoveToLocation(Target->GetActorLocation());
+		}
 
+		else if (FVector::Dist(Target->GetActorLocation(), GetActorLocation()) <= AttackRange)
+		{
+			AI->StopMovement();
+
+			State = ETutoState::ATTACKREADY;
+			AnimInstance->AnimState = ETutoState::ATTACKREADY;
+		}
+// 		State = ETutoState::CHASE;
+// 		AnimInstance->AnimState = ETutoState::CHASE;
 	}
+}
+
+void ACTutorialEnemy::SettingManager(ACTutoManager* LevelManager)
+{
+	Manager = LevelManager;
+
+	AI = Cast<AAIController>(GetController());
 }
 
 void ACTutorialEnemy::OnTutoCollision()
@@ -189,10 +216,53 @@ float ACTutorialEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent co
 
 			State = ETutoState::DIE;
 			AnimInstance->AnimState = ETutoState::DIE;
+
+			if (Manager)
+			{
+				Manager->InputTutoEnemyDIE();
+			}
 		}
 
 		return 0;
 	}
 
 	return TakeDamageAmount;
+}
+
+void ACTutorialEnemy::IDLEEnd()
+{
+	if (AnimInstance)
+	{
+		State = ETutoState::CHASE;
+		AnimInstance->AnimState = ETutoState::CHASE;
+
+		AI = Cast<AAIController>(GetController());
+	}
+}
+
+void ACTutorialEnemy::ATKEnd()
+{
+	State = ETutoState::CHASE;
+	AnimInstance->AnimState = ETutoState::CHASE;
+}
+
+void ACTutorialEnemy::AttackTurn()
+{
+	//공격이 제대로 실행되기 전에 플레이어를 바라보도록 만듦
+	// 플레이어 방향 계산
+	FVector TargetLocation = Target->GetActorLocation();
+	FVector MyLocation = GetActorLocation();
+	FVector DirectionToTarget = (TargetLocation - MyLocation).GetSafeNormal();
+
+	// Yaw 회전만 조정 (Pitch는 유지)
+	FRotator TargetRotation = FRotationMatrix::MakeFromX(DirectionToTarget).Rotator();
+	TargetRotation.Pitch = 0.0f; // Pitch를 0으로 설정해 수평 회전만 적용
+	TargetRotation.Roll = 0.0f;
+
+	// 부드러운 회전을 위해 Interp 사용 (선택 사항)
+	FRotator CurrentRotation = GetActorRotation();
+	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 100.0f);
+
+	// Pawn 회전 설정
+	SetActorRotation(NewRotation);
 }
