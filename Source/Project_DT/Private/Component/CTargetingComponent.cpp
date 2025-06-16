@@ -164,7 +164,7 @@ void UCTargetingComponent::OnLookOn ( )
         return;
     }
 
-    AActor* Target = FindClosestEnemyByDirection ( 300.f , InputDirection );
+    AActor* Target = FindClosestEnemyByDirection ( 600.f , InputDirection );
     if ( Target )
     {
         LockedOnTarget = Target;

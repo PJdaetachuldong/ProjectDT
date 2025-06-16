@@ -5,6 +5,8 @@
 #include "Components/WidgetSwitcher.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/CPlayer.h"
+#include "Component/CMointageComponent.h"
+#include "Utilities/CHelper.h"
 
 void UCTutorialWidget::NativeConstruct()
 {
@@ -30,8 +32,11 @@ FReply UCTutorialWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKey
 	{
 		SetSwitcherIndex(0);
 		APlayerController* C = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-		ACPlayer* Player = Cast<ACPlayer>(C->GetPawn());
-		Player->OnAvoid();
+		UCMointageComponent* Montages=CHelpers::GetComponent<UCMointageComponent>(C->GetPawn());
+		UCStateComponent* State=CHelpers::GetComponent<UCStateComponent>(C->GetPawn());
+		State->SetBackStepMode();
+		Montages->PlayBackStepMode(EActState::DodgeB);
+		
 		C->bShowMouseCursor = false;
 		FInputModeGameOnly InputMode;
 		C->SetInputMode(InputMode);

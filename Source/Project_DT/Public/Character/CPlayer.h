@@ -181,6 +181,9 @@ private:
 	void SelectWidgetOff();
 	void SelectWidgetOn();
 	void SelectKatana();
+public:
+
+	UFUNCTION(BlueprintCallable)
 	void SelectGreatSword();
 
 public:

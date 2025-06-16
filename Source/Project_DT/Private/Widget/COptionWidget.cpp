@@ -8,6 +8,8 @@
 #include "Kismet/GameplayStatics.h"
 #include <Character/CPlayer.h>
 
+#include "LHW_GameModeBase.h"
+
 void UCOptionWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -41,7 +43,12 @@ void UCOptionWidget::KeyHandler()
 void UCOptionWidget::TeleportHandler()
 {
 	ACPlayer* player = Cast<ACPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	ALHW_GameModeBase* GameMode=Cast<ALHW_GameModeBase>(player->GetWorld()->GetAuthGameMode());
+	if (!GameMode)return;
+	GameMode->CreateCharacterUI();
+	player->SelectGreatSword();
 	player->SetActorLocation(Position);
+	SetSwitcher();
 }
 
 void UCOptionWidget::ExitHandler()
