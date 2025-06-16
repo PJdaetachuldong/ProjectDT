@@ -86,6 +86,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget>TutorialWidgetClass;
 
+public:
 	UPROPERTY(EditAnywhere)
 	class UCTutorialWidget* TutorialWidget;
 

@@ -17,5 +17,12 @@ class PROJECT_DT_API UCTutorialWidget : public UUserWidget
 protected:
 	virtual void NativeConstruct() override;
 
+public:
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
+	UFUNCTION(BlueprintCallable)
+	void SetSwitcherIndex(int32 index);
+
+	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
+	class UWidgetSwitcher* WidgetSwitcher_9;
 };
