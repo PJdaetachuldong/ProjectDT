@@ -149,8 +149,7 @@ private:
 	UFUNCTION()
 	void OnParryDetected(EParryState ParryDirection);
 	
-	UFUNCTION()
-	void TestHandler();
+
 	UFUNCTION()
 	void TestHandler2();
 
@@ -187,4 +186,7 @@ public:
 	bool bGuardHit =false;
 	
 	bool PlayerDead = false;
+public:
+	UFUNCTION()
+	void TestHandler();
 };

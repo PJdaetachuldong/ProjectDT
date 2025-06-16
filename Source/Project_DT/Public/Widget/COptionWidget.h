@@ -52,6 +52,6 @@ public:
 	class UWidgetSwitcher* Switcher;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Position", meta = (BindWidget))
-	FVector Position= FVector::ZeroVector;
+	FVector Position= FVector(-3872.0, -13410.0, 960.0);
 
 };

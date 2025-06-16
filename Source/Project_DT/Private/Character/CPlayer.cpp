@@ -151,7 +151,6 @@ void ACPlayer::BeginPlay()
 
 	State->OnStateTypeChanged.AddDynamic(this, &ACPlayer::OnStateTypeChanged);
 	// Parry->OnParryDetected.AddDynamic(this, &ACPlayer::OnParryDetected);
-	Montages->PlayBackStepMode(EActState::DodgeB);
 	
 }
 
@@ -211,6 +210,7 @@ void ACPlayer::OnStateTypeChanged(EStateType InPrevType, EStateType InNewType)
 		break;
 	}
 }
+
 void ACPlayer::OnAvoid()
 {
 	if (State->IsIdleMode() or State->IsCancelMode())
@@ -236,6 +236,11 @@ void ACPlayer::BackStep()
 
 	EActState DodgeDirection = EActState::DodgeB; 
 	if (!TargetComp->IsLockedOn())
+	{
+		DodgeDirection = EActState::DodgeF;
+		Dodge->DodgeRotate = TEXT("Back");
+	}
+	else if (Degree==0)
 	{
 		DodgeDirection = EActState::DodgeF;
 		Dodge->DodgeRotate = TEXT("Back");
@@ -280,6 +285,7 @@ void ACPlayer::BackStep()
 		Dodge->DodgeRotate = TEXT("Left");
 		DodgeDirection = EActState::DodgeFL;
 	}
+
 	FRotator NewRotation = InputDir.Rotation();
 	NewRotation.Pitch = 0;
 	NewRotation.Roll = 0;
@@ -313,8 +319,9 @@ void ACPlayer::OnParryDetected(EParryState ParryDirection)
 
 void ACPlayer::TestHandler()
 {
-	// State->SetStartMode();
+	State->SetStartMode();
 	Montages->PlayIntro();
+	ALHW_GameModeBase* GameMode=Cast<ALHW_GameModeBase>(GetWorld()->GetAuthGameMode());
 	Production->SetViewToCineCameraByIndex(0,1.5f);
 }
 
