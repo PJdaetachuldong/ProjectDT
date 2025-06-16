@@ -75,6 +75,7 @@ void ACBossWeapon::PlayParringAnim()
 	IsPlayerParring = true;
 	
 	MyBoss->AnimInstance->Montage_Play(MyBoss->AM_ParringInteraction);
+	MyBoss->FSMComponent->ParringDontMoveTime = 0.0f;
 }
 
 void ACBossWeapon::PlayerDamage()
@@ -118,7 +119,7 @@ void ACBossWeapon::DashAttackHitCheck()
 {
 	OverlapLocation = MyBoss->Target->GetActorLocation();
 
-	GetWorld()->GetTimerManager().SetTimer(ParringCheckTimer, this, &ACBossWeapon::PlayerDamage, 0.01f, false);
+	GetWorld()->GetTimerManager().SetTimer(ParringCheckTimer, this, &ACBossWeapon::PlayerDamage, 0.000001f, false);
 
 // 	//만약 플레이어가 패링 감지중이면
 // 	if (IsPlayerParring)

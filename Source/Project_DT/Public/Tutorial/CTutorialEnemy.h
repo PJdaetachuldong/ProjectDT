@@ -39,7 +39,7 @@ public:
 
 	AAIController* AI;
 
-	ACharacter* Target;
+	class ACPlayer* Target;
 
 	class UCTutoAnim* AnimInstance;
 
@@ -63,6 +63,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = Tutorial)
 	bool IsParry = false;
+
+	UPROPERTY(EditAnywhere, Category = Tutorial)
+	bool IsATKGide = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category =FSM)
 	ETutoState State = ETutoState::IDLE;

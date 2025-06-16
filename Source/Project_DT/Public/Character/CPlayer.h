@@ -57,10 +57,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	class UCPerfectDodgeComponent* Dodge;
-private:
+public:
 	UPROPERTY(VisibleAnywhere)
 	class UCTargetingComponent* TargetComp;
 
+private:
 	UPROPERTY(VisibleAnywhere)
 	class UCStatusComponent* Status;
 
@@ -131,7 +132,7 @@ public:
 private:
 	UFUNCTION()
 	void OnStateTypeChanged(EStateType InPrevType, EStateType InNewType);
-private:
+public:
 	void OnAvoid();
 private:
 	void BackStep();

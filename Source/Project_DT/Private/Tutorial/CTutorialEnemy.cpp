@@ -10,6 +10,8 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Tutorial/CTutoManager.h"
+#include "Character/CPlayer.h"
+#include "Component/CTargetingComponent.h"
 
 // Sets default values
 ACTutorialEnemy::ACTutorialEnemy()
@@ -30,7 +32,7 @@ void ACTutorialEnemy::BeginPlay()
 	GetCharacterMovement()->MaxWalkSpeed = 200.0f;
 	
 	
-	Target = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	Target = Cast<ACPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
 	AnimInstance = Cast<UCTutoAnim>(GetMesh()->GetAnimInstance());
 
@@ -60,7 +62,7 @@ void ACTutorialEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(State == ETutoState::DIE ) return;
+	if(State == ETutoState::DIE || IsATKGide) return;
 
 	if (State == ETutoState::IDLE || State == ETutoState::BREAK) 
 	{
@@ -216,6 +218,8 @@ float ACTutorialEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent co
 
 			State = ETutoState::DIE;
 			AnimInstance->AnimState = ETutoState::DIE;
+			
+			Target->TargetComp->ResetLockOn();
 
 			if (Manager)
 			{

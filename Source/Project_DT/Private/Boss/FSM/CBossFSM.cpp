@@ -68,6 +68,17 @@ void UCBossFSM::IDLEState()
 
 void UCBossFSM::ATTACKState()
 {
+	ParringDontMoveTime += GetWorld()->DeltaTimeSeconds;
+	if (ParringDontMoveTime >= ParringDibtMoveLimitTime)
+	{
+
+	}
+
+	else
+	{
+		 return;
+	}
+
 	//공격 상태에서 또다시 여러가지 공격 패턴으로 나뉘어짐
 	switch ( AttackState )
 	{

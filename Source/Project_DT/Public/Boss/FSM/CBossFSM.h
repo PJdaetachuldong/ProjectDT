@@ -199,4 +199,7 @@ public:
 
 	FTimerHandle SetSIDEMOVEStateTimerHandle;
 	void SetSIDEMOVEState();
+
+	float ParringDontMoveTime = 2.5f;
+	float ParringDibtMoveLimitTime = 2.5f;
 };

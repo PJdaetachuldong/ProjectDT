@@ -28,6 +28,7 @@ public:
 
 	ACTutorialEnemy* SpawnTutoEnemy1;
 	ACTutorialEnemy* SpawnTutoEnemy2;
+	ACTutorialEnemy* SpawnTutoEnemy3;
 
 	class AAIController* AIController;
 
@@ -37,9 +38,19 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* StartCollision;
 
+	UPROPERTY(EditAnywhere, Category = SpawnLocation)
+	class USceneComponent* FirstTransform;
+
+	UPROPERTY(EditAnywhere, Category = SpawnLocation)
+	class USceneComponent* SecondTransform;
+
+	UPROPERTY(EditAnywhere, Category = SpawnLocation)
+	class USceneComponent* ThirdTransform;
+
 	bool IsTutoStart = false;
 
 	bool IsFirstTutoEnemyDIE = false;
+	bool IsSecondTutoEnemyDIE = false;
 
 	void InputTutoEnemyDIE();
 

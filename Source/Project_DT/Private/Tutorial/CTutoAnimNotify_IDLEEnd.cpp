@@ -21,5 +21,8 @@ void UCTutoAnimNotify_IDLEEnd::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 
 	CheckNull(My);
 
-	My->IDLEEnd();
+	if (!My->IsATKGide)
+	{
+		My->IDLEEnd();
+	}
 }
