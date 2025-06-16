@@ -123,3 +123,8 @@ void ALHW_GameModeBase::SwitchOption()
 	if(OptionWidget->Switcher->GetActiveWidgetIndex()==0)
 		OptionWidget->SetSwitcher();
 }
+
+void ALHW_GameModeBase::HiddenQuest()
+{
+	QuestWidget->HiddenQuest();
+}

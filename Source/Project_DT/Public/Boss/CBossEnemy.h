@@ -265,6 +265,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class USceneComponent* EffectTrans;
+
+	UFUNCTION(BlueprintCallable)
+	void HiddenWidget();
 };
 
 USTRUCT(BlueprintType)

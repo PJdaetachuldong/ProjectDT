@@ -1623,6 +1623,11 @@ void ACBossEnemy::RestartGame()
 	FSMComponent->SideDirection = 0.0f;
 }
 
+void ACBossEnemy::HiddenWidget()
+{
+	BossUI->HiddenProgressbar();
+}
+
 void ACBossEnemy::LoadStatsFromAsset ( )
 {
 	Super::LoadStatsFromAsset();

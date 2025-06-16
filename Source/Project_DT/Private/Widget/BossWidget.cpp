@@ -27,6 +27,13 @@ void UBossWidget::SetBossShieldProgessBar(float S)
 	float shield = FMath::Clamp(S / BossOwner->MaxShieldAmount, 0.0f, 1.0f);
 	Shield=shield;
 }
+
+void UBossWidget::HiddenProgressbar()
+{
+	if (this)
+		RemoveFromParent();
+}
+
 void UBossWidget::SetOwner(AActor* Owner)
 {
 	BossOwner=Cast<ACBossEnemy>(Owner);

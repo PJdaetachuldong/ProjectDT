@@ -38,11 +38,13 @@ public:
 	void CreateMapUI();
 
 	void SwitchOption();
+	UFUNCTION(BlueprintCallable)
+	void HiddenQuest();
+	
 
 private:
 	bool CheckMap=true;
-
-
+	
 private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget>IntroWidgetClass;
@@ -89,7 +91,5 @@ private:
 public:
 	UPROPERTY(EditAnywhere)
 	class UCTutorialWidget* TutorialWidget;
-
-
 
 };

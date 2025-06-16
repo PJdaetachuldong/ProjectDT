@@ -9,6 +9,8 @@
 #include <Character/CPlayer.h>
 
 #include "LHW_GameModeBase.h"
+#include "Component/CProductionComponent.h"
+#include "Utilities/CHelper.h"
 
 void UCOptionWidget::NativeConstruct()
 {
@@ -44,11 +46,13 @@ void UCOptionWidget::TeleportHandler()
 {
 	ACPlayer* player = Cast<ACPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	ALHW_GameModeBase* GameMode=Cast<ALHW_GameModeBase>(player->GetWorld()->GetAuthGameMode());
+	UCProductionComponent* Production=CHelpers::GetComponent<UCProductionComponent>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	if (!GameMode)return;
 	GameMode->CreateCharacterUI();
 	player->SelectGreatSword();
 	player->SetActorLocation(Position);
 	SetSwitcher();
+	Production->SetCameraLookAtNearestTarget();
 }
 
 void UCOptionWidget::ExitHandler()

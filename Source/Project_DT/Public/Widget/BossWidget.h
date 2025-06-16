@@ -22,7 +22,7 @@ public:
 	void SetBossHpProgessBar(float HP);
 	UFUNCTION()
 	void SetBossShieldProgessBar(float S);
-
+	void HiddenProgressbar();
 	void SetOwner(AActor* Owner);
 private:
 	class ACBossEnemy* BossOwner;

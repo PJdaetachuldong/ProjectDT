@@ -193,4 +193,7 @@ public:
 public:
 	UFUNCTION()
 	void TestHandler();
+	
+	UFUNCTION(BlueprintCallable)
+	void WidgetVisibleHandler(bool isTrue);
 };

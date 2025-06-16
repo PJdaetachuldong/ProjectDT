@@ -18,6 +18,7 @@ public:
 
 public:
 	void ShowQuest();
+	void HiddenQuest();
 	
 public:
 	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)

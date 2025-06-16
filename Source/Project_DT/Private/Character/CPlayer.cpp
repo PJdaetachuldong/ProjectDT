@@ -135,6 +135,7 @@ ACPlayer::ACPlayer()
 	//위젯
 	CHelpers::GetClass(&WidgetClass, AssetPaths::PlayerWidget);
 }
+
 void ACPlayer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -148,10 +149,7 @@ void ACPlayer::BeginPlay()
 	{
 		UWidget = CreateWidget<UCPlayerWidget>(GetWorld(), WidgetClass);
 	}
-
 	State->OnStateTypeChanged.AddDynamic(this, &ACPlayer::OnStateTypeChanged);
-	// Parry->OnParryDetected.AddDynamic(this, &ACPlayer::OnParryDetected);
-	
 }
 
 void ACPlayer::Tick(float DeltaTime)
@@ -323,6 +321,14 @@ void ACPlayer::TestHandler()
 	Montages->PlayIntro();
 	ALHW_GameModeBase* GameMode=Cast<ALHW_GameModeBase>(GetWorld()->GetAuthGameMode());
 	Production->SetViewToCineCameraByIndex(0,1.5f);
+}
+
+void ACPlayer::WidgetVisibleHandler(bool isTrue)
+{
+	if (isTrue)
+		UWidget->SetRenderOpacity(0);
+	else
+		UWidget->SetRenderOpacity(1);
 }
 
 void ACPlayer::TestHandler2()

@@ -13,3 +13,8 @@ void UCQuestWidget::ShowQuest()
 	AddToViewport();
 	PlayAnimation(QuestFadeIn);
 }
+
+void UCQuestWidget::HiddenQuest()
+{
+	PlayAnimationReverse(QuestFadeIn);
+}
