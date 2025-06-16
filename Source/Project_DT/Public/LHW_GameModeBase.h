@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,7 +7,7 @@
 #include "LHW_GameModeBase.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class PROJECT_DT_API ALHW_GameModeBase : public AGameModeBase
@@ -27,13 +27,13 @@ public:
 
 	UFUNCTION()
 	void EndLoading();
-	
+
 	UFUNCTION(BlueprintCallable)
 	void CreateCharacterUI();
-	
+
 	UFUNCTION(BlueprintCallable)
 	void CreateScriptUI(const FString& Text);
-	
+
 	UFUNCTION()
 	void CreateMapUI();
 
@@ -42,7 +42,7 @@ public:
 private:
 	bool CheckMap=true;
 
-	
+
 private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget>IntroWidgetClass;
@@ -52,7 +52,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget>LoadingWidgetClass;
-	
+
 	UPROPERTY(EditAnywhere)
 	class UCLoadingWidget* LoadingWidget;
 
@@ -61,28 +61,34 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget>ScriptWidgetClass;
-	
+
 	UPROPERTY(EditAnywhere)
 	class UCScriptWidget* ScriptWidget;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget>MapWidgetClass;
-	
+
 	UPROPERTY(EditAnywhere)
 	class UCMapWidget* MapWidget;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget>QuestWidgetClass;
-	
+
 	UPROPERTY(EditAnywhere)
 	class UCQuestWidget* QuestWidget;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget>OptionWidgetClass;
-	
+
 	UPROPERTY(EditAnywhere)
 	class UCOptionWidget* OptionWidget;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget>TutorialWidgetClass;
 
-	
+	UPROPERTY(EditAnywhere)
+	class UCTutorialWidget* TutorialWidget;
+
+
+
 };
