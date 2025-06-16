@@ -75,6 +75,8 @@ void ALHW_GameModeBase::CreateLoadingUI()
 	FInputModeGameOnly InputMode;
 	C->SetInputMode(InputMode);
 	C->bShowMouseCursor=false;
+	ACPlayer* player=Cast<ACPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	player->TestHandler();
 }
 
 void ALHW_GameModeBase::EndLoading()
@@ -84,6 +86,7 @@ void ALHW_GameModeBase::EndLoading()
 	OptionWidget->SetSwitcherIndex(0);
 	TutorialWidget->AddToViewport();
 	TutorialWidget->SetSwitcherIndex(0);
+
 }
 
 void ALHW_GameModeBase::CreateCharacterUI()

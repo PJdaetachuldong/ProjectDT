@@ -93,7 +93,7 @@ void UCScriptWidget::StartTypingEffect()
 		TypeText->SetText(FText::FromString(Substring));
 		CurrentIndex++;
 
-	}), 0.05f, true); // 속도는 조절 가능
+	}), 0.03f, true); // 속도는 조절 가능
 }
 void UCScriptWidget::NativeDestruct()
 {

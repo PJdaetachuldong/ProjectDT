@@ -23,7 +23,6 @@ void UCPerfectDodgeComponent::BeginPlay()
     Movement = CHelpers::GetComponent<UCMovementComponent>(OwnerCharacter);
 }
 
-
 void UCPerfectDodgeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);

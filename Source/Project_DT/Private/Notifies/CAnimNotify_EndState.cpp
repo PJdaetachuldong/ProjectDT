@@ -31,13 +31,25 @@ void UCAnimNotify_EndState::Notify ( USkeletalMeshComponent* Meshcomp , UAnimSeq
 		break;
 	case EStateType::BackStep: { character->End_BackStep (); }
 		break;
-	case EStateType::Equip:
+	case EStateType::Equip:{ State->SetIdleMode(); }
 		break;
-	case EStateType::Hitted:
+	case EStateType::Hitted:{ State->SetIdleMode(); }
 		break;
 	case EStateType::Dead:{ State->SetIdleMode(); }
 		break;
-	case EStateType::Action:
+	case EStateType::Action:{ State->SetIdleMode(); }
+		break;
+	case EStateType::Cancel:{ State->SetIdleMode(); }
+		break;
+	case EStateType::Counter:{ State->SetIdleMode(); }
+		break;
+	case EStateType::Guard:{ State->SetIdleMode(); }
+		break;
+	case EStateType::Heal:{ State->SetIdleMode(); }
+		break;
+	case EStateType::Parry:{ State->SetIdleMode(); }
+		break;
+	case EStateType::Start:{ State->SetIdleMode(); }
 		break;
 	case EStateType::Max:
 		break;

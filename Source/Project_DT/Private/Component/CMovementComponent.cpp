@@ -87,29 +87,38 @@ void UCMovementComponent::OnMoveForward ( const FInputActionValue& Value )
 	OwnerCharacter->AddMovementInput ( ForwardVector , ForwardScale );
 }
 
-void UCMovementComponent::OnMoveRight ( const FInputActionValue& Value )
+void UCMovementComponent::OnMoveRight(const FInputActionValue& Value)
 {
+	// 입력된 스케일 값 가져오기
+	RightScale = Value.Get<float>();
 
-	RightScale = Value.Get<float> ( );
+	// 데드존 설정 (이 값보다 작으면 무시)
+	const float InputThreshold = 0.7f; // 예시 값, 필요에 따라 조절하세요.
 
-	FRotator rotator = FRotator ( 0 , OwnerCharacter->GetControlRotation ( ).Yaw , 0 );
-	FVector ForwardVector = FQuat ( rotator ).GetForwardVector ( );
-	FVector RightVector = FQuat ( rotator ).GetRightVector ( );
+	// RightScale의 절댓값이 임계값보다 작으면 0으로 처리 (작은 값 무시)
+	if (FMath::Abs(RightScale) < InputThreshold)
+	{
+		RightScale = 0.0f;
+	}
 
-	if ( bTopViewCamera )
+	FRotator rotator = FRotator(0, OwnerCharacter->GetControlRotation().Yaw, 0);
+	FVector ForwardVector = FQuat(rotator).GetForwardVector();
+	FVector RightVector = FQuat(rotator).GetRightVector();
+
+	if (bTopViewCamera)
 	{
 		ForwardVector = FVector::XAxisVector;
 		RightVector = FVector::YAxisVector;
 	}
 
 	// 최종 입력 방향 계산
-	LastInputDirection = ( ForwardVector * ForwardScale + RightVector * RightScale ).GetSafeNormal ( );
+	LastInputDirection = (ForwardVector * ForwardScale + RightVector * RightScale).GetSafeNormal();
 
-	if ( !bCanMove ) return;
+	if (!bCanMove) return;
+
 	// 이동 적용
-	OwnerCharacter->AddMovementInput ( RightVector , RightScale );
+	OwnerCharacter->AddMovementInput(RightVector, RightScale);
 }
-
 void UCMovementComponent::OnHorizontalLook(const FInputActionValue& Value)
 {
 	if (!OwnerCharacter) return; // OwnerCharacter가 유효한지 확인
