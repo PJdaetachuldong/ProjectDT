@@ -56,78 +56,44 @@ void UCOptionWidget::ExitHandler()
 }
 
 void UCOptionWidget::SetSwitcher()
-
 {
-
 	switch (Switcher->GetActiveWidgetIndex())
 	{
 	case 0:
-
 		{
-
 			Switcher->SetActiveWidgetIndex(1);
-
 			APlayerController* C=Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-
 			C->bShowMouseCursor=true;
-
 			FInputModeUIOnly InputMode;
-
 			InputMode.SetWidgetToFocus(TakeWidget());
-
 			C->SetInputMode(InputMode);
-
 			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
-
 		}break;
-
 	case 1:
-
 		{
-
 			Switcher->SetActiveWidgetIndex(0);
-
 			APlayerController* C=Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-
 			C->bShowMouseCursor=false;
-
 			FInputModeGameOnly InputMode;
-
 			C->SetInputMode(InputMode);
-
 			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
-
 		}break;
-
 	case 2:
-
 		{
-
 			Switcher->SetActiveWidgetIndex(1);
-
 		}break;
-
 	default:
-
 		{
-
 			// Switcher->SetActiveWidgetIndex(0);
-
 			// APlayerController* C=Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-
 			// C->bShowMouseCursor=true;
-
 			// FInputModeGameOnly InputMode;
-
 			// C->SetInputMode(InputMode);
-
 			// UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
-
 		}break;
-
 	}
-
 }
+
 void UCOptionWidget::SetSwitcherIndex(int32 index)
 {
 	Switcher->SetActiveWidgetIndex(index);

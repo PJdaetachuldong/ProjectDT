@@ -83,6 +83,7 @@ void ALHW_GameModeBase::EndLoading()
 	OptionWidget->AddToViewport();
 	OptionWidget->SetSwitcherIndex(0);
 	TutorialWidget->AddToViewport();
+	TutorialWidget->SetSwitcherIndex(0);
 }
 
 void ALHW_GameModeBase::CreateCharacterUI()
