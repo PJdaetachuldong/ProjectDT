@@ -41,7 +41,12 @@ void ACTutoManager::Tick(float DeltaTime)
 	{
 		if (!SpawnTutoEnemy1)
 		{
-			SpawnTutoEnemy1 = GetWorld()->SpawnActor<ACTutorialEnemy>(TutoEnemy, GetActorTransform());
+			//스폰할 객체에 대한 스폰 옵션을 설정하는 구조체
+			FActorSpawnParameters Params;
+			//스폰 과정에 충돌이 생겨도 제자리에서 스폰할 수 있게 만듦
+			Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			SpawnTutoEnemy1 = GetWorld()->SpawnActor<ACTutorialEnemy>(TutoEnemy, GetActorTransform(),Params);
 
 			AIController->Possess(SpawnTutoEnemy1);
 
@@ -55,12 +60,17 @@ void ACTutoManager::Tick(float DeltaTime)
 
 			if (CurSpawnTime >= EnemySpawnDelay && !SpawnTutoEnemy2)
 			{
+				//스폰할 객체에 대한 스폰 옵션을 설정하는 구조체
+				FActorSpawnParameters Params;
+				//스폰 과정에 충돌이 생겨도 제자리에서 스폰할 수 있게 만듦
+				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
 				SpawnTutoEnemy1->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				SpawnTutoEnemy1->GetMesh()->SetVisibility(false);
 
 				CurSpawnTime = 0.0f;
 				
-				SpawnTutoEnemy2 = GetWorld()->SpawnActor<ACTutorialEnemy>(TutoEnemy, GetActorTransform());
+				SpawnTutoEnemy2 = GetWorld()->SpawnActor<ACTutorialEnemy>(TutoEnemy, GetActorTransform(), Params);
 
 				AIController->Possess(SpawnTutoEnemy2);
 
