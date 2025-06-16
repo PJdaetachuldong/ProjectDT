@@ -262,6 +262,9 @@ public:
 	TSubclassOf<class ACBossDashATKCollision> DashATKColli;
 
 	class ACBossDashATKCollision* SpawnDashATKColli;
+
+	UPROPERTY(EditAnywhere)
+	class USceneComponent* EffectTrans;
 };
 
 USTRUCT(BlueprintType)

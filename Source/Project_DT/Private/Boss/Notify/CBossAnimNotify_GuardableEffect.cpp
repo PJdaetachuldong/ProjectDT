@@ -37,15 +37,25 @@ void UCBossAnimNotify_GuardableEffect::NotifyBegin(USkeletalMeshComponent* MeshC
 
 	if (SelectedSystem)
 	{
-		// 나이아가라 이펙트를 스폰 (설정한 소켓, 위치 오프셋, 회전에 맞춤)
-		SpawnEffect = UNiagaraFunctionLibrary::SpawnSystemAttached(
+// 		// 나이아가라 이펙트를 스폰 (설정한 소켓, 위치 오프셋, 회전에 맞춤)
+// 		SpawnEffect = UNiagaraFunctionLibrary::SpawnSystemAttached(
+// 			SelectedSystem,
+// 			MeshComp,
+// 			SocketName, // 설정한 소켓 이름
+// 			LocalLocation, // 로컬 위치 오프셋
+// 			LocalRotation, // 로컬 회전
+// 			EAttachLocation::KeepRelativeOffset,
+// 			true // Auto Destroy
+// 		);
+
+		// 나이아가라 이펙트를 지정된 위치에 스폰
+		SpawnEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			My, // 소유자 (예: Actor 또는 World Context Object)
 			SelectedSystem,
-			MeshComp,
-			SocketName, // 설정한 소켓 이름
-			LocalLocation, // 로컬 위치 오프셋
-			LocalRotation, // 로컬 회전
-			EAttachLocation::KeepRelativeOffset,
-			true // Auto Destroy
+			My->EffectTrans->GetComponentLocation(), 
+			My->EffectTrans->GetComponentRotation(),
+			FVector(1.0f),
+			true
 		);
 	}
 }
