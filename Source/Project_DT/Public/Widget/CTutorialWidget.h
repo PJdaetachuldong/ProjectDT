@@ -17,6 +17,10 @@ protected:
 public:
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
+	virtual void NativeTick(const FGeometry& MyGeometry, float DeltaTime) override;
+
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
 	UFUNCTION(BlueprintCallable)
 	void SetSwitcherIndex(int32 index);
 
