@@ -138,22 +138,6 @@ void UCParryComponent::PerformParryDetection()
         FCollisionShape::MakeSphere(ParryTraceRadius),
         Params
     );
-
-// --- 디버그 드로잉 (틱마다 업데이트) ---
-#if WITH_EDITOR
-    FColor DrawColor = FColor::Yellow; // 기본은 감지 중 색상
-    if (bHit) {
-        DrawColor = FColor::Red; // 뭔가 맞았다면 빨간색 (아직 패링 성공X)
-    }
-    // DebugDrawDuration이 -1.0f이므로 Tick마다 계속 그려져 갱신됩니다.
-    DrawDebugLine(GetWorld(), Start, End, DrawColor, false, -1.0f, 0, DebugDrawThickness); 
-    DrawDebugSphere(GetWorld(), End, ParryTraceRadius, 16, DrawColor, false, -1.0f, 0, DebugDrawThickness);
-    if (bHit)
-    {
-        // 히트 지점은 성공 시에만 짧게 남도록 DebugDrawDuration 사용
-        DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 15.f, 12, FColor::Cyan, false, DebugDrawDuration, 0, DebugDrawThickness);
-    }
-#endif
 // --- 디버그 드로잉 끝 ---
 
     AActor* HitActor = HitResult.GetActor();
@@ -169,8 +153,6 @@ void UCParryComponent::PerformParryDetection()
                 return; 
             }
 
-            // --- 패링 성공! ---
-            CLog::Log("Parry | SUCCESS! Boss Weapon: " + BossWeapon->GetName() + ", Impact Point: " + HitResult.ImpactPoint.ToString(), __FILE__, __LINE__);
 
             // 패링 판정 윈도우 즉시 종료 (성공했으니 더 이상 감지할 필요 없음)
             EndParryWindow(); 

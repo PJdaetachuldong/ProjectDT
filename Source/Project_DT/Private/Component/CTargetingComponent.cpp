@@ -59,25 +59,6 @@ AActor* UCTargetingComponent::FindClosestEnemyByDirection ( float MaxDistance , 
     FCollisionQueryParams Params;
     Params.AddIgnoredActor ( OwnerCharacter );
 
-    // 디버그: 오버랩 쿼리 정보 로그
-    UE_LOG ( LogTemp , Log ,
-        TEXT ( "[Overlap Debug] Starting OverlapMultiByObjectType | Center: %s | Radius: %.2f | Channel: ECC_EngineTraceChannel3" ) ,
-        *CharacterLocation.ToString ( ) , MaxDistance );
-
-    // 디버그: 오버랩 범위 시각화 (파란색 구체, 1초 지속)
-    DrawDebugSphere (
-        GetWorld ( ) ,
-        CharacterLocation ,
-        MaxDistance ,
-        32 ,
-        FColor::Blue ,
-        false ,
-        0.001f ,
-        0 ,
-        2.0f
-    );
-
-    // 캐릭터 중심의 원형 탐색
     GetWorld ( )->OverlapMultiByObjectType (
         Overlaps ,
         CharacterLocation ,
@@ -87,19 +68,12 @@ AActor* UCTargetingComponent::FindClosestEnemyByDirection ( float MaxDistance , 
         Params
     );
 
-    // 디버그: 오버랩 결과 로그
-    UE_LOG ( LogTemp , Log ,
-        TEXT ( "[Overlap Debug] Found %d objects in overlap query" ) , Overlaps.Num ( ) );
 
     for ( const FOverlapResult& Result : Overlaps )
     {
         AActor* Enemy = Result.GetActor ( );
         if ( !IsValid ( Enemy ) ) continue;
 
-        // 디버그: 감지된 오브젝트 정보 로그
-        UE_LOG ( LogTemp , Log ,
-            TEXT ( "[Overlap Debug] Detected Actor: %s | Location: %s" ) ,
-            *Enemy->GetName ( ) , *Enemy->GetActorLocation ( ).ToString ( ) );
 
         // 유효한 적을 배열에 추가
         PotentialTargets.Add ( Enemy );
@@ -126,14 +100,6 @@ AActor* UCTargetingComponent::FindClosestEnemyByDirection ( float MaxDistance , 
 
     if ( ClosestTarget )
     {
-        DrawDebugSphere (
-            GetWorld ( ) ,
-            ClosestTarget->GetActorLocation ( ) ,
-            60.f ,
-            16 ,
-            FColor::Red ,
-            false , 0.1f , 0 , 3.f
-        );
 
         UE_LOG ( LogTemp , Warning ,
             TEXT ( "[LockOn] Selected Target: %s (DotProduct: %.2f)" ) ,
