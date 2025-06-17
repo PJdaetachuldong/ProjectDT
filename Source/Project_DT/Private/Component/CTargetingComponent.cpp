@@ -87,15 +87,33 @@ AActor* UCTargetingComponent::FindClosestEnemyByDirection ( float MaxDistance , 
             *Enemy->GetName ( ) , DotProduct
         );
 
-        if ( DotProduct > ClosestDot )
-        {
-            ClosestDot = DotProduct;
-            ClosestTarget = Enemy;
-            TargetEnemy=ClosestTarget;
-            FVector TargetLoc = TargetEnemy->GetActorLocation() - TargetEnemy->GetActorForwardVector()*137.f;	//137은 오차
-            FRotator TargetRot = TargetEnemy->GetActorRotation();
-            Motion->AddOrUpdateWarpTargetFromLocationAndRotation(TEXT("Target"), TargetLoc, TargetRot);
-        }
+if ( DotProduct > ClosestDot )
+{
+    ClosestDot = DotProduct;
+    ClosestTarget = Enemy;
+    TargetEnemy = ClosestTarget; // ClosestTarget을 TargetEnemy에 할당
+
+    FVector TargetLoc;
+    FRotator TargetRot = TargetEnemy->GetActorRotation(); // 기본적으로 타겟의 회전 사용
+
+    // 무기 타입에 따라 목표 위치(TargetLoc) 계산 방식 변경
+    if (Weapon->GetWeaponType() == EWeaponType::Katana)
+    {
+        TargetLoc = TargetEnemy->GetActorLocation() + TargetEnemy->GetActorRightVector() * 150.f; // 타겟의 오른쪽으로 150 유닛 떨어진 위치
+    }
+    else if (Weapon->GetWeaponType() == EWeaponType::GreatSword)
+    {
+        TargetLoc = TargetEnemy->GetActorLocation() - TargetEnemy->GetActorForwardVector() * 180.f; // 타겟의 정면(뒤)으로 180 유닛 떨어진 위치
+
+    }
+    else
+    {
+        TargetLoc = TargetEnemy->GetActorLocation() - TargetEnemy->GetActorForwardVector() * 137.f;
+    }
+
+    // Motion Warping 타겟 설정
+    Motion->AddOrUpdateWarpTargetFromLocationAndRotation(TEXT("Target"), TargetLoc, TargetRot);
+}
     }
 
     if ( ClosestTarget )
@@ -126,7 +144,6 @@ void UCTargetingComponent::OnLookOn ( )
     FVector InputDirection = Movement->LastInputDirection.GetSafeNormal ( );
     if ( InputDirection.IsNearlyZero ( ) )
     {
-        UE_LOG ( LogTemp , Warning , TEXT ( "[LockOn] No valid input direction. %f"),InputDirection.Size() );
         return;
     }
 
@@ -135,14 +152,7 @@ void UCTargetingComponent::OnLookOn ( )
     {
         LockedOnTarget = Target;
         bIsLockedOn = true;
-        UE_LOG ( LogTemp , Warning , TEXT ( "[LockOn] Locked on to: %s" ) , *Target->GetName ( ) );
     }
-    //else
-    //{
-    //    LockedOnTarget = nullptr;
-    //    bIsLockedOn = false;
-    //    UE_LOG ( LogTemp , Warning , TEXT ( "[LockOn] Lock-Off (No target found)" ) );
-    //}
 }
 void UCTargetingComponent::UpdateLockOn ( float DeltaTime )
 {
@@ -181,8 +191,6 @@ void UCTargetingComponent::UpdateLockOn ( float DeltaTime )
         FRotator lookAtRot = UKismetMathLibrary::FindLookAtRotation(OwnerCharacter->GetActorLocation(), LockedOnTarget->GetActorLocation());
     }
 
-    // 디버그
-    DrawDebugSphere ( GetWorld ( ) , LockedOnTarget->GetActorLocation ( ) , 70.f , 16 , FColor::Blue , false , -1.f , 0 , 3.f );
 }
 
 void UCTargetingComponent::ResetLockOn ( )

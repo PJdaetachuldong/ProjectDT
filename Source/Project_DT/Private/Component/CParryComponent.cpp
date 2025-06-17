@@ -19,8 +19,8 @@ UCParryComponent::UCParryComponent()
 {
     PrimaryComponentTick.bCanEverTick = true; 
     bOnParryCooldown = false; 
-    bIsParryWindowActive = false; 
-    
+    bIsParryWindowActive = false;
+    CHelpers::GetAsset(&ParrySound,AssetPaths::ParrySound);
     // 디버그 드로잉 지속 시간을 기본값으로 설정 (상시 표시)
     DebugDrawDuration = -1.0f; 
 }

@@ -65,7 +65,9 @@ private:
 
     // 소유자 캐릭터의 상태 컴포넌트 (스태미나, 경직 등 처리)
     UPROPERTY(VisibleAnywhere, Category = "References")
-    class UCStateComponent* StateComponent; 
+    class UCStateComponent* StateComponent;
+    UPROPERTY()
+    class USoundCue* ParrySound;
     
     // 이전에 구현된 스태미나 컴포넌트가 있다면 여기에 추가
     // UPROPERTY(VisibleAnywhere, Category = "References")

@@ -40,12 +40,19 @@ public:
 	void SwitchOption();
 	UFUNCTION(BlueprintCallable)
 	void HiddenQuest();
+	UFUNCTION(BlueprintCallable, Category = "Audio")
+	void StopMusic_FadeOut(float FadeOutDuration = 2.0f);
 	
+	UFUNCTION(BlueprintCallable, Category = "Audio")
+	void PlayMusic_FadeIn(USoundCue* SoundToPlay, float FadeInDuration = 2.0f, float VolumeMultiplier = 1.0f);
 
 private:
 	bool CheckMap=true;
 	
 private:
+
+	UPROPERTY()
+	class UAudioComponent* BackgroundMusicComponent;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget>IntroWidgetClass;
 
@@ -87,6 +94,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget>TutorialWidgetClass;
+
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class USoundCue* IntroSound;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class USoundCue* MainSound;
 
 public:
 	UPROPERTY(EditAnywhere)
