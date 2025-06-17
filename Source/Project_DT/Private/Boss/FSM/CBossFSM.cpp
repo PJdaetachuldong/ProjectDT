@@ -142,6 +142,7 @@ void UCBossFSM::DIEState()
 		
 		State = EBossState::DIE;
 		AttackState = EBossATTACKState::NONE;
+		SetATKState = ESetATKState::SETATKNONE;
 		MyBoss->GetCapsuleComponent()->SetCollisionProfileName(FName("BlockAll"));
 	}
 }

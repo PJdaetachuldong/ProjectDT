@@ -302,6 +302,11 @@ void ACBossEnemy::Tick(float DeltaTime)
 
 	if(!BossStart) return;
 
+	if(CurHP <= 0 && FSMComponent->State != EBossState::DIE)
+	{	
+		FSMComponent->State = EBossState::DIE;
+		return;
+	}
 	//쉴드가 부셔진 상태이면
 	if (CurShieldAmount <= 0.0f)
 	{
@@ -794,7 +799,7 @@ void ACBossEnemy::Hitted()
 		{
 			if(ShieldBreakHit < 2) ++ShieldBreakHit;
 
-			if(FSMComponent->State == EBossState::BREAK && ShieldBreakHit >= 2)
+			if(FSMComponent->State == EBossState::BREAK && ShieldBreakHit >= 2 && CurHP > 0)
 			{
 				FSMComponent->State = EBossState::ATTACK;
 				FSMComponent->AttackState = EBossATTACKState::NONE;
@@ -868,21 +873,36 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 				/*CurHP -= 10.0f * 0.2f;*/
 				/*SetHP(10.0f * Damage.Power);*/
 
-				//체력이 0이하가 됐을 경우
-				if (CurHP <= 0)
-				{
-					//보스 사망
-					FSMComponent->State = EBossState::DIE;
-
-					return 0;
-				}
-
 				//쉴드가 0이하가 됐을 경우
 				if (CurShieldAmount <= 0)
 				{
 					// -가 된 쉴드 게이지만큼 체력을 깎아줌
 					/*CurHP += ShieldAmount;*/
 					SetHP(-CurShieldAmount);
+
+					//체력이 0이하가 됐을 경우
+					if (CurHP <= 0)
+					{
+						//보스 사망
+						FSMComponent->State = EBossState::DIE;
+
+						if (BossUI->IsInViewport())
+						{
+							BossUI->RemoveFromParent();
+
+							SpawnWeapon->SetActorEnableCollision(ECollisionEnabled::NoCollision);
+						}
+
+						//모든 몽타주 재생을 멈춤
+						AnimInstance->StopAllMontages(0.4f);
+
+						AnimInstance->State = EBossState::DIE;
+
+						//AI 움직임 멈춤
+						GetController()->StopMovement();
+
+						return 0;
+					}
 
 					if (FSMComponent->State != EBossState::BREAK)
 					{
@@ -931,6 +951,22 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 					{
 						//보스 사망
 						FSMComponent->State = EBossState::DIE;
+
+						if (BossUI->IsInViewport())
+						{
+							BossUI->RemoveFromParent();
+
+							SpawnWeapon->SetActorEnableCollision(ECollisionEnabled::NoCollision);
+						}
+
+						//모든 몽타주 재생을 멈춤
+						AnimInstance->StopAllMontages(0.4f);
+
+						AnimInstance->State = EBossState::DIE;
+
+						//AI 움직임 멈춤
+						GetController()->StopMovement();
+
 						return 0;
 					}
 
@@ -969,6 +1005,21 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 			{
 				//사망 처리
 				FSMComponent->State = EBossState::DIE;
+
+				if (BossUI->IsInViewport())
+				{
+					BossUI->RemoveFromParent();
+
+					SpawnWeapon->SetActorEnableCollision(ECollisionEnabled::NoCollision);
+				}
+
+				//모든 몽타주 재생을 멈춤
+				AnimInstance->StopAllMontages(0.4f);
+
+				AnimInstance->State = EBossState::DIE;
+
+				//AI 움직임 멈춤
+				GetController()->StopMovement();
 
 				return 0;
 			}
@@ -1015,21 +1066,36 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 					/*CurHP -= 10.0f * 0.2f;*/
 					/*SetHP(10.0f * 0.2f);*/
 
-					//체력이 0이하가 됐을 경우
-					if (CurHP <= 0)
-					{
-						//보스 사망
-						FSMComponent->State = EBossState::DIE;
-
-						return 0;
-					}
-
 					//쉴드가 0이하가 됐을 경우
 					if (CurShieldAmount <= 0)
 					{
 						// -가 된 쉴드 게이지만큼 체력을 깎아줌
 						/*CurHP += ShieldAmount;*/
 						SetHP(-CurShieldAmount);
+
+						//체력이 0이하가 됐을 경우
+						if (CurHP <= 0)
+						{
+							//보스 사망
+							FSMComponent->State = EBossState::DIE;
+
+							if (BossUI->IsInViewport())
+							{
+								BossUI->RemoveFromParent();
+
+								SpawnWeapon->SetActorEnableCollision(ECollisionEnabled::NoCollision);
+							}
+
+							//모든 몽타주 재생을 멈춤
+							AnimInstance->StopAllMontages(0.4f);
+
+							AnimInstance->State = EBossState::DIE;
+
+							//AI 움직임 멈춤
+							GetController()->StopMovement();
+
+							return 0;
+						}
 
 						if (FSMComponent->State != EBossState::BREAK)
 						{
@@ -1069,6 +1135,22 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 						{
 							//보스 사망
 							FSMComponent->State = EBossState::DIE;
+
+							if (BossUI->IsInViewport())
+							{
+								BossUI->RemoveFromParent();
+
+								SpawnWeapon->SetActorEnableCollision(ECollisionEnabled::NoCollision);
+							}
+
+							//모든 몽타주 재생을 멈춤
+							AnimInstance->StopAllMontages(0.4f);
+
+							AnimInstance->State = EBossState::DIE;
+
+							//AI 움직임 멈춤
+							GetController()->StopMovement();
+
 							return 0;
 						}
 
@@ -1107,6 +1189,21 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 				{
 					//사망 처리
 					FSMComponent->State = EBossState::DIE;
+
+					if (BossUI->IsInViewport())
+					{
+						BossUI->RemoveFromParent();
+
+						SpawnWeapon->SetActorEnableCollision(ECollisionEnabled::NoCollision);
+					}
+
+					//모든 몽타주 재생을 멈춤
+					AnimInstance->StopAllMontages(0.4f);
+
+					AnimInstance->State = EBossState::DIE;
+
+					//AI 움직임 멈춤
+					GetController()->StopMovement();
 
 					return 0;
 				}
