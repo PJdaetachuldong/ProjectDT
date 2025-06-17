@@ -77,7 +77,6 @@ void ACTutoWeapon::TutoWeaponOverlap(UPrimitiveComponent* OverlappedComponent, A
 
 	if (Player)
 	{
-		GEngine->AddOnScreenDebugMessage(111, 1.0f, FColor::White, TEXT("Counter Attack!!!"));
 
 		//가드가 가능한 공격일 경우
 		if (MyOwner->IsParry)

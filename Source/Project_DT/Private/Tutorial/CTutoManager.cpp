@@ -63,6 +63,7 @@ void ACTutoManager::Tick(float DeltaTime)
 			AIController->Possess(SpawnTutoEnemy1);
 
 			SpawnTutoEnemy1->IsATKGide = true;
+			SpawnTutoEnemy1->IsDontHit = false;
 			SpawnTutoEnemy1->SettingManager(this);
 
 			ALHW_GameModeBase* GameMode = Cast<ALHW_GameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));

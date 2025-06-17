@@ -100,4 +100,6 @@ public:
 	void IDLEEnd();
 
 	void ATKEnd();
+
+	bool IsDontHit = true;
 };
