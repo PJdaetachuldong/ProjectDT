@@ -122,35 +122,6 @@ void UCPlayerAnim::CheckFootstep(FName FootBoneName, bool& bOutIsOnGround, FVect
         QueryParams
     );
 
-    // 디버그 드로잉 (선택 사항)
-    #if ENABLE_DRAW_DEBUG
-    if (GEngine)  // Check if GEngine is valid
-    {
-        DrawDebugLine(
-            World,
-            TraceStart,
-            TraceEnd,
-            bHit ? FColor::Green : FColor::Red,
-            false, // PersistentLines
-            5.0f,  // LifeTime
-            0,     // DepthPriority
-            1.0f   // Thickness
-        );
-        if (bHit)
-        {
-            DrawDebugSphere(
-                World,
-                HitResult.Location,
-                5.0f, // Radius
-                12,   // Segments
-                FColor::Green,
-                false, // PersistentLines
-                5.0f // LifeTime
-            );
-        }
-    }
-    #endif
-
     if (bHit && HitResult.bBlockingHit)
     {
         bOutIsOnGround = true;
