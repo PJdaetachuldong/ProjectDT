@@ -73,7 +73,7 @@ public:
 	float GuardGage = 0.0f;
 
 	//가드가 실행되는 조건 설정 변수
-	float GuardPlaying = 10.0f;
+	float GuardPlaying = 7.0f;
 
 	//가드가 성공하였는지 체크하는 변수
 	bool IsGuardSucssess = false;
