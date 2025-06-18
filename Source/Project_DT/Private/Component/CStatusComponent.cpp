@@ -15,7 +15,7 @@ void UCStatusComponent::BeginPlay ( )
 
 	OwnerCharacter = Cast<ACharacter> ( GetOwner ( ) );
 
-	Health = MaxHealth;
+	Health = 0;
 	Mana = 0;
 
 

@@ -111,6 +111,12 @@ void ACBossWeapon::PlayerDamage()
 		true
 	);
 
+	if(HitNumber > MyBoss->HitData->HitDatas.Max() - 1)
+	{
+		// 사용자 정의 데미지 이벤트 생성
+		MyBoss->HitData->HitDatas[0].SendDamage(MyBoss, this, MyBoss->Target);
+		return;
+	}
 	// 사용자 정의 데미지 이벤트 생성
 	MyBoss->HitData->HitDatas[HitNumber].SendDamage(MyBoss, this, MyBoss->Target);
 }

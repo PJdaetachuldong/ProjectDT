@@ -23,6 +23,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Boss)
 	class ACBossEnemy* MyBoss;
 
 // 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

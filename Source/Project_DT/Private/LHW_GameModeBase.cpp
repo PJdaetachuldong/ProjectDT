@@ -114,7 +114,7 @@ void ALHW_GameModeBase::CreateCharacterUI()
 	auto* Status= CHelpers::GetComponent<UCStatusComponent>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	Status->Heal(50);
 	// Status->Damage(100);
-	Status->UseMana(70);
+	Status->RecoverMana(100);
 
 	FTimerHandle Handler;
 }

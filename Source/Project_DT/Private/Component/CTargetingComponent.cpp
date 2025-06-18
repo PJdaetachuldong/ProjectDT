@@ -186,7 +186,7 @@ void UCTargetingComponent::UpdateLockOn ( float DeltaTime )
 
         // 컨트롤러 회전 보간
         FRotator NewControlRot = FMath::RInterpTo ( ControlRot , CamToTargetRot , DeltaTime , 5.f );
-        if (LockedOnTarget->IsA(ACBossEnemy::StaticClass()))
+        if (LockedOnTarget->IsA(ACEnemyBase::StaticClass()))
             Controller->SetControlRotation ( NewControlRot );
         FRotator lookAtRot = UKismetMathLibrary::FindLookAtRotation(OwnerCharacter->GetActorLocation(), LockedOnTarget->GetActorLocation());
     }

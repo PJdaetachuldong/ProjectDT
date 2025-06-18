@@ -178,8 +178,8 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction(IA_LeftAttack, ETriggerEvent::Started, Weapon, &UCWeaponComponent::DoAction);
 		playerInput->BindAction(IA_RightAttack, ETriggerEvent::Started, Weapon, &UCWeaponComponent::DoHeavyAction);
 		playerInput->BindAction(IA_SpecialAttack, ETriggerEvent::Started, Weapon,
-		                        &UCWeaponComponent::SubAction_Skill_Pressed);
-		playerInput->BindAction(IA_SpecialAttack, ETriggerEvent::Completed, Weapon,
+		                        //&UCWeaponComponent::SubAction_Skill_Pressed);
+		//playerInput->BindAction(IA_SpecialAttack, ETriggerEvent::Completed, Weapon,
 		                        &UCWeaponComponent::SubAction_Skill_Released);
 		playerInput->BindAction(IA_Guard, ETriggerEvent::Started, this, &ACPlayer::OnGuard);
 		playerInput->BindAction(IA_Guard, ETriggerEvent::Completed, this, &ACPlayer::OffGuard);
