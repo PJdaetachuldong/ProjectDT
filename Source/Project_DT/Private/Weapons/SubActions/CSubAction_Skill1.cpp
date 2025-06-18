@@ -10,16 +10,14 @@
 #include "Weapons/CDoAction.h"
 void UCSubAction_Skill1::Pressed ( )
 {
+		CheckTrue(State->IsSubActionMode());
+		CheckTrue ( State->IsIdleMode() or State->IsActionMode() );
+		Super::Pressed ( );
 
-	CheckFalse ( State->IsIdleMode ( ) );
-	if (Status->GetMana()<20)return;
-	Status->UseMana(20);
-	Super::Pressed ( );
+		State->SetActionMode ( );
+		State->OnSubActionMode ( );
 
-	State->SetActionMode ( );
-	State->OnSubActionMode ( );
-
-	ActionData.DoAction ( Owner );
+		ActionData.DoAction ( Owner );
 }
 void UCSubAction_Skill1::Begin_SubAction_Skill_Implementation ( )
 {

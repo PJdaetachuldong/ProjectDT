@@ -13,6 +13,8 @@ void UCSubAction_Guard::Pressed ( )
 {
 	CheckTrue ( State->IsHittedMode());
 	CheckTrue ( State->IsSubActionMode ( ) );
+	CheckTrue ( State->IsCounterMode ( ) );
+	CheckTrue ( DoAction->RetrunParry() );
 	Super::Pressed();
 
 	State->SetActionMode ( );

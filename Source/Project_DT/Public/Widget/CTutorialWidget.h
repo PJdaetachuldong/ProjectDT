@@ -26,4 +26,10 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
 	class UWidgetSwitcher* WidgetSwitcher_9;
+
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
+	class UImage* MouseImg;
+private:
+	int32 CounterCount = 0;
 };

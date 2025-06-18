@@ -17,4 +17,5 @@ void UCSubAction::BeginPlay ( class ACharacter* InOwner , class ACAttachment* In
 	State = CHelpers::GetComponent<UCStateComponent> ( InOwner );
 	Movement = CHelpers::GetComponent<UCMovementComponent> ( InOwner );
 	Weapon = CHelpers::GetComponent<UCWeaponComponent> ( InOwner );
+	DoAction=InDoAction;
 }
