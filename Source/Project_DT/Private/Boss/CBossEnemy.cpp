@@ -230,8 +230,8 @@ void ACBossEnemy::InitializeMontageMap()
 	{
 		TArray<FMontageRateScale> ComboAttack01Rates;
 		ComboAttack01Rates.Add(FMontageRateScale{FName("ComboAttack_01_01"), 0.5f, true});
-		ComboAttack01Rates.Add(FMontageRateScale{FName("ComboAttack_01_02"), 0.7f, false });
-		ComboAttack01Rates.Add(FMontageRateScale{FName("ComboAttack_01_03"), 0.7f, true });
+		ComboAttack01Rates.Add(FMontageRateScale{FName("ComboAttack_01_02"), 0.6f, true });
+		ComboAttack01Rates.Add(FMontageRateScale{FName("ComboAttack_01_03"), 0.6f, true });
 		ComboAttack01Rates.Add(FMontageRateScale{FName("ComboAttack_01_04"), 0.7f, true });
 		MontageScaleMap.Add(AM_ComboAttack_01, ComboAttack01Rates);
 	}
@@ -240,8 +240,8 @@ void ACBossEnemy::InitializeMontageMap()
 	{
 		TArray<FMontageRateScale> ComboAttack02Rates;
 		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_01"), 0.5f, true });
-		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_02"), 0.7f, false});
-		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_03"), 0.7f,false});
+		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_02"), 0.6f, true });
+		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_03"), 0.6f,true });
 		ComboAttack02Rates.Add(FMontageRateScale{FName("ComboAttack_02_04"), 0.7f, true });
 		MontageScaleMap.Add(AM_ComboAttack_02, ComboAttack02Rates);
 	}
@@ -258,7 +258,7 @@ void ACBossEnemy::InitializeMontageMap()
 	if (AM_RangedAttack)
 	{
 		TArray<FMontageRateScale> RangedAttackRates;
-		RangedAttackRates.Add(FMontageRateScale{ FName("Default"), 1.0f, false });
+		RangedAttackRates.Add(FMontageRateScale{ FName("Default"), 1.0f, true });
 		MontageScaleMap.Add(AM_RangedAttack, RangedAttackRates);
 	}
 
