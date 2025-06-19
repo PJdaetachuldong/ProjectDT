@@ -211,9 +211,8 @@ void ACPlayer::OnStateTypeChanged(EStateType InPrevType, EStateType InNewType)
 
 void ACPlayer::OnAvoid()
 {
-	if (Weapon->GetDoAction()){
-	if (Weapon->GetDoAction()->RetrunParry())return;
-	}
+	CheckTrue(State->IsHealMode());
+	CheckTrue(State->IsBackstepMode()); 
 	if (State->IsIdleMode() or State->IsCancelMode())
 		State->SetBackStepMode();
 }
@@ -348,7 +347,10 @@ void ACPlayer::EscapeHandler()
 
 void ACPlayer::OnGuard()
 {
+	CheckNull(Weapon->GetDoAction());
 	CheckTrue(Weapon->GetDoAction()->RetrunParry());
+	CheckTrue(State->IsBackstepMode());
+	CheckTrue(State->IsHealMode());
 	Parry->OnParry();
 }
 

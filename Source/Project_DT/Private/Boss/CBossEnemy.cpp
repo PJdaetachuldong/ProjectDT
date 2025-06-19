@@ -794,6 +794,7 @@ void ACBossEnemy::Hitted()
 	
 	if (!!Damage.Event && !!Damage.Event->HitData) {
 		FHitData* data = Damage.Event->HitData;
+		CLog::Log(data->Power);
 
 		if (CurShieldAmount <= 0.0f)
 		{
@@ -1728,7 +1729,6 @@ void ACBossEnemy::HiddenWidget()
 void ACBossEnemy::LoadStatsFromAsset ( )
 {
 	Super::LoadStatsFromAsset();
-
 }
 
 void ACBossEnemy::SetSPColli()

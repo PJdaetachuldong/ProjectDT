@@ -9,6 +9,7 @@
 #include "Enemy/EnemyBase/CEnemyBase.h"
 #include "../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraComponent.h"
 #include "Component/CStatusComponent.h"
+#include "Weapons/CWeaponComponent.h"
 // Sets default values
 ACAttachment::ACAttachment()
 {
@@ -127,7 +128,13 @@ void ACAttachment::Tick(float DeltaTime)
 			if (OnAttachmentBeginOverlap.IsBound())
 				OnAttachmentBeginOverlap.Broadcast(OwnerCharacter, this, Cast<ACharacter>(Hit.GetActor()));
 			Status=CHelpers::GetComponent<UCStatusComponent>(OwnerCharacter);
-			Status->RecoverMana(5);
+			UCWeaponComponent* Weapon=CHelpers::GetComponent<UCWeaponComponent>(OwnerCharacter);
+			
+			if (Weapon->GetWeaponType()==EWeaponType::Katana)
+				Status->RecoverMana(2);
+			else if (Weapon->GetWeaponType()==EWeaponType::GreatSword)
+				Status->RecoverMana(5);
+
 			if (HitEffect) // HitEffect가 블루프린트에서 설정되었는지 확인
 			{
 				UNiagaraFunctionLibrary::SpawnSystemAtLocation(

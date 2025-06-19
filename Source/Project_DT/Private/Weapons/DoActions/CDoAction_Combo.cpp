@@ -201,6 +201,7 @@ void UCDoAction_Combo::CounterAction()
     if (CounterActionDatas.IsValidIndex(0))
     {
         CounterActionDatas[0].DoCounterAction(OwnerCharacter);
+        DamageIndex = 6;
     }
     else
     {
