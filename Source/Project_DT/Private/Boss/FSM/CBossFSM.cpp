@@ -207,7 +207,7 @@ void UCBossFSM::NONEState()
 	if (TargetDist >= 200.0f)
 	{
 		//움직인 거리가 600이상일 경우
-		if (TotalMoveDistance >= 600.0f)
+		if (TotalMoveDistance >= 1200.0f)
 		{
 			int32 SideMoveCheckInt = 0;
 
@@ -217,7 +217,7 @@ void UCBossFSM::NONEState()
 			}
 
 			//랜덤값이 4 이하
-			if (SideMoveCheckInt <= 4)
+			if (SideMoveCheckInt <= 2)
 			{
 				//좌우 이동하게 만듦
 				SideMove();
@@ -225,7 +225,7 @@ void UCBossFSM::NONEState()
 			}
 
 			//랜덤값이 5이상
-			else if (SideMoveCheckInt >= 5)
+			else if (SideMoveCheckInt >= 3)
 			{
 				//움직인 거리값 초기화
 				TotalMoveDistance = 0.0f;

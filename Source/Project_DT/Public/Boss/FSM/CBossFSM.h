@@ -143,7 +143,7 @@ public:
 	float CurComboAttackTime = 0.0f;
 
 	//콤보 공격 쿨타임, 적어야함
-	float ComboCooltime = 3.5f;
+	float ComboCooltime = 2.0f;
 
 	//어느 콤보 공격을 할지 저장하는 변수
 	int32 ComboAttackIndex;
@@ -161,7 +161,7 @@ public:
 	void GetOwnerEnemy();
 
 	float CurSideMoveTime = 0.0f;
-	float SideMoveLimitTime = 3.5f;
+	float SideMoveLimitTime = 1.0f;
 	float SideDirection = 0.0f;
 
 	//자신의 주인과 AI를 저장하는 변수

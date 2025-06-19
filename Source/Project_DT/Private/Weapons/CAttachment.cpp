@@ -126,7 +126,6 @@ void ACAttachment::Tick(float DeltaTime)
 			/*Enemy->Hit(GetName());*/
 			if (OnAttachmentBeginOverlap.IsBound())
 				OnAttachmentBeginOverlap.Broadcast(OwnerCharacter, this, Cast<ACharacter>(Hit.GetActor()));
-			GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Yellow, FString::Printf(TEXT("Hit: %s"), *Hit.GetActor()->GetName()));
 			Status=CHelpers::GetComponent<UCStatusComponent>(OwnerCharacter);
 			Status->RecoverMana(5);
 			if (HitEffect) // HitEffect가 블루프린트에서 설정되었는지 확인
