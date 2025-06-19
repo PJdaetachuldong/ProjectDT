@@ -174,12 +174,12 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		                        &UCMovementComponent::OnHorizontalLook);
 		playerInput->BindAction(IA_Dash, ETriggerEvent::Triggered, Movement, &UCMovementComponent::OnSprint);
 		playerInput->BindAction(IA_Dash, ETriggerEvent::Completed, Movement, &UCMovementComponent::OnRun);
-		playerInput->BindAction(IA_Avoid, ETriggerEvent::Completed, this, &ACPlayer::OnAvoid);
+		playerInput->BindAction(IA_Avoid, ETriggerEvent::Started, this, &ACPlayer::OnAvoid);
 		playerInput->BindAction(IA_LeftAttack, ETriggerEvent::Started, Weapon, &UCWeaponComponent::DoAction);
 		playerInput->BindAction(IA_RightAttack, ETriggerEvent::Started, Weapon, &UCWeaponComponent::DoHeavyAction);
 		playerInput->BindAction(IA_SpecialAttack, ETriggerEvent::Started, Weapon,
-		                        //&UCWeaponComponent::SubAction_Skill_Pressed);
-		//playerInput->BindAction(IA_SpecialAttack, ETriggerEvent::Completed, Weapon,
+		                        &UCWeaponComponent::SubAction_Skill_Pressed);
+		playerInput->BindAction(IA_SpecialAttack, ETriggerEvent::Completed, Weapon,
 		                        &UCWeaponComponent::SubAction_Skill_Released);
 		playerInput->BindAction(IA_Guard, ETriggerEvent::Started, this, &ACPlayer::OnGuard);
 		playerInput->BindAction(IA_Guard, ETriggerEvent::Completed, this, &ACPlayer::OffGuard);
@@ -345,6 +345,7 @@ void ACPlayer::EscapeHandler()
 
 void ACPlayer::OnGuard()
 {
+	CheckTrue(Weapon->GetDoAction()->RetrunParry());
 	Parry->OnParry();
 }
 

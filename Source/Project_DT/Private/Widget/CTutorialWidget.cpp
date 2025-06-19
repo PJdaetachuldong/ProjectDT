@@ -8,6 +8,7 @@
 #include "Component/CMointageComponent.h"
 #include "Utilities/CHelper.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Components/Image.h"
 
 void UCTutorialWidget::NativeConstruct()
 {
@@ -82,7 +83,6 @@ FReply UCTutorialWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 void UCTutorialWidget::SetSwitcherIndex(int32 index)
 {
 	WidgetSwitcher_9->SetActiveWidgetIndex(index);
-
 	switch (index)
 	{
 	case 0:
@@ -110,6 +110,17 @@ void UCTutorialWidget::SetSwitcherIndex(int32 index)
 	{
 		
 	}break;
+	case 5:
+		{
+			if (CounterCount>=2)
+			{
+				MouseImg->SetOpacity(0);
+			}
+			CounterCount++;
+		}break;
+	case 6:
+		{
+		}break;
 	default:
 	{
 	}break;

@@ -147,7 +147,6 @@ void UCWeaponComponent::DoHeavyAction ( )
 		GetDoAction ( )->DoHeavyAction ( );
 		GetDoAction ( )->HeavyAttack ( );
 	}
-
 }
 
 void UCWeaponComponent::SubAction_Pressed()
@@ -200,7 +199,6 @@ void UCWeaponComponent::OnParry ( EParryState ParryState )
 	if ( !!GetDoAction())
 		GetDoAction ( )->DoActionParry ( ParryState );
 }
-
 void UCWeaponComponent::SetMode ( EWeaponType InType )
 {
 	if ( Type == InType )
@@ -216,13 +214,11 @@ void UCWeaponComponent::SetMode ( EWeaponType InType )
 		ChangeType ( InType );
 	}
 }
-
 void UCWeaponComponent::ChangeType ( EWeaponType InType )
 {
 	EWeaponType prevType = Type;
 	Type = InType;
-
-
+	
 	if ( OnWeaponTypeChange.IsBound ( ) )
 		OnWeaponTypeChange.Broadcast ( prevType , InType );
 }

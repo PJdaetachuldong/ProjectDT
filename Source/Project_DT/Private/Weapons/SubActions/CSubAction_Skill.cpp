@@ -19,6 +19,5 @@ void UCSubAction_Skill::BeginPlay ( class ACharacter* InOwner , class ACAttachme
 
 void UCSubAction_Skill::Pressed ( )
 {
-
 	State->OnSubActionMode ( );
 }

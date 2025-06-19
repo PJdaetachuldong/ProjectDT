@@ -58,7 +58,6 @@ void UCParryComponent::OnParry()
     // 패링 시도 쿨다운 중이거나, 이미 패링 윈도우가 활성화된 상태라면 실행하지 않음
     if (bOnParryCooldown || bIsParryWindowActive)
     {
-        CLog::Log("Parry | Cannot initiate: On cooldown or window already active.", __FILE__, __LINE__);
         return;
     }
 
