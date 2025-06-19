@@ -193,8 +193,11 @@ float ACTutorialEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent co
 	CLog::Log(Damage.Power);
 	CLog::Log(Damage.Causer);
 
-	if (State == ETutoState::DIE) return 0;
-
+	if (State == ETutoState::DIE)
+	{
+		Target->TargetComp->ResetLockOn();
+		return 0;
+	}
 	if(IsDontHit) return 0;
 	
 	if (CurShieldAmount > 0)

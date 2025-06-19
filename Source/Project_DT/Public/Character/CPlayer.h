@@ -180,6 +180,9 @@ public:
 private:
 	void SelectWidgetOff();
 	void SelectWidgetOn();
+
+
+	UFUNCTION(BlueprintCallable)
 	void SelectKatana();
 public:
 
