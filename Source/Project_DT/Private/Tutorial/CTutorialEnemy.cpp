@@ -255,6 +255,16 @@ void ACTutorialEnemy::ATKEnd()
 	AnimInstance->AnimState = ETutoState::CHASE;
 }
 
+void ACTutorialEnemy::DIESetLocation()
+{
+	if (!IsParry)
+	{
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->SetVisibility(false);
+		SetActorLocation(FVector(0, -200, 0));
+	}
+}
+
 void ACTutorialEnemy::AttackTurn()
 {
 	//공격이 제대로 실행되기 전에 플레이어를 바라보도록 만듦
