@@ -112,11 +112,6 @@ void UCTutorialWidget::SetSwitcherIndex(int32 index)
 	}break;
 	case 5:
 		{
-			if (CounterCount>=2)
-			{
-				MouseImg->SetOpacity(0);
-			}
-			CounterCount++;
 		}break;
 	case 6:
 		{

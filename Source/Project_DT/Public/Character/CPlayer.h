@@ -58,7 +58,7 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class UCPerfectDodgeComponent* Dodge;
 public:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite)
 	class UCTargetingComponent* TargetComp;
 
 private:

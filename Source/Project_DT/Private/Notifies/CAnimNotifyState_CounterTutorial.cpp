@@ -4,6 +4,8 @@
 #include "Notifies/CAnimNotifyState_CounterTutorial.h"
 #include "Global.h"
 #include "LHW_GameModeBase.h"
+#include "Components/Image.h"
+#include "Widget/CPlayerWidget.h"
 #include "Widget/CTutorialWidget.h"
 
 FString UCAnimNotifyState_CounterTutorial::GetNotifyName_Implementation() const
@@ -15,19 +17,18 @@ void UCAnimNotifyState_CounterTutorial::NotifyBegin(USkeletalMeshComponent* Mesh
 	float TotalDuration)
 {
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration);
-	ALHW_GameModeBase* GameMode=Cast<ALHW_GameModeBase>(GetWorld());
-	CheckNull(GameMode);
-		GameMode->TutorialWidget->SetSwitcherIndex(5);
-	UGameplayStatics::SetGlobalTimeDilation(MeshComp->GetWorld(), 0.8f);
+	CheckNull(MeshComp->GetOwner());
+	UCPlayerWidget* widget=CHelpers::GetWidget<UCPlayerWidget>(MeshComp->GetOwner());
+	CheckNull(widget);
+	widget->Board->SetRenderOpacity(0.2);
 	
 }
 
 void UCAnimNotifyState_CounterTutorial::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	Super::NotifyEnd(MeshComp, Animation);
-	ALHW_GameModeBase* GameMode=Cast<ALHW_GameModeBase>(MeshComp->GetOwner()->GetWorld());
-	CheckNull(GameMode);
-	GameMode->TutorialWidget->SetSwitcherIndex(0);
-	UGameplayStatics::SetGlobalTimeDilation(MeshComp->GetWorld(), 1.0f);
-	
+	CheckNull(MeshComp->GetOwner());
+	UCPlayerWidget* widget=CHelpers::GetWidget<UCPlayerWidget>(MeshComp->GetOwner());
+	CheckNull(widget);
+	widget->Board->SetRenderOpacity(0);
 }
