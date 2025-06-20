@@ -102,4 +102,6 @@ public:
 	void ATKEnd();
 
 	bool IsDontHit = true;
+
+	void DIESetLocation();
 };

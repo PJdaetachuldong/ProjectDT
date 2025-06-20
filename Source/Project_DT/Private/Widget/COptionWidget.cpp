@@ -9,7 +9,10 @@
 #include <Character/CPlayer.h>
 
 #include "LHW_GameModeBase.h"
+#include "Boss/CBossEnemy.h"
 #include "Component/CProductionComponent.h"
+#include "Components/TextBlock.h"
+#include "Runtime/AdvancedWidgets/Public/Components/RadialSlider.h"
 #include "Utilities/CHelper.h"
 
 void UCOptionWidget::NativeConstruct()
@@ -20,6 +23,11 @@ void UCOptionWidget::NativeConstruct()
 	Key->OnClicked.AddDynamic(this,&UCOptionWidget::KeyHandler);
 	Teleport->OnClicked.AddDynamic(this,&UCOptionWidget::TeleportHandler);
 	Exit->OnClicked.AddDynamic(this,&UCOptionWidget::ExitHandler);
+	
+	Balance->OnClicked.AddDynamic(this,&UCOptionWidget::ShowBalance);
+	Set->OnClicked.AddDynamic(this,&UCOptionWidget::SetBossBalance);
+	HPSlider->OnValueChanged.AddDynamic(this, &UCOptionWidget::HpValueChanged);
+	ShieldSlider->OnValueChanged.AddDynamic(this, &UCOptionWidget::ShieldValueChanged);
 }
 
 FReply UCOptionWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
@@ -93,6 +101,10 @@ void UCOptionWidget::SetSwitcher()
 		{
 			Switcher->SetActiveWidgetIndex(1);
 		}break;
+	case 3:
+		{
+			Switcher->SetActiveWidgetIndex(1);
+		}break;
 	default:
 		{
 			// Switcher->SetActiveWidgetIndex(0);
@@ -108,4 +120,43 @@ void UCOptionWidget::SetSwitcher()
 void UCOptionWidget::SetSwitcherIndex(int32 index)
 {
 	Switcher->SetActiveWidgetIndex(index);
+}
+
+void UCOptionWidget::ShowBalance()
+{
+	SetSwitcherIndex(3);
+	
+	UWorld* World = GetWorld();
+	if (!World)return; 
+	TArray<AActor*> FoundBossEnemies;
+	UGameplayStatics::GetAllActorsOfClass(World, ACBossEnemy::StaticClass(), FoundBossEnemies);
+	if (FoundBossEnemies.Num() > 0)
+	{
+		for (AActor* Actor : FoundBossEnemies)
+		{
+			BossEnemy = Cast<ACBossEnemy>(Actor);
+			
+			BossHPText->SetText(FText::AsNumber(BossEnemy->MaxHP));
+			BossShieldText->SetText(FText::AsNumber(BossEnemy->MaxShieldAmount));
+		}
+	}
+}
+
+void UCOptionWidget::SetBossBalance()
+{
+	BossEnemy->StatsAsset->Stats.MaxHP=HP;
+	BossEnemy->StatsAsset->Stats.ShieldAmount=Shield;
+	BossEnemy->LoadStatsFromAsset();
+}
+
+void UCOptionWidget::HpValueChanged(float v)
+{
+	HP = FMath::Lerp(0.0f, MaxHPValue, v);
+	BossHPText->SetText(FText::AsNumber(HP));
+}
+
+void UCOptionWidget::ShieldValueChanged(float v)
+{
+	Shield = FMath::Lerp(0.0f, MaxShieldValue, v);
+	BossShieldText->SetText(FText::AsNumber(Shield));
 }

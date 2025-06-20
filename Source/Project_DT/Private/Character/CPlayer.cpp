@@ -191,8 +191,8 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		
 		playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Started, this, &ACPlayer::SelectWidgetOn);
 		playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Completed, this, &ACPlayer::SelectGreatSword);
-		playerInput->BindAction(IA_Cheat, ETriggerEvent::Started, Montages, &UCMointageComponent::PlayDeadMode);
-		playerInput->BindAction(IA_Cheat2, ETriggerEvent::Started, this, &ACPlayer::TestHandler);
+		// playerInput->BindAction(IA_Cheat, ETriggerEvent::Started, Montages, &UCMointageComponent::PlayDeadMode);
+		// playerInput->BindAction(IA_Cheat2, ETriggerEvent::Started, this, &ACPlayer::TestHandler);
 		playerInput->BindAction(IA_Select, ETriggerEvent::Started, this, &ACPlayer::TestHandler2);
 		playerInput->BindAction(IA_ESC, ETriggerEvent::Started, this, &ACPlayer::EscapeHandler);
 	}
@@ -211,6 +211,8 @@ void ACPlayer::OnStateTypeChanged(EStateType InPrevType, EStateType InNewType)
 
 void ACPlayer::OnAvoid()
 {
+	CheckTrue(State->IsHealMode());
+	CheckTrue(State->IsBackstepMode()); 
 	if (State->IsIdleMode() or State->IsCancelMode())
 		State->SetBackStepMode();
 }
@@ -345,7 +347,10 @@ void ACPlayer::EscapeHandler()
 
 void ACPlayer::OnGuard()
 {
+	CheckNull(Weapon->GetDoAction());
 	CheckTrue(Weapon->GetDoAction()->RetrunParry());
+	CheckTrue(State->IsBackstepMode());
+	CheckTrue(State->IsHealMode());
 	Parry->OnParry();
 }
 

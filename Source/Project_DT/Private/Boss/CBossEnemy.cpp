@@ -319,7 +319,11 @@ void ACBossEnemy::Tick(float DeltaTime)
 			//실드를 다시 복구
 			//CurShieldAmount = MaxShieldAmount;
 
+<<<<<<< HEAD
 			SetShieldAmount(-MaxShieldAmount);
+=======
+			SetShieldAmount(-(MaxShieldAmount +90));
+>>>>>>> 1585483c531f76f72910fb4ddd431e139a006c56
 
 			ShieldBreakHit = 0;
 
@@ -794,6 +798,7 @@ void ACBossEnemy::Hitted()
 	
 	if (!!Damage.Event && !!Damage.Event->HitData) {
 		FHitData* data = Damage.Event->HitData;
+		CLog::Log(data->Power);
 
 		if (CurShieldAmount <= 0.0f)
 		{
@@ -1728,7 +1733,6 @@ void ACBossEnemy::HiddenWidget()
 void ACBossEnemy::LoadStatsFromAsset ( )
 {
 	Super::LoadStatsFromAsset();
-
 }
 
 void ACBossEnemy::SetSPColli()

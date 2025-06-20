@@ -55,6 +55,8 @@ private:
 
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
+	class UImage* Board;
+	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
 	class UProgressBar* Player_HP_Dark;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "UI", meta = (BindWidget))
