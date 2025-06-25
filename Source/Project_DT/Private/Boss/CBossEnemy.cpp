@@ -319,11 +319,7 @@ void ACBossEnemy::Tick(float DeltaTime)
 			//실드를 다시 복구
 			//CurShieldAmount = MaxShieldAmount;
 
-<<<<<<< HEAD
 			SetShieldAmount(-MaxShieldAmount);
-=======
-			SetShieldAmount(-(MaxShieldAmount +90));
->>>>>>> 1585483c531f76f72910fb4ddd431e139a006c56
 
 			ShieldBreakHit = 0;
 

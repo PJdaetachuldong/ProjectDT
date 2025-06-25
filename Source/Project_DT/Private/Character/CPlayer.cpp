@@ -383,6 +383,13 @@ void ACPlayer::Hitted()
 		data->PlayMontage(this);
 		data->PlayHitStop(GetWorld());
 		{
+			if(Cast<ACBossWeapon>(Damage.Causer)->HitNumber == 11)
+			{ 
+				Damage.Character = nullptr;
+				Damage.Causer = nullptr;
+				Damage.Event = nullptr;
+				return;
+			}
 			FVector start = GetActorLocation();
 			FVector target = Damage.Character->GetActorLocation();
 			FVector direction = target - start;
