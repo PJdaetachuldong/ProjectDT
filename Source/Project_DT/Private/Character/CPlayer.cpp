@@ -37,7 +37,7 @@ ACPlayer::ACPlayer()
 	CHelpers::CreateComponent<USpringArmComponent>(this, &SpringArmL, "SpringArmL", GetMesh());
 	CHelpers::CreateComponent<USpringArmComponent>(this, &SpringArmR, "SpringArmR", GetMesh());
 	CHelpers::CreateComponent<USpringArmComponent>(this, &CameraActionArm, "CameraActionArm",GetMesh());
-	
+
 	CHelpers::CreateComponent<UCameraComponent>(this, &Camera, "Camera", SpringArm);
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -90));
 	GetMesh()->SetRelativeRotation(FRotator(0, -90, 0));
@@ -51,13 +51,13 @@ ACPlayer::ACPlayer()
 
 	SpringArm->SetRelativeLocation(FVector(0, 0, 140));
 	SpringArm->SetRelativeRotation(FRotator(0, 90, 0));
-	
+
 	SpringArmL->SetRelativeLocation(FVector(60, 0, 140));
 	SpringArmL->SetRelativeRotation(FRotator(0, 90, 0));
-	
+
 	SpringArmR->SetRelativeLocation(FVector(-60, 0, 140));
 	SpringArmR->SetRelativeRotation(FRotator(0, 90, 0));
-	
+
 	SpringArm->TargetArmLength = 250;
 	SpringArmL->TargetArmLength = 250;
 	SpringArmR->TargetArmLength = 250;
@@ -109,7 +109,7 @@ ACPlayer::ACPlayer()
 	CHelpers::CreateActorComponent<UCCameraActionComponent>(this, &CameraAction, "CameraAction");
 	CHelpers::CreateActorComponent<UMotionWarpingComponent>(this, &MotionWarping, "MotionWarping");
 	CHelpers::CreateActorComponent<UCProductionComponent>(this, &Production, "Production");
-	
+
 
 	//인풋 받기
 	CHelpers::GetAsset(&IMC, AssetPaths::IMC);
@@ -153,7 +153,7 @@ void ACPlayer::BeginPlay()
 }
 
 void ACPlayer::Tick(float DeltaTime)
-{ 
+{
 	Super::Tick(DeltaTime);
 
 }
@@ -184,16 +184,16 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction(IA_Guard, ETriggerEvent::Started, this, &ACPlayer::OnGuard);
 		playerInput->BindAction(IA_Guard, ETriggerEvent::Completed, this, &ACPlayer::OffGuard);
 		playerInput->BindAction(IA_Heal, ETriggerEvent::Started, this, &ACPlayer::Healing);
-		
+
 
 		playerInput->BindAction(IA_TestBtn, ETriggerEvent::Started, this, &ACPlayer::SelectWidgetOn);
 		playerInput->BindAction(IA_TestBtn, ETriggerEvent::Completed, this, &ACPlayer::SelectKatana);
-		
+
 		playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Started, this, &ACPlayer::SelectWidgetOn);
 		playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Completed, this, &ACPlayer::SelectGreatSword);
 		// playerInput->BindAction(IA_Cheat, ETriggerEvent::Started, Montages, &UCMointageComponent::PlayDeadMode);
-		// playerInput->BindAction(IA_Cheat2, ETriggerEvent::Started, this, &ACPlayer::TestHandler);
-		playerInput->BindAction(IA_Select, ETriggerEvent::Started, this, &ACPlayer::TestHandler2);
+		playerInput->BindAction(IA_Cheat2, ETriggerEvent::Started, this, &ACPlayer::TestHandler2);
+		playerInput->BindAction(IA_Select, ETriggerEvent::Started, this, &ACPlayer::SelectWeapon);
 		playerInput->BindAction(IA_ESC, ETriggerEvent::Started, this, &ACPlayer::EscapeHandler);
 	}
 }
@@ -212,7 +212,7 @@ void ACPlayer::OnStateTypeChanged(EStateType InPrevType, EStateType InNewType)
 void ACPlayer::OnAvoid()
 {
 	CheckTrue(State->IsHealMode());
-	CheckTrue(State->IsBackstepMode()); 
+	CheckTrue(State->IsBackstepMode());
 	if (State->IsIdleMode() or State->IsCancelMode())
 		State->SetBackStepMode();
 }
@@ -234,7 +234,7 @@ void ACPlayer::BackStep()
 	float Angle = FMath::Atan2(RightDot, ForwardDot);
 	float Degree = FMath::RadiansToDegrees(Angle);
 
-	EActState DodgeDirection = EActState::DodgeB; 
+	EActState DodgeDirection = EActState::DodgeB;
 	if (!TargetComp->IsLockedOn())
 	{
 		DodgeDirection = EActState::DodgeF;
@@ -368,7 +368,7 @@ void ACPlayer::Hitted()
 	if (Montages->isDead)return;
 	if (Weapon->GetDoAction())
 		if (Weapon->GetDoAction()->RetrunParry())return;
-	
+
 	if (Status->Damage(Damage.Power) <= 0)
 	{
 		State->SetDeadMode();
@@ -384,7 +384,7 @@ void ACPlayer::Hitted()
 		data->PlayHitStop(GetWorld());
 		{
 			if(Cast<ACBossWeapon>(Damage.Causer)->HitNumber == 11)
-			{ 
+			{
 				Damage.Character = nullptr;
 				Damage.Causer = nullptr;
 				Damage.Event = nullptr;
@@ -437,21 +437,30 @@ void ACPlayer::SelectWidgetOff()
 void ACPlayer::SelectKatana()
 {
 	CheckNull(UWidget);
-	if (!UWidget->AllowChange)return;
-	if(Weapon->GetWeaponType()==EWeaponType::Katana)
-		UWidget->FadeOutSelectWindow();
-		
-	SelectWidgetOff();
-	UWidget->SelectKatana();
-}
+	//if (!UWidget->AllowChange)return;
+	//if(Weapon->GetWeaponType()==EWeaponType::Katana)
+		//UWidget->FadeOutSelectWindow();
 
+	//SelectWidgetOff();
+	UWidget->KatanaEndSelect();
+}
 void ACPlayer::SelectGreatSword()
 {
 	CheckNull(UWidget);
-	if (!UWidget->AllowChange)return;
-	if(Weapon->GetWeaponType()==EWeaponType::GreatSword)
-		UWidget->FadeOutSelectWindow();
-	SelectWidgetOff();
-	UWidget->SelectGreatSword();
+	//if (!UWidget->AllowChange)return;
+	//if(Weapon->GetWeaponType()==EWeaponType::GreatSword)
+		//UWidget->FadeOutSelectWindow();
+	//SelectWidgetOff();
+	UWidget->GreatSwordEndSelect();
 }
- 
+void ACPlayer::SelectWeapon()
+{
+	if (Weapon->GetWeaponType() == EWeaponType::Katana) {
+		SelectGreatSword();
+	}
+	else if (Weapon->GetWeaponType() == EWeaponType::GreatSword)
+	{
+		SelectKatana();
+	}
+
+}

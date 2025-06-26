@@ -182,12 +182,16 @@ private:
 	void SelectWidgetOn();
 
 
-	UFUNCTION(BlueprintCallable)
-	void SelectKatana();
+
 public:
 
 	UFUNCTION(BlueprintCallable)
 	void SelectGreatSword();
+
+	UFUNCTION(BlueprintCallable)
+	void SelectKatana();
+
+	void SelectWeapon();
 
 public:
 	bool bGuardHit =false;

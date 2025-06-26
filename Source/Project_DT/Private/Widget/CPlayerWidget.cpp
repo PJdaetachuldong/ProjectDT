@@ -121,6 +121,7 @@ void UCPlayerWidget::SelectGreatSword()
 
 void UCPlayerWidget::KatanaEndSelect()
 {
+	
 	CheckNull(State);
 	State->SetIdleMode();
 	Weapon->SetKatanaMode();

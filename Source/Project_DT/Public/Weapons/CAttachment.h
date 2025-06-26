@@ -75,6 +75,8 @@ protected:
 	class USkeletalMeshComponent* ColorMesh;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class UNiagaraSystem* HitEffect;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class UNiagaraSystem* HitEffect2;
 
 private:
 	bool bCollisionTraceEnabled = false;
@@ -98,4 +100,14 @@ private:
 
 	FTimerHandle ScaleTimerHandle;
 	float ScaleTime;
+	UPROPERTY() // UPROPERTY 매크로를 붙여 GC가 관리하도록 합니다.
+	TSet<AActor*> HitActorsThisSwing; 
+
+	// 베지어 곡선 접선 계산 함수 (필요 시 선언)
+	FVector GetBezierCurveTangent(const FVector& P0, const FVector& P1, const FVector& P2, float T);
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FRotator HorizontalRotation;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FRotator VerticalRotation;
 };
