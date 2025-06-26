@@ -40,8 +40,8 @@ void ACTutoWeapon::Tick(float DeltaTime)
 void ACTutoWeapon::PlayParringAnim()
 {
 	//현재 재생중인 몽타주 멈춤
-	MyOwner->AnimInstance->AnimState = ETutoState::CHASE;
-	MyOwner->State = ETutoState::CHASE;
+	MyOwner->AnimInstance->AnimState = ETutoState::PARRY;
+	MyOwner->State = ETutoState::PARRY;
 	
 	IsTutoPlayerParring = true;
 

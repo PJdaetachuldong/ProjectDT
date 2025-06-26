@@ -9,6 +9,9 @@
 #include "Utilities/CHelper.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Image.h"
+#include "Weapons/CWeaponComponent.h"
+#include "Weapons/CDoAction.h"
+#include "Weapons/DoActions/CDoAction_Combo.h"
 
 void UCTutorialWidget::NativeConstruct()
 {
@@ -29,7 +32,7 @@ FReply UCTutorialWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKey
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
 		return FReply::Handled();
 	}
-
+	
 	else if(WidgetSwitcher_9->GetActiveWidgetIndex() == 2 && InKeyEvent.GetKey() == EKeys::SpaceBar)
 	{
 		SetSwitcherIndex(0);
@@ -45,6 +48,19 @@ FReply UCTutorialWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKey
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
 		return FReply::Handled();
 	}
+
+// 	else if ((WidgetSwitcher_9->GetActiveWidgetIndex() == 5 && InKeyEvent.GetKey() == EKeys::LeftMouseButton))
+// 	{
+// 		SetSwitcherIndex(0);
+// 		APlayerController* C = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+// 		ACPlayer* Player = Cast<ACPlayer>(C->GetPawn());
+// 		/*Player->Parry->OnParry();*/
+// 		C->bShowMouseCursor = false;
+// 		FInputModeGameOnly InputMode;
+// 		C->SetInputMode(InputMode);
+// 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+// 		return FReply::Handled();
+// 	}
 	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
 
@@ -71,13 +87,44 @@ FReply UCTutorialWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 {
 	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 
-	// 마우스 클릭 시 포커스를 다시 설정
-	APlayerController* C = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-	SetFocus();
-	FInputModeUIOnly InputMode;
-	InputMode.SetWidgetToFocus(TakeWidget());
-	C->SetInputMode(InputMode);
-	return FReply::Handled(); // 마우스 입력을 캡처하여 뷰포트로 전달되지 않도록
+	if ((WidgetSwitcher_9->GetActiveWidgetIndex() == 5 && InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton))
+	{
+		SetSwitcherIndex(0);
+		APlayerController* C = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		ACPlayer* Player = Cast<ACPlayer>(C->GetPawn());
+
+		UCWeaponComponent* weapon = CHelpers::GetComponent<UCWeaponComponent>(C->GetPawn());
+		UCDoAction_Combo* combo = Cast<UCDoAction_Combo>(weapon->GetDoAction());
+		/*CheckNull(combo);*/
+		UCStateComponent* State = CHelpers::GetComponent<UCStateComponent>(C->GetPawn());
+// 		CheckNull(weapon);
+// 		CheckNull(State);
+// 		CheckNull(weapon->GetDoAction());
+		
+		combo->bExist = true;
+		weapon->GetDoAction()->CounterAction();
+		State->SetCounterMode();
+
+		/*Player->Parry->OnParry();*/
+		C->bShowMouseCursor = false;
+		FInputModeGameOnly InputMode;
+		C->SetInputMode(InputMode);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+		return FReply::Handled();
+	}
+
+	else
+	{
+		// 마우스 클릭 시 포커스를 다시 설정
+		APlayerController* C = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		SetFocus();
+		FInputModeUIOnly InputMode;
+		InputMode.SetWidgetToFocus(TakeWidget());
+		C->SetInputMode(InputMode);
+		return FReply::Handled(); // 마우스 입력을 캡처하여 뷰포트로 전달되지 않도록
+	}
+
+	return FReply::Handled();
 }
 
 void UCTutorialWidget::SetSwitcherIndex(int32 index)
@@ -111,8 +158,13 @@ void UCTutorialWidget::SetSwitcherIndex(int32 index)
 		
 	}break;
 	case 5:
-		{
-		}break;
+	{
+		APlayerController* C = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+		FInputModeUIOnly InputMode;
+		InputMode.SetWidgetToFocus(TakeWidget());
+		C->SetInputMode(InputMode);
+	}
+	break;
 	case 6:
 		{
 		}break;

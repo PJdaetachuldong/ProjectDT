@@ -64,7 +64,7 @@ void ACTutorialEnemy::Tick(float DeltaTime)
 
 	if(State == ETutoState::DIE || IsATKGide) return;
 
-	if (State == ETutoState::IDLE || State == ETutoState::BREAK) 
+	if (State == ETutoState::IDLE || State == ETutoState::BREAK || State == ETutoState::PARRY) 
 	{
 		if(AI)
 		{
