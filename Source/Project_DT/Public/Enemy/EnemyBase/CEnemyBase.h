@@ -96,4 +96,15 @@ public:
 	virtual void SetHP(float value);
 
 	virtual void SetShieldAmount(float value);
+
+// 	void ShakeEffect();
+// 	void UpdateShakeEffect(float DeltaTime);
+// 	void StopShake();
+// 
+// 	bool IsShaking = false;
+// 	float CurShakeTime = 0.0f;
+// 	float ShakeDuration = 0.5f;
+// 	float ShakeIntensity = 1.0f;
+// 	FVector OriginalMeshLocation;
+// 	FTimerHandle ShakeTimerHandle;
 };

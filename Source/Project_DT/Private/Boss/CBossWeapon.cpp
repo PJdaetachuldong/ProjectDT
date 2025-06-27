@@ -203,7 +203,7 @@ void ACBossWeapon::WeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 // 			{
 // 				OverlapRotator = FRotator(0.0f, ImpactNormal.Rotation().Yaw, 0.0f);
 // 			}
-			GetWorld()->GetTimerManager().SetTimer(ParringCheckTimer,this, &ACBossWeapon::PlayerDamage,0.1f,false);
+			GetWorld()->GetTimerManager().SetTimer(ParringCheckTimer,this, &ACBossWeapon::PlayerDamage,0.001f,false);
 
 // 			//만약 플레이어가 패링 감지중이면
 // 			if (/*Weapon->GetDoAction() && Weapon->GetDoAction()->RetrunParry()*/ IsPlayerParring)

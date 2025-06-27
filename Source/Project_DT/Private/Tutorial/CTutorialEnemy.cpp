@@ -62,9 +62,24 @@ void ACTutorialEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(State == ETutoState::DIE || IsATKGide) return;
+	if(State == ETutoState::DIE/* || IsATKGide*/) return;
 
-	if (State == ETutoState::IDLE || State == ETutoState::BREAK) 
+	if (IsATKGide)
+	{
+		if (IsShaking)
+		{
+			UpdateShakeEffect(DeltaTime);
+		}
+
+		return;
+	}
+
+	if (IsShaking)
+	{
+		UpdateShakeEffect(DeltaTime);
+	}
+
+	if (State == ETutoState::IDLE || State == ETutoState::BREAK || State == ETutoState::PARRY) 
 	{
 		if(AI)
 		{
@@ -146,11 +161,15 @@ void ACTutorialEnemy::LoadStatsFromAsset()
 void ACTutorialEnemy::SetHP(float value)
 {
 	CurHP = CurHP - value;
+
+	ShakeEffect();
 }
 
 void ACTutorialEnemy::SetShieldAmount(float value)
 {
 	CurShieldAmount = CurShieldAmount - value;
+
+	ShakeEffect();
 }	
 
 void ACTutorialEnemy::Hitted()
@@ -198,8 +217,11 @@ float ACTutorialEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent co
 		Target->TargetComp->ResetLockOn();
 		return 0;
 	}
-	if(IsDontHit) return 0;
-	
+	if(IsDontHit) 
+	{ 
+		ShakeEffect();
+		return 0;
+	}
 	if (CurShieldAmount > 0)
 	{
 		SetShieldAmount(Damage.Power);
@@ -263,6 +285,51 @@ void ACTutorialEnemy::DIESetLocation()
 		GetMesh()->SetVisibility(false);
 		SetActorLocation(FVector(0, -200, 0));
 	}
+}
+
+void ACTutorialEnemy::ShakeEffect()
+{
+	if (!IsShaking)
+	{
+		IsShaking = true;
+		CurShakeTime = 0.0f;
+		OriginalMeshLocation = GetMesh()->GetRelativeLocation();
+
+		GetWorldTimerManager().SetTimer(ShakeTimerHandle, this, &ACTutorialEnemy::StopShake, ShakeDuration, false);
+	}
+}
+
+void ACTutorialEnemy::UpdateShakeEffect(float DeltaTime)
+{
+// 	if (IsWorldPause())
+// 	{
+// 		StopShake();
+// 		return;
+// 	}
+
+	CurShakeTime += DeltaTime;
+
+	FVector RandomOffeset = FVector(
+		UKismetMathLibrary::RandomFloatInRange(-ShakeIntensity, ShakeIntensity),
+		UKismetMathLibrary::RandomFloatInRange(-ShakeIntensity, ShakeIntensity),
+		UKismetMathLibrary::RandomFloatInRange(-ShakeIntensity, ShakeIntensity));
+
+	GetMesh()->SetRelativeLocation(OriginalMeshLocation + RandomOffeset);
+
+	float Alpha = CurShakeTime / ShakeDuration;
+	GetMesh()->SetRelativeLocation(FMath::Lerp(OriginalMeshLocation + RandomOffeset, OriginalMeshLocation, Alpha));
+}
+
+void ACTutorialEnemy::StopShake()
+{
+	IsShaking = false;
+	GetMesh()->SetRelativeLocation(OriginalMeshLocation);
+	GetWorldTimerManager().ClearTimer(ShakeTimerHandle);
+}
+
+bool ACTutorialEnemy::IsWorldPause()
+{
+	return FMath::IsNearlyZero(UGameplayStatics::GetGlobalTimeDilation(GetWorld()));
 }
 
 void ACTutorialEnemy::AttackTurn()

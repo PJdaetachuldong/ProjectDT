@@ -36,13 +36,13 @@ public:
 public:
 	void OnAttachmentBeginOverlap ( class ACharacter* InAttacker , AActor* InAttackCuaser , class ACharacter* InOther ) override;
 
+	bool bExist;
 private:
 	int32 Index=0;
 	int32 HeavyIndex = 0;
 	int32 DamageIndex;
 
 	bool bEnable;
-	bool bExist;
 
 
 	TArray<FString> ComboArray;

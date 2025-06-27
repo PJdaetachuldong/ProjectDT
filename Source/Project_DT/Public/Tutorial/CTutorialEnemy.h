@@ -16,6 +16,7 @@ enum class ETutoState : uint8
 	CHASE UMETA(DisplayName = "CHASE"),
 	ATTACKREADY UMETA(DisplayName = "ATTACKREADY"),
 	ATTACK UMETA(DisplayName = "ATTACK"),
+	PARRY UMETA(DisplayName = "PARRY"),
 	BREAK UMETA ( DisplayName = "BREAK" ),
 	DIE UMETA(DisplayName = "DIE")
 };
@@ -95,7 +96,7 @@ public:
 	float TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	float CurAttackTime = 0.0f;
-	float AttackLimitTime = 2.5f;
+	float AttackLimitTime = 1.1f;
 
 	void IDLEEnd();
 
@@ -104,4 +105,17 @@ public:
 	bool IsDontHit = true;
 
 	void DIESetLocation();
+
+	void ShakeEffect();
+	void UpdateShakeEffect(float DeltaTime);
+	void StopShake();
+
+	bool IsWorldPause();
+
+	bool IsShaking = false;
+	float CurShakeTime = 0.0f;
+	float ShakeDuration = 0.3f;
+	float ShakeIntensity = 7.0f;
+	FVector OriginalMeshLocation;
+	FTimerHandle ShakeTimerHandle;
 };
