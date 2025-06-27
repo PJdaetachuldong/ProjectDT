@@ -32,12 +32,16 @@ void UCTutoAnimNotify_TimeStop::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 		{
 			GameMode->TutorialWidget->SetSwitcherIndex(1);
 
+			My->StopShake();
+
 			UGameplayStatics::SetGlobalTimeDilation(My->Target->GetController()->GetWorld(), 0.0f);
 		}
 
 		else
 		{
 			GameMode->TutorialWidget->SetSwitcherIndex(2);
+
+			My->StopShake();
 
 			UGameplayStatics::SetGlobalTimeDilation(My->Target->GetController()->GetWorld(), 0.0f);
 		}

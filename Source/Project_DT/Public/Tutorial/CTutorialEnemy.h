@@ -105,4 +105,17 @@ public:
 	bool IsDontHit = true;
 
 	void DIESetLocation();
+
+	void ShakeEffect();
+	void UpdateShakeEffect(float DeltaTime);
+	void StopShake();
+
+	bool IsWorldPause();
+
+	bool IsShaking = false;
+	float CurShakeTime = 0.0f;
+	float ShakeDuration = 0.3f;
+	float ShakeIntensity = 7.0f;
+	FVector OriginalMeshLocation;
+	FTimerHandle ShakeTimerHandle;
 };

@@ -123,3 +123,37 @@ void ACEnemyBase::SetShieldAmount(float value)
 {
 
 }
+
+// void ACEnemyBase::ShakeEffect()
+// {
+// 	if (!IsShaking)
+// 	{
+// 		IsShaking = true;
+// 		CurShakeTime = 0.0f;
+// 		OriginalMeshLocation = GetMesh()->GetRelativeLocation();
+// 
+// 		GetWorldTimerManager().SetTimer(ShakeTimerHandle , this, &ACEnemyBase::StopShake, ShakeDuration, false);
+// 	}
+// }
+// 
+// void ACEnemyBase::UpdateShakeEffect(float DeltaTime)
+// {
+// 	CurShakeTime += DeltaTime;
+// 
+// 	FVector RandomOffeset = FVector(
+// 		UKismetMathLibrary::RandomFloatInRange(-ShakeIntensity, ShakeIntensity),
+// 		UKismetMathLibrary::RandomFloatInRange(-ShakeIntensity, ShakeIntensity),
+// 		UKismetMathLibrary::RandomFloatInRange(-ShakeIntensity, ShakeIntensity));
+// 
+// 	GetMesh()->SetRelativeLocation(OriginalMeshLocation + RandomOffeset);
+// 
+// 	float Alpha = CurShakeTime / ShakeDuration;
+// 	GetMesh()->SetRelativeLocation(FMath::Lerp(OriginalMeshLocation + RandomOffeset, OriginalMeshLocation, Alpha));
+// }
+// 
+// void ACEnemyBase::StopShake()
+// {
+// 	IsShaking = false;
+// 	GetMesh()->SetRelativeLocation(OriginalMeshLocation);
+// 	GetWorldTimerManager().ClearTimer(ShakeTimerHandle);
+// }
