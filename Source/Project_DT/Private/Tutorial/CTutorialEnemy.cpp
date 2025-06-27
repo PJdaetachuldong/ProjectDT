@@ -322,6 +322,8 @@ void ACTutorialEnemy::UpdateShakeEffect(float DeltaTime)
 
 void ACTutorialEnemy::StopShake()
 {
+	if(!IsShaking) return;
+
 	IsShaking = false;
 	GetMesh()->SetRelativeLocation(OriginalMeshLocation);
 	GetWorldTimerManager().ClearTimer(ShakeTimerHandle);
