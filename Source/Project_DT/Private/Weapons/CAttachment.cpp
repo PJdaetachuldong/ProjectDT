@@ -17,7 +17,7 @@ ACAttachment::ACAttachment()
     CHelpers::CreateComponent<USkeletalMeshComponent>(this, &SkeletalMesh, "SkeletalMesh");
     CHelpers::CreateComponent ( this , &Root , "Root" );
     SetRootComponent(Root);
-    SkeletalMesh->SetupAttachment(Root);
+    SkeletalMesh->SetupAttachment(Root);		
     ColorMesh->SetupAttachment(Root);
     
     SkeletalMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
