@@ -10,12 +10,22 @@
 #include "Boss/CBossWeapon.h"
 #include "Boss/CBossEnemy.h"
 #include "Weapons/CDoAction.h"
+#include "Components/AudioComponent.h"
+#include "Boss/FSM/CBossFSM.h"
 
 // Sets default values
 ACRangeAttack::ACRangeAttack()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(L"AudioComponent");
+	AudioComponent->bAutoActivate = false;
+	AudioComponent->SetupAttachment(RootComponent);
+
+	SecondAudioComponent = CreateDefaultSubobject<UAudioComponent>(L"SecondAudioComponent");
+	SecondAudioComponent->bAutoActivate = false;
+	SecondAudioComponent->SetupAttachment(AudioComponent);
 	
 // 	BoxComp = CreateDefaultSubobject<UBoxComponent>(L"RangedATKCollision");
 // 	SetRootComponent(BoxComp);
@@ -32,6 +42,18 @@ void ACRangeAttack::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (FireSound)
+	{
+		AudioComponent->SetSound(FireSound);
+		AudioComponent->Play();
+	}
+
+	if (SecondSound)
+	{
+		SecondAudioComponent->SetSound(SecondSound);
+		SecondAudioComponent->Play();
+	}
+
 /*	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &ACRangeAttack::OverlapPlayer);*/
 }
 
@@ -54,10 +76,24 @@ void ACRangeAttack::Tick(float DeltaTime)
 		{
 // 			//자신을 안보이게 하고 다시 오브젝트 풀로 되돌림
 // 			SetActive(false, FVector(0));
+			
+			AudioComponent->Stop();
+
+			SecondAudioComponent->Stop();
 
 			Destroy();
 		}
 /*	}*/
+
+/*	UpdateSound();*/
+
+	if (MyBoss->FSMComponent->TargetDist <= 450.0f)
+	{
+		
+		AudioComponent->SetVolumeMultiplier(1.5f);
+		
+		SecondAudioComponent->SetVolumeMultiplier(1.5f);
+	}
 }
 
 void ACRangeAttack::SetDirectionAndBoss(FVector ToPlayerDirection, ACBossEnemy* Who)
@@ -162,8 +198,34 @@ void ACRangeAttack::HitPlayer()
 		}
 	}
 
+	AudioComponent->Stop();
+
+	SecondAudioComponent->Stop();
+
 	Destroy();
 }
+
+// void ACRangeAttack::UpdateSound()
+// {
+// 	if(!MyBoss || !AudioComponent || !SecondAudioComponent || !FireSound) return;
+// 	
+// 	if(MyBoss->Target)
+// 	{ 
+// 		float SoundVolume = FMath::Lerp(1.0f, 0.0f, (MyBoss->FSMComponent->TargetDist - MinDist)/ (MaxDist - MinDist));
+// 		SoundVolume = FMath::Clamp(SoundVolume, 0.8f, 1.5f);
+// 		
+// 		AudioComponent->SetVolumeMultiplier(SoundVolume);
+// 
+// 		SecondAudioComponent->SetVolumeMultiplier(SoundVolume);
+// 	}
+
+// 	else
+// 	{
+// 		AudioComponent->SetVolumeMultiplier(0.0f);
+// 
+// 		SecondAudioComponent->SetVolumeMultiplier(0.0f);
+// 	}
+/*}*/
 
 // void ACRangeAttack::SetActive(bool Value, FVector DirectionToTarget)
 // {

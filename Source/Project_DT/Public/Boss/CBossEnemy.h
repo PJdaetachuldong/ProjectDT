@@ -268,6 +268,33 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void HiddenWidget();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+    USoundWave* SwordSwing_1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+    USoundWave* SwordSwing_2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+    USoundWave* SwordSwing_3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+    USoundWave* SwordSwing_4;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+    USoundWave* SwordSwing_5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+    USoundWave* SwordSwing_6;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+    USoundWave* Shield_Break;
+
+	UPROPERTY (EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* GuardSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* GreateGuardSound;
 };
 
 USTRUCT(BlueprintType)

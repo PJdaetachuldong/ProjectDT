@@ -58,4 +58,22 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Hit)
 	void HitPlayer();
+
+	UPROPERTY(EditAnywhere)
+    UAudioComponent* AudioComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+    USoundWave* FireSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+    USoundWave* SecondSound;
+
+	UPROPERTY(EditAnywhere)
+    UAudioComponent* SecondAudioComponent;
+
+// 	void UpdateSound();
+// 
+// 	float MaxDist = 700.0f;
+// 
+// 	float MinDist = 100.0f;
 };
