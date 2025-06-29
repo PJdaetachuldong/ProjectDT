@@ -877,6 +877,8 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 				//쉴드가 0이하가 됐을 경우
 				if (CurShieldAmount <= 0)
 				{
+					UGameplayStatics::PlaySoundAtLocation(this, Shield_Break, GetActorLocation());
+
 					// -가 된 쉴드 게이지만큼 체력을 깎아줌
 					/*CurHP += ShieldAmount;*/
 					SetHP(-CurShieldAmount);
@@ -920,6 +922,7 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 				//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
 				if (CurShieldAmount > 0 && AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) != FName("Counter") /*FSMComponent->AttackState != EBossATTACKState::COUNTERATTACK*/ && FSMComponent->State != EBossState::BREAK && !AnimInstance->Montage_IsPlaying(AM_Guard))
 				{
+					UGameplayStatics::PlaySoundAtLocation(this, GuardSound, GetActorLocation());
 					AnimInstance->Montage_Play(AM_ShieldHit);
 					FSMComponent->CurSideMoveTime = 0.0f;
 					FSMComponent->SideDirection = 0.0f;
@@ -943,6 +946,8 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 				//쉴드가 0이하가 됐을 경우
 				if (CurShieldAmount <= 0)
 				{
+					UGameplayStatics::PlaySoundAtLocation(this, Shield_Break, GetActorLocation());
+
 					// -가 된 쉴드 게이지만큼 체력을 깎아줌
 					/*CurHP += ShieldAmount;*/
 					SetHP(-CurShieldAmount);
@@ -1070,6 +1075,8 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 					//쉴드가 0이하가 됐을 경우
 					if (CurShieldAmount <= 0)
 					{
+						UGameplayStatics::PlaySoundAtLocation(this, Shield_Break, GetActorLocation());
+
 						// -가 된 쉴드 게이지만큼 체력을 깎아줌
 						/*CurHP += ShieldAmount;*/
 						SetHP(-CurShieldAmount);
@@ -1113,7 +1120,11 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 					//브레이크 상태가 아니면 재생되게, 나중에 조건 바꾸기
 					if (CurShieldAmount > 0 && AnimInstance->Montage_GetCurrentSection(AnimInstance->GetCurrentActiveMontage()) != FName("Counter") && FSMComponent->State != EBossState::BREAK)
 					{
+						UGameplayStatics::PlaySoundAtLocation(this, GreateGuardSound, GetActorLocation());
 						AnimInstance->Montage_Play(AM_ShieldHit);
+						FSMComponent->CurSideMoveTime = 0.0f;
+						FSMComponent->SideDirection = 0.0f;
+						FSMComponent->SetATKState = ESetATKState::SETATKNONE;
 					}
 
 					//쉴드는 데미지의 값 만큼 감소
@@ -1127,6 +1138,8 @@ float ACBossEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const&
 					//쉴드가 0이하가 됐을 경우
 					if (CurShieldAmount <= 0)
 					{
+						UGameplayStatics::PlaySoundAtLocation(this, Shield_Break, GetActorLocation());
+
 						// -가 된 쉴드 게이지만큼 체력을 깎아줌
 						/*CurHP += ShieldAmount;*/
 						SetHP(-CurShieldAmount);

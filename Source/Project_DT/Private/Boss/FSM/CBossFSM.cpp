@@ -68,6 +68,11 @@ void UCBossFSM::IDLEState()
 
 void UCBossFSM::ATTACKState()
 {
+	if (AttackState != EBossATTACKState::SETATK)
+	{
+		MyBoss->AnimInstance->MoveDirection = 0.0f;
+	}
+
 	ParringDontMoveTime += GetWorld()->DeltaTimeSeconds;
 	if (ParringDontMoveTime >= ParringDibtMoveLimitTime)
 	{
