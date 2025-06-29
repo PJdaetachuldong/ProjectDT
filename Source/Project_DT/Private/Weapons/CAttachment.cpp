@@ -7,10 +7,8 @@
 #include "Components/ShapeComponent.h"
 #include "Components/SceneComponent.h"
 #include "Enemy/EnemyBase/CEnemyBase.h"
-#include "../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraComponent.h"
 #include "Component/CStatusComponent.h"
 #include "Weapons/CWeaponComponent.h"
-#include "Kismet/KismetMathLibrary.h" // UKismetMathLibrary::FindLookAtRotation 사용을 위해 추가
 
 // Sets default values
 ACAttachment::ACAttachment()
@@ -228,13 +226,26 @@ if (HitEffect)
         true
     );
 }
+       	UWorld* World = GetWorld();
+       	if (World)
+       	{
+       		// 시간을 0.1배로 느리게 합니다. (1.0f가 정상 속도)
+       		UGameplayStatics::SetGlobalTimeDilation(World, 0.4f);
+
+       		// 0.1초 후에 시간을 원래대로 되돌리는 타이머를 설정합니다.
+       		FTimerHandle TimerHandle_ResetTimeDilation;
+       		World->GetTimerManager().SetTimer(
+				   TimerHandle_ResetTimeDilation,
+				   this,
+				   &ACAttachment::ResetTimeDilation,
+				   0.05f, // 0.1초 후에 실행
+				   false // 반복하지 않음
+			   );
+       	}
+       	OnHitEvent();
        }
     }
-    // 디버그 드로잉 (기존 코드 유지)
-    // DrawDebugBox(GetWorld(), CurrentStartLocation, FVector(2.f), FColor::Blue, false, 0.1f);
-    // DrawDebugBox(GetWorld(), CurrentEndLocation, FVector(2.f), FColor::Red, false, 0.1f);
-    // DrawDebugBox(GetWorld(), PrevStartLocation, FVector(2.f), FColor::Cyan, false, 0.1f);
-    // DrawDebugBox(GetWorld(), PrevEndLocation, FVector(2.f), FColor::Magenta, false, 0.1f);
+
 }
 
 void ACAttachment::OnBeginEquip()
@@ -415,4 +426,35 @@ FVector ACAttachment::GetBezierCurveTangent(const FVector& P0, const FVector& P1
     // 2차 베지어 곡선 P(t) = (1-t)^2*P0 + 2(1-t)t*P1 + t^2*P2
     // 미분하면 P'(t) = 2(1-t)(P1-P0) + 2t(P2-P1)
     return 2 * (1 - T) * (P1 - P0) + 2 * T * (P2 - P1);
+}
+void ACAttachment::ResetTimeDilation()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		// 시간을 1.0배 (정상 속도)로 되돌립니다.
+		UGameplayStatics::SetGlobalTimeDilation(World, 1.0f);
+	}
+}
+void ACAttachment::OnHitEvent() // 예: 피격이 발생했을 때 호출되는 함수
+{
+	// ... (기존 피격 처리 로직) ...
+
+	// HitSoundCues 배열에 사운드 큐가 하나라도 있는지 확인
+	if (HitSoundCues.Num() > 0)
+	{
+		// 배열에서 랜덤한 인덱스 선택
+		int32 RandomIndex = FMath::RandRange(0, HitSoundCues.Num() - 1);
+
+		// 선택된 사운드 큐가 유효한지 확인
+		if (HitSoundCues[RandomIndex])
+		{
+			// 액터 위치에서 사운드 큐 재생
+			UGameplayStatics::PlaySoundAtLocation(
+				this, // 월드를 가져올 오브젝트 (보통 자기 자신)
+				HitSoundCues[RandomIndex], // 재생할 사운드 큐
+				GetActorLocation() // 사운드가 재생될 월드 위치
+			);
+		}
+	}
 }

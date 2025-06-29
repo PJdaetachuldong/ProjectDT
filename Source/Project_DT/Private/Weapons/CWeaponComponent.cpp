@@ -115,20 +115,19 @@ void UCWeaponComponent::SetFistMode ( )
 
 void UCWeaponComponent::SetKatanaMode ( )
 {
-		CheckFalse ( IsIdleMode ( ) );
+		// CheckFalse ( IsIdleMode ( ) );
 		SetMode ( EWeaponType::Katana );
 }
 
 void UCWeaponComponent::SetSwordMode ( )
 {
-		CheckFalse ( IsIdleMode ( ) );
-		SetMode ( EWeaponType::Sword );
+			SetMode ( EWeaponType::Sword );
 }
 
 void UCWeaponComponent::SetGreatSwordMode ( )
 {
 
-		CheckFalse ( IsIdleMode ( ) );
+		// CheckFalse ( IsIdleMode ( ) );
 		SetMode ( EWeaponType::GreatSword );
 }
 

@@ -32,6 +32,7 @@ ALHW_GameModeBase::ALHW_GameModeBase()
 	CHelpers::GetClass(&TutorialWidgetClass, AssetPaths::Tutorial);
 	CHelpers::GetAsset(&IntroSound, AssetPaths::IntroSound);
 	CHelpers::GetAsset(&MainSound, AssetPaths::MainSound);
+	CHelpers::GetAsset(&BossSound, AssetPaths::BossSound);
 
 	// 생성자에서 오디오 컴포넌트를 미리 생성합니다.
 	// 이는 GameMode 액터가 스폰될 때 함께 생성됩니다.
@@ -165,6 +166,11 @@ void ALHW_GameModeBase::PlayMusic_FadeIn(USoundCue* SoundToPlay, float FadeInDur
 		BackgroundMusicComponent->FadeIn(FadeInDuration, 1.0f, 0.0f); // 0.0 볼륨부터 1.0 볼륨까지 페이드 인
 		BackgroundMusicComponent->Play(); // 페이드 인 전에 Play를 호출해야 합니다.
 	}
+}
+
+void ALHW_GameModeBase::PlayBossSound_FadeIn()
+{
+	PlayMusic_FadeIn(BossSound,0.5f,0.5f);
 }
 
 void ALHW_GameModeBase::StopMusic_FadeOut(float FadeOutDuration)

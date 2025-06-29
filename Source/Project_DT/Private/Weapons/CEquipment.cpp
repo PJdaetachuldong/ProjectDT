@@ -17,17 +17,25 @@ void UCEquipment::BeginPlay ( class ACharacter* InOwner , TArray<FEquipmentData>
 
 void UCEquipment::Equip_Implementation ( )
 {
-	State->SetEquipMode ( );
+	State = CHelpers::GetComponent<UCStateComponent> ( OwnerCharacter );
+	
 
 	if ( Data[0].bCanMove == false )
 		Movement->Stop ( );
 
-	if ( !!Data[0].Montage )
-		OwnerCharacter->PlayAnimMontage ( Data[0].Montage , Data[0].PlayRate );
-	else {
-		Begin_Equip ( );
-		End_Equip ( );
-	}
+
+	// if ( !!Data[0].Montage ){
+		if (State->IsActionMode() or State->IsSubActionMode() or State->IsCounterMode())
+			OwnerCharacter->PlayAnimMontage ( Data[1].Montage , Data[1].PlayRate );
+		else
+			OwnerCharacter->PlayAnimMontage ( Data[0].Montage , Data[0].PlayRate );
+
+	State->SetEquipMode ( );
+	// }
+	// else {
+	// 	Begin_Equip ( );
+	// 	End_Equip ( );
+	// }
 	if ( Data[0].bUseControlRotation )
 		Movement->EnableControlRotation ( );
 }
@@ -45,10 +53,11 @@ void UCEquipment::Begin_Equip_Implementation ( )
 {
 	bBeginEquip = false;
 	bEquipped = true;
+	State->SetEquipMode();
+	
 	if ( OnEquipmentBeginEquip.IsBound ( ) )
 		OnEquipmentBeginEquip.Broadcast ( );
 	Movement->Move ( );
-	State->SetActionMode ( );
 
 }
 

@@ -11,7 +11,8 @@
 void UCSubAction_Skill1::Pressed ( )
 {
 		CheckTrue(State->IsSubActionMode());
-		CheckTrue ( State->IsIdleMode() or State->IsActionMode() );
+		CheckFalse (State->IsIdleMode());
+	
 		Super::Pressed ( );
 
 		State->SetActionMode ( );

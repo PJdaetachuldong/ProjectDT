@@ -52,6 +52,8 @@ namespace AssetPaths
     //사운드
     constexpr const TCHAR* IntroSound = TEXT("/Script/Engine.SoundCue'/Game/LHW/res/mp3/PerituneMaterial_World_OP_Cue.PerituneMaterial_World_OP_Cue'");
     constexpr const TCHAR* MainSound = TEXT("/Script/Engine.SoundCue'/Game/LHW/res/mp3/PerituneMaterial_Whisper3_loop_Cue.PerituneMaterial_Whisper3_loop_Cue'");
+    constexpr const TCHAR* BossSound = TEXT("/Script/Engine.SoundCue'/Game/LHW/res/mp3/videoplayback_Cue.videoplayback_Cue'");
+    
     constexpr const TCHAR* ParrySound = TEXT("/Script/Engine.SoundCue'/Game/Sword_Master_Battle_Sounds/WAVs/Sword_Block_15_Cue.Sword_Block_15_Cue'");
     
 }

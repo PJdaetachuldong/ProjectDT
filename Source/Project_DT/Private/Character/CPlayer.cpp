@@ -155,7 +155,14 @@ void ACPlayer::BeginPlay()
 void ACPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	// EStateType CurrentType = State->GetStateType();
+	//
+	// // Enum을 문자열로 변환
+	// FString EnumString = UEnum::GetValueAsString(CurrentType);
+	//
+	// // 인게임 화면에 출력
+	// GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, 
+	// 	FString::Printf(TEXT("Current State: %s"), *EnumString));
 }
 
 void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -186,11 +193,11 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction(IA_Heal, ETriggerEvent::Started, this, &ACPlayer::Healing);
 
 
-		playerInput->BindAction(IA_TestBtn, ETriggerEvent::Started, this, &ACPlayer::SelectWidgetOn);
-		playerInput->BindAction(IA_TestBtn, ETriggerEvent::Completed, this, &ACPlayer::SelectKatana);
+		// playerInput->BindAction(IA_TestBtn, ETriggerEvent::Started, this, &ACPlayer::SelectWidgetOn);
+		// playerInput->BindAction(IA_TestBtn, ETriggerEvent::Completed, this, &ACPlayer::SelectKatana);
 
-		playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Started, this, &ACPlayer::SelectWidgetOn);
-		playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Completed, this, &ACPlayer::SelectGreatSword);
+		// playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Started, this, &ACPlayer::SelectWidgetOn);
+		// playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Completed, this, &ACPlayer::SelectGreatSword);
 		// playerInput->BindAction(IA_Cheat, ETriggerEvent::Started, Montages, &UCMointageComponent::PlayDeadMode);
 		playerInput->BindAction(IA_Cheat2, ETriggerEvent::Started, this, &ACPlayer::TestHandler2);
 		playerInput->BindAction(IA_Select, ETriggerEvent::Started, this, &ACPlayer::SelectWeapon);
@@ -455,6 +462,7 @@ void ACPlayer::SelectGreatSword()
 }
 void ACPlayer::SelectWeapon()
 {
+	if (State->IsEquipMode())return;
 	if (Weapon->GetWeaponType() == EWeaponType::Katana) {
 		SelectGreatSword();
 	}

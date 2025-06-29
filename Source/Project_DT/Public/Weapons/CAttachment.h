@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Sound/SoundCue.h"
 #include "CAttachment.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE ( FAttachmentBeginCollision );
@@ -105,9 +106,15 @@ private:
 
 	// 베지어 곡선 접선 계산 함수 (필요 시 선언)
 	FVector GetBezierCurveTangent(const FVector& P0, const FVector& P1, const FVector& P2, float T);
+
+	void ResetTimeDilation();
+
+	void OnHitEvent();
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FRotator HorizontalRotation;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FRotator VerticalRotation;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TArray<USoundCue*> HitSoundCues;
 };

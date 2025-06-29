@@ -46,6 +46,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Audio")
 	void PlayMusic_FadeIn(USoundCue* SoundToPlay, float FadeInDuration = 2.0f, float VolumeMultiplier = 1.0f);
 
+	UFUNCTION(BlueprintCallable, Category = "Audio")
+	void PlayBossSound_FadeIn();
+
 private:
 	bool CheckMap=true;
 	
@@ -100,6 +103,8 @@ public:
 	class USoundCue* IntroSound;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class USoundCue* MainSound;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class USoundCue* BossSound;
 
 public:
 	UPROPERTY(EditAnywhere)

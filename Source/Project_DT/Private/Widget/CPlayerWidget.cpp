@@ -123,7 +123,8 @@ void UCPlayerWidget::KatanaEndSelect()
 {
 	
 	CheckNull(State);
-	State->SetIdleMode();
+	// State->SetIdleMode();
+
 	Weapon->SetKatanaMode();
 
 	IsCancelWidget=false;
@@ -134,7 +135,8 @@ void UCPlayerWidget::KatanaEndSelect()
 void UCPlayerWidget::GreatSwordEndSelect()
 {
 	CheckNull(State);
-	State->SetIdleMode();
+	// State->SetIdleMode();
+	
 	Weapon->SetGreatSwordMode();
 	IsCancelWidget=false;
 	UGameplayStatics::SetGlobalTimeDilation(OwnerCharacter, 1.0f);
