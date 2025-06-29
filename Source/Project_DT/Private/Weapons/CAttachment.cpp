@@ -231,10 +231,10 @@ if (HitEffect)
        }
     }
     // 디버그 드로잉 (기존 코드 유지)
-    DrawDebugBox(GetWorld(), CurrentStartLocation, FVector(2.f), FColor::Blue, false, 0.1f);
-    DrawDebugBox(GetWorld(), CurrentEndLocation, FVector(2.f), FColor::Red, false, 0.1f);
-    DrawDebugBox(GetWorld(), PrevStartLocation, FVector(2.f), FColor::Cyan, false, 0.1f);
-    DrawDebugBox(GetWorld(), PrevEndLocation, FVector(2.f), FColor::Magenta, false, 0.1f);
+    // DrawDebugBox(GetWorld(), CurrentStartLocation, FVector(2.f), FColor::Blue, false, 0.1f);
+    // DrawDebugBox(GetWorld(), CurrentEndLocation, FVector(2.f), FColor::Red, false, 0.1f);
+    // DrawDebugBox(GetWorld(), PrevStartLocation, FVector(2.f), FColor::Cyan, false, 0.1f);
+    // DrawDebugBox(GetWorld(), PrevEndLocation, FVector(2.f), FColor::Magenta, false, 0.1f);
 }
 
 void ACAttachment::OnBeginEquip()
@@ -371,11 +371,11 @@ void ACAttachment::PerformTriangleTrace(
     if (World->LineTraceSingleByChannel(Hit1, A, B, ECC_EngineTraceChannel5, Params))
     {
        OutHits.Add(Hit1);
-       DrawDebugLine(World, A, B, FColor::Red, false, 0.1f, 0, 2.f);
+       //DrawDebugLine(World, A, B, FColor::Red, false, 0.1f, 0, 2.f);
     }
     else
     {
-       DrawDebugLine(World, A, B, FColor::Green, false, 0.1f, 0, 1.f);
+       //DrawDebugLine(World, A, B, FColor::Green, false, 0.1f, 0, 1.f);
     }
 
     // B to C 트레이스
@@ -383,11 +383,11 @@ void ACAttachment::PerformTriangleTrace(
     if (World->LineTraceSingleByChannel(Hit2, B, C, ECC_EngineTraceChannel5, Params))
     {
        OutHits.Add(Hit2);
-       DrawDebugLine(World, B, C, FColor::Red, false, 0.1f, 0, 2.f);
+       //DrawDebugLine(World, B, C, FColor::Red, false, 0.1f, 0, 2.f);
     }
     else
     {
-       DrawDebugLine(World, B, C, FColor::Green, false, 0.1f, 0, 1.f);
+       //DrawDebugLine(World, B, C, FColor::Green, false, 0.1f, 0, 1.f);
     }
 
     // C to A 트레이스
@@ -395,11 +395,11 @@ void ACAttachment::PerformTriangleTrace(
     if (World->LineTraceSingleByChannel(Hit3, C, A, ECC_EngineTraceChannel5, Params))
     {
        OutHits.Add(Hit3);
-       DrawDebugLine(World, C, A, FColor::Red, false, 0.1f, 0, 2.f);
+       //DrawDebugLine(World, C, A, FColor::Red, false, 0.1f, 0, 2.f);
     }
     else
     {
-       DrawDebugLine(World, C, A, FColor::Green, false, 0.1f, 0, 1.f);
+       //DrawDebugLine(World, C, A, FColor::Green, false, 0.1f, 0, 1.f);
     }
 }
 
