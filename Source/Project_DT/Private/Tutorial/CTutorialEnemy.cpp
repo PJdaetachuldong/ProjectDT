@@ -113,6 +113,11 @@ void ACTutorialEnemy::Tick(float DeltaTime)
 
 	else if (State == ETutoState::CHASE)
 	{
+		if (IsInvincibility)
+		{
+			IsInvincibility = false;
+		}
+
 		if (FVector::Dist(Target->GetActorLocation(), GetActorLocation()) > AttackRange)
 		{
 			AI->MoveToLocation(Target->GetActorLocation());
@@ -174,6 +179,13 @@ void ACTutorialEnemy::SetShieldAmount(float value)
 
 void ACTutorialEnemy::Hitted()
 {
+	if(!IsATKGide && /*State == ETutoState::IDLE*/ IsInvincibility) return;
+
+	if (IsParry && !IsParrySuccess)
+	{
+		return;
+	}
+
 	//사망 상태면 안되게 막음
 	if (State == ETutoState::BREAK || State == ETutoState::DIE) return;
 
@@ -204,6 +216,16 @@ void ACTutorialEnemy::Hitted()
 
 float ACTutorialEnemy::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
+	if (!IsATKGide && /*State == ETutoState::IDLE*/ IsInvincibility)
+	{
+		return 0;
+	}
+
+	if (IsParry && !IsParrySuccess)
+	{
+		return 0;
+	}
+
 	float damage = Super::TakeDamage(TakeDamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	Damage.Power = damage;
 	Damage.Character = Cast<ACharacter>(EventInstigator->GetPawn());

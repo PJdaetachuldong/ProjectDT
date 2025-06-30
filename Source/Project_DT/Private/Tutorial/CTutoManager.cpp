@@ -25,6 +25,11 @@ ACTutoManager::ACTutoManager()
 	StartCollision->SetCollisionProfileName(L"BossWeapon");
 	StartCollision->OnComponentBeginOverlap.AddDynamic(this, &ACTutoManager::SpawnStart);
 
+	UIRemoveCollision = CreateDefaultSubobject<UBoxComponent>(L"UIRemoveColli");
+	UIRemoveCollision->SetupAttachment(SceneComp);
+	UIRemoveCollision->SetCollisionProfileName(L"BossWeapon");
+	UIRemoveCollision->OnComponentBeginOverlap.AddDynamic(this, &ACTutoManager::UIRemoteOverlap);
+
 	FirstTransform = CreateDefaultSubobject<USceneComponent>(L"FirstTransform");
 	FirstTransform->SetupAttachment(SceneComp);
 
@@ -158,6 +163,48 @@ void ACTutoManager::SpawnStart(UPrimitiveComponent* OverlappedComponent, AActor*
 		AIController = GetWorld()->SpawnActor<AAIController>(AAIController::StaticClass());
 
 		StartCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void ACTutoManager::UIRemoteOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ACPlayer* Player = Cast<ACPlayer>(OtherActor);
+
+	if (Player)
+	{
+		ALHW_GameModeBase* GameMode = Cast<ALHW_GameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+
+		IsAllSpawn = true;
+
+		if (SpawnTutoEnemy1 && !IsFirstTutoEnemyDIE)
+		{
+			SpawnTutoEnemy1->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			SpawnTutoEnemy1->GetMesh()->SetVisibility(false);
+
+			SpawnTutoEnemy1->SetActorLocation(FVector(0, -200, 0));
+
+			GameMode->TutorialWidget->SetSwitcherIndex(0);
+		}
+		
+		if (SpawnTutoEnemy2 && !IsSecondTutoEnemyDIE)
+		{
+			SpawnTutoEnemy2->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			SpawnTutoEnemy2->GetMesh()->SetVisibility(false);
+
+			SpawnTutoEnemy2->SetActorLocation(FVector(0, -200, 0));
+
+			GameMode->TutorialWidget->SetSwitcherIndex(0);
+		}
+
+		if (SpawnTutoEnemy3 && SpawnTutoEnemy3->CurHP > 0)
+		{
+			SpawnTutoEnemy3->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			SpawnTutoEnemy3->GetMesh()->SetVisibility(false);
+
+			SpawnTutoEnemy3->SetActorLocation(FVector(0, -200, 0));
+
+			GameMode->TutorialWidget->SetSwitcherIndex(0);
+		}
 	}
 }
 

@@ -6,6 +6,7 @@
 #include "Tutorial/CTutorialEnemy.h"
 #include "LHW_GameModeBase.h"
 #include "Widget/CTutorialWidget.h"
+#include "Tutorial/CTutoWeapon.h"
 
 FString UCTutoAnimNotify_ClickUI::GetNotifyName_Implementation() const
 {
@@ -28,8 +29,18 @@ void UCTutoAnimNotify_ClickUI::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 
 	if (GameMode)
 	{
-		GameMode->TutorialWidget->SetSwitcherIndex(5);
+		if (My->IsParry && My->IsParrySuccess)
+		{
+			GameMode->TutorialWidget->SetSwitcherIndex(5);
 
-		UGameplayStatics::SetGlobalTimeDilation(My->Target->GetController()->GetWorld(), 0.0f);
+			UGameplayStatics::SetGlobalTimeDilation(My->Target->GetController()->GetWorld(), 0.0f);
+		}
+
+		else if(!My->IsParry)
+		{
+			GameMode->TutorialWidget->SetSwitcherIndex(5);
+
+			UGameplayStatics::SetGlobalTimeDilation(My->Target->GetController()->GetWorld(), 0.0f);
+		}
 	}
 }

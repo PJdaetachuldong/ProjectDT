@@ -64,6 +64,8 @@ void ACTutoWeapon::TutoPlayerDamage()
 	{
 		IsTutoPlayerParring = false;
 
+		MyOwner->IsParrySuccess = true;
+
 		return;
 	}
 

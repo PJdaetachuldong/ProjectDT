@@ -106,6 +106,10 @@ public:
 
 	void DIESetLocation();
 
+	bool IsInvincibility = true;
+
+	bool IsParrySuccess = false;
+
 	void ShakeEffect();
 	void UpdateShakeEffect(float DeltaTime);
 	void StopShake();

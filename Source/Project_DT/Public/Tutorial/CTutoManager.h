@@ -38,6 +38,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* StartCollision;
 
+	UPROPERTY(EditAnywhere)
+	class UBoxComponent* UIRemoveCollision;
+
 	UPROPERTY(EditAnywhere, Category = SpawnLocation)
 	class USceneComponent* FirstTransform;
 
@@ -61,4 +64,7 @@ public:
 
 	UFUNCTION()
 	void SpawnStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void UIRemoteOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };
