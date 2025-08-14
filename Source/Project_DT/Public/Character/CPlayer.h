@@ -29,17 +29,18 @@ private:
 	class UCWeaponComponent* Weapon;
 
 	UPROPERTY(VisibleAnywhere)
-	class UCMointageComponent* Montages;
+	class UCMointageComponent* Montages; //Component
 
 	UPROPERTY(VisibleAnywhere)
 	class UCStateComponent* State;
 	
 	UPROPERTY(VisibleAnywhere)
 	class UCCameraActionComponent* CameraAction;
-
+	//모션 워핑 컴포넌트
 	UPROPERTY(VisibleAnywhere)
 	class UMotionWarpingComponent* MotionWarping;
 
+	//컷씬 기능 관련 컴포넌트 
 	UPROPERTY(VisibleAnywhere)
 	class UCProductionComponent* Production;
 	

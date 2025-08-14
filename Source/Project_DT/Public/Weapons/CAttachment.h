@@ -18,7 +18,6 @@ class PROJECT_DT_API ACAttachment : public AActor
 {
 	GENERATED_BODY()
 
-
 protected:
 	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
 	class USceneComponent* Root;

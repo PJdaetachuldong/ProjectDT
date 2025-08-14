@@ -42,8 +42,6 @@ private:
 	class UCCameraActionComponent* CameraComp;
 
 
-	
-
 
 private:
     UFUNCTION(BlueprintCallable)
