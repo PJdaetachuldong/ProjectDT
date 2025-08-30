@@ -138,6 +138,10 @@ private:
 	UFUNCTION()
 	void OnParryDetected(EParryState ParryDirection);
 
+private:
+	void OnGuard();
+	void OffGuard();
+
 public:
 	void End_BackStep() override;
 	private:
@@ -159,5 +163,8 @@ private:
 	void SelectWidgetOn();
 	void SelectKatana();
 	void SelectGreatSword();
+
+public:
+	bool bGuardHit =false;
 	
 };

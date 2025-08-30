@@ -47,7 +47,7 @@ void UCPlayerWidget::NativeConstruct()
 void UCPlayerWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 {
 	Super::NativeTick(MyGeometry, DeltaTime);
-	if (WeaponSelect->GetRenderOpacity()>=0.4f)
+	if (WeaponSelect->GetRenderOpacity()>=0.05f)
 		IsAllowChangeWeapon=true;
 	else
 		IsAllowChangeWeapon=false;
@@ -100,28 +100,26 @@ void UCPlayerWidget::FadeInSelectWindow()
 
 void UCPlayerWidget::FadeOutSelectWindow()
 {
-	if (WeaponSelect->GetRenderOpacity()>0.01f)
-		PlayAnimationReverse(WeaponSelectPadeAnimation);
+		PlayAnimation(WeaponSelectPadeOutAnimation);
 }
 
 void UCPlayerWidget::SelectKatana()
 {
 	CheckTrue(Weapon->IsKatanaMode());
-	if (GetIsAllowChangeWeapon())
+	// if (GetIsAllowChangeWeapon())
 		PlayAnimation(SelectSecondAnimation);
 }
 
 void UCPlayerWidget::SelectGreatSword()
 {
 	CheckTrue(Weapon->IsGreatSwordMode());
-	if (GetIsAllowChangeWeapon())
+	// if (GetIsAllowChangeWeapon())
 		PlayAnimation(SelectThirdAnimation);
 }
 
 void UCPlayerWidget::KatanaEndSelect()
 {
 	Weapon->SetKatanaMode();
-	FadeOutSelectWindow();
 	IsCancelWidget=false;
 	UGameplayStatics::SetGlobalTimeDilation(OwnerCharacter, 1.0f);
 	PlayAnimation(WeaponGageRotationKatana);
@@ -130,7 +128,6 @@ void UCPlayerWidget::KatanaEndSelect()
 void UCPlayerWidget::GreatSwordEndSelect()
 {
 	Weapon->SetGreatSwordMode();
-	FadeOutSelectWindow();
 	IsCancelWidget=false;
 	UGameplayStatics::SetGlobalTimeDilation(OwnerCharacter, 1.0f);
 	PlayAnimation(WeaponGageRotationGreatSword);
@@ -144,6 +141,7 @@ void UCPlayerWidget::CancelHandler()
 void UCPlayerWidget::TurnOnLight()
 {
 	PlayAnimation(LightOnOff, 0.f, 1, EUMGSequencePlayMode::Forward, 1.0f);
+	FadeOutSelectWindow();
 }
 
 void UCPlayerWidget::ShowStatusUI()

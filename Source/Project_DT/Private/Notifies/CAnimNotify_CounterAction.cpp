@@ -18,8 +18,12 @@ void UCAnimNotify_CounterAction::Notify ( USkeletalMeshComponent* MeshComp , UAn
 	CheckNull ( MeshComp->GetOwner ( ) );
 
 	UCWeaponComponent* weapon = CHelpers::GetComponent<UCWeaponComponent> ( MeshComp->GetOwner ( ) );
+	UCStateComponent* State = CHelpers::GetComponent<UCStateComponent> ( MeshComp->GetOwner ( ) );
 	CheckNull ( weapon );
+	CheckNull ( State );
 	CheckNull ( weapon->GetDoAction ( ) );
 
 	weapon->GetDoAction ( )->CounterAction ( );
+    State->SetCounterMode();
+	
 }

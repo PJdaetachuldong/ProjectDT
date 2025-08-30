@@ -31,6 +31,7 @@ void UCPlayerAnim::NativeUpdateAnimation ( float DeltaSeconds )
 	Trajectory = Owner->Trajectory;
 	WeaponType = Weapon->GetWeaponType ( );
 	StateType = State->GetStateType ( );
+	isGuardHit=Owner->bGuardHit;
 }
 
 void UCPlayerAnim::OnWeaponTypeChanged ( EWeaponType InPrevType , EWeaponType InNewType )

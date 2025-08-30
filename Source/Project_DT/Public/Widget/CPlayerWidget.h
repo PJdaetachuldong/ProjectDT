@@ -76,6 +76,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
 	class UWidgetAnimation* WeaponSelectPadeAnimation;
+	
+	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
+	class UWidgetAnimation* WeaponSelectPadeOutAnimation;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidgetAnim),Transient,BlueprintReadWrite)
 	class UWidgetAnimation* WeaponGageRotationKatana;

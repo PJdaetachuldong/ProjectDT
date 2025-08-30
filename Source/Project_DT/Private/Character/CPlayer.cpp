@@ -146,7 +146,7 @@ void ACPlayer::BeginPlay()
 	}
 
 	State->OnStateTypeChanged.AddDynamic(this, &ACPlayer::OnStateTypeChanged);
-	Parry->OnParryDetected.AddDynamic(this, &ACPlayer::OnParryDetected);
+	// Parry->OnParryDetected.AddDynamic(this, &ACPlayer::OnParryDetected);
 	Montages->PlayBackStepMode(EActState::DodgeB);
 	
 }
@@ -180,14 +180,16 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		                        &UCWeaponComponent::SubAction_Skill_Pressed);
 		playerInput->BindAction(IA_SpecialAttack, ETriggerEvent::Completed, Weapon,
 		                        &UCWeaponComponent::SubAction_Skill_Released);
-		playerInput->BindAction(IA_Guard, ETriggerEvent::Started, Weapon, &UCWeaponComponent::SubAction_Pressed);
-		playerInput->BindAction(IA_Guard, ETriggerEvent::Completed, Weapon, &UCWeaponComponent::SubAction_Released);
-
-		playerInput->BindAction(IA_TestBtn, ETriggerEvent::Completed, this, &ACPlayer::SelectKatana);
-		playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Completed, this, &ACPlayer::SelectGreatSword);
+		playerInput->BindAction(IA_Guard, ETriggerEvent::Started, this, &ACPlayer::OnGuard);
+		playerInput->BindAction(IA_Guard, ETriggerEvent::Completed, this, &ACPlayer::OffGuard);
 		playerInput->BindAction(IA_Heal, ETriggerEvent::Started, this, &ACPlayer::Healing);
-		playerInput->BindAction(IA_Select, ETriggerEvent::Started, this, &ACPlayer::SelectWidgetOn);
-		playerInput->BindAction(IA_Select, ETriggerEvent::Completed, this, &ACPlayer::SelectWidgetOff);
+		
+
+		playerInput->BindAction(IA_TestBtn, ETriggerEvent::Started, this, &ACPlayer::SelectWidgetOn);
+		playerInput->BindAction(IA_TestBtn, ETriggerEvent::Completed, this, &ACPlayer::SelectKatana);
+		
+		playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Started, this, &ACPlayer::SelectWidgetOn);
+		playerInput->BindAction(IA_TestBtn2, ETriggerEvent::Completed, this, &ACPlayer::SelectGreatSword);
 	}
 }
 
@@ -285,11 +287,10 @@ void ACPlayer::DeadHandler()
 
 void ACPlayer::Healing()
 {
+	CheckFalse(State->IsIdleMode());
 	if (Status->GetMana()<40)return;
 	Montages->PlayHealingMode();
-	Status->Heal(50);
-	//Status->Damage(50);
-	Status->UseMana(40);
+
 }
 
 void ACPlayer::Jump()
@@ -300,6 +301,15 @@ void ACPlayer::Jump()
 void ACPlayer::OnParryDetected(EParryState ParryDirection)
 {
 	Weapon->OnParry(ParryDirection);
+}
+
+void ACPlayer::OnGuard()
+{
+	Parry->OnParry();
+}
+
+void ACPlayer::OffGuard()
+{
 }
 
 void ACPlayer::End_BackStep()
@@ -313,13 +323,11 @@ void ACPlayer::Hitted()
 	if (Weapon->GetDoAction())
 		if (Weapon->GetDoAction()->RetrunParry())return;
 	
-
 	if (Status->Damage(Damage.Power) <= 0)
 	{
 		State->SetDeadMode();
 		return;
 	}
-	State->SetHittedMode();
 	Damage.Power = 0;
 
 	if (!!Damage.Event && !!Damage.Event->HitData)
@@ -350,13 +358,6 @@ float ACPlayer::TakeDamage(float TakeDamageAmount, struct FDamageEvent const& Da
 	Damage.Character = Cast<ACharacter>(EventInstigator->GetPawn());
 	Damage.Causer = DamageCauser;
 	Damage.Event = (FActionDamageEvent*)&DamageEvent;
-	ACBossWeapon* Enemy = Cast<ACBossWeapon>(DamageCauser);
-	CLog::Log(Enemy->GetName());
-	if (Enemy)
-		if (Enemy->CheckGuardBool())
-		{
-			if (Parry->GetGuardState())return 0;
-		}
 	if (Dodge->ReturnPerfectDodge())return 0;
 	Hitted();
 
@@ -373,19 +374,25 @@ void ACPlayer::SelectWidgetOn()
 void ACPlayer::SelectWidgetOff()
 {
 	if (UWidget->GetIsCancelWidget())return;
-	UWidget->FadeOutSelectWindow();
 	UGameplayStatics::SetGlobalTimeDilation(GetOwner(), 1.0f);
 }
 
 void ACPlayer::SelectKatana()
 {
 	CheckNull(UWidget);
+	if(Weapon->GetWeaponType()==EWeaponType::Katana)
+		UWidget->FadeOutSelectWindow();
+		
+	SelectWidgetOff();
 	UWidget->SelectKatana();
 }
 
 void ACPlayer::SelectGreatSword()
 {
 	CheckNull(UWidget);
+	if(Weapon->GetWeaponType()==EWeaponType::GreatSword)
+		UWidget->FadeOutSelectWindow();
+	SelectWidgetOff();
 	UWidget->SelectGreatSword();
 }
  
